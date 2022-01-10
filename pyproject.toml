@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "compressai-train"
+version = "0.1.0"
+description = "CompressAI trainer"
+authors = ["InterDigital AI Lab <compressai@interdigital.com>"]
+license = "BSD 3-Clause Clear License"
+
+[tool.poetry.dependencies]
+python = ">=3.8.0,<3.10"
+aim = "^3.6.3"
+catalyst = "22.02.1"
+compressai = "^1.1.9"
+hydra-core = "^1.2"
+matplotlib = "^3.4.3"
+numpy = "^1.21.2"
+omegaconf = "^2.2.2"
+Pillow = "^8.3.2"
+pytest = "^6.2.5"
+pytorch-msssim = "^0.2.1"
+PyYAML = "^5.4.1"
+scipy = "^1.6.0"
+seaborn = "^0.11.2"
+tensorboard = "^2.9.0"
+toml = "^0.10.2"
+torch = "^1.8.0"
+torchvision = "^0.9.0"
+typing-extensions = "^3.10.0"
+
+[tool.poetry.dev-dependencies]
+black = "^22.3.0"
+isort = "^5.10.1"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

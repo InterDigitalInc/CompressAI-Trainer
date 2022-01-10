@@ -1,0 +1,17 @@
+.aim/
+__pycache__/
+data/
+log*/
+mlruns/
+out/
+
+*.jpg
+*.json
+*.log
+*.npy
+*.patch
+*.png
+*.pth
+*.pth.tar
+*.tar
+*.tif

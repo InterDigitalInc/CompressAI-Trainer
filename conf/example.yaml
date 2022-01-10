@@ -1,0 +1,137 @@
+variables:
+  common_root: ".."
+  checkpoints_root: "${common_root}/checkpoints"
+  datasets_root: "${common_root}/datasets"
+  logs_root: "${common_root}/logs"
+
+dataset:
+  train:
+    type: "Vimeo90kDataset"
+    config:
+      root: "${variables.datasets_root}/vimeo90k/vimeo_triplet"
+      split: "train"
+    loader:
+      shuffle: True
+      batch_size: 8
+      num_workers: 2
+    settings:
+      patch_size: [ 256, 256, ]
+    transforms:
+      - "RandomCrop": {size: "${dataset.train.settings.patch_size}"}
+      - "ToTensor": {}
+  valid:
+    type: "Vimeo90kDataset"
+    config:
+      root: "${variables.datasets_root}/vimeo90k/vimeo_triplet"
+      split: "valid"
+    loader:
+      shuffle: False
+      batch_size: 8
+      num_workers: 2
+    settings:
+      patch_size: [ 256, 256, ]
+    transforms:
+      - "CenterCrop": {size: "${dataset.valid.settings.patch_size}"}
+      - "ToTensor": {}
+  infer:
+    type: "ImageFolder"
+    config:
+      root: "${variables.datasets_root}/kodak"
+      split: "test"
+    loader:
+      shuffle: False
+      batch_size: 1
+      num_workers: 2
+    settings:
+    transforms:
+      - "ToTensor": {}
+
+model:
+  name: "bmshj2018-factorized"
+
+hp:
+  # Qualities 1-5
+  N: 128
+  M: 192
+  # Qualities 6-8
+  # N: 192
+  # M: 320
+
+exp:
+  name: "example_experiment"
+
+engine:
+  logdir: "${variables.logs_root}/engine/${env.aim.run_hash}"
+  num_epochs: 400
+  valid_loader: "valid"
+  valid_metric: "loss"
+  minimize_valid_metric: True
+  verbose: True
+  check: False
+  callbacks:
+    - type: "SchedulerCallback"
+      scheduler_key: "net"
+      mode: "epoch"
+      loader_key: "valid"
+      metric_key: "loss"
+    - type: "CheckpointCallback"
+      logdir: "${variables.checkpoints_root}/${env.aim.run_hash}"
+      loader_key: "valid"
+      metric_key: "loss"
+      minimize: True
+      mode: "runner"
+      resume_runner:  # "${variables.checkpoints_root}/${env.aim.run_hash}/runner.last.pth"
+      topk: 10000     # number of top-k checkpoints to keep
+    - type: "EarlyStoppingCallback"
+      patience: 50
+      loader_key: "valid"
+      metric_key: "loss"
+      minimize: True
+
+  loggers:
+    aim: {}
+    tensorboard:
+      logdir: "${variables.logs_root}/tensorboard/${env.aim.run_hash}"
+
+optimizer:
+  type: "net_aux"
+  net:
+    lr: 0.0001
+  aux:
+    lr: 0.001
+  grad_clip:
+    max_norm: 1.0
+
+scheduler:
+  net:
+    type: "ReduceLROnPlateau"
+    mode: "min"
+
+criterion:
+  type: "RateDistortionLoss"
+  lmbda: 0.001
+
+misc:
+  device: "cuda"
+  seed: 1234
+
+env:
+  aim:
+    repo: "${variables.logs_root}/aim"
+    run_hash:
+  git:
+    compressai:
+      branch:
+      hash:
+      main_hash:
+    compressai_train:
+      branch:
+      hash:
+      main_hash:
+  slurm:
+    account:
+    job_id:
+    job_name:
+  system:
+    hostname:
+    username:
