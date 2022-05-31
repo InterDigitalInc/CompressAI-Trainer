@@ -2,12 +2,10 @@ from __future__ import annotations
 
 from typing import Any
 
-import aim
 import catalyst
 import catalyst.callbacks
 import catalyst.utils
 import hydra
-from catalyst import dl
 from omegaconf import DictConfig
 
 from compressai_train.config import (
@@ -20,7 +18,6 @@ from compressai_train.config import (
     get_env,
 )
 from compressai_train.runners import ImageCompressionRunner
-from compressai_train.utils.catalyst import AimLogger
 
 
 def setup(conf: DictConfig) -> dict[str, Any]:
@@ -52,23 +49,7 @@ def main(conf: DictConfig):
 
     runner = ImageCompressionRunner()
 
-    runner.train(
-        **engine_kwargs,
-        loggers={
-            "aim": AimLogger(
-                experiment=conf.exp.name,
-                run_hash=conf.env.aim.run_hash,
-                repo=aim.Repo(
-                    conf.env.aim.repo,
-                    init=not aim.Repo.exists(conf.env.aim.repo),
-                ),
-                **conf.engine.loggers.aim,
-            ),
-            "tensorboard": dl.TensorboardLogger(
-                **conf.engine.loggers.tensorboard,
-            ),
-        },
-    )
+    runner.train(**engine_kwargs)
 
 
 if __name__ == "__main__":

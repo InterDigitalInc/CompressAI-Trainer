@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any, Dict, cast
 
+import aim
+from catalyst import dl
 from omegaconf import DictConfig, OmegaConf
 
 from compressai_train.registry.catalyst import CALLBACKS
@@ -14,6 +16,7 @@ from compressai_train.typing.torch import (
     TOptimizer,
     TScheduler,
 )
+from compressai_train.utils.catalyst import AimLogger
 
 from .dataset import create_dataset_tuple
 
@@ -70,4 +73,18 @@ def configure_engine(conf: DictConfig) -> dict[str, Any]:
         create_callback(cb_conf) for cb_conf in conf.engine.callbacks
     ]
     engine_kwargs["hparams"] = OmegaConf.to_container(conf)
+    engine_kwargs["loggers"] = {
+        "aim": AimLogger(
+            experiment=conf.exp.name,
+            run_hash=conf.env.aim.run_hash,
+            repo=aim.Repo(
+                conf.env.aim.repo,
+                init=not aim.Repo.exists(conf.env.aim.repo),
+            ),
+            **conf.engine.loggers.aim,
+        ),
+        "tensorboard": dl.TensorboardLogger(
+            **conf.engine.loggers.tensorboard,
+        ),
+    }
     return engine_kwargs
