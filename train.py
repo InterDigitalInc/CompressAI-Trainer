@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-import argparse
-import sys
-from typing import Any, cast
+from typing import Any
 
 import aim
 import catalyst
@@ -10,7 +8,7 @@ import catalyst.callbacks
 import catalyst.utils
 import hydra
 from catalyst import dl
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import DictConfig
 
 from compressai_train.config import (
     configure_engine,
@@ -46,23 +44,6 @@ def setup(conf: DictConfig) -> dict[str, Any]:
     )
 
     return {**d, **configure_engine(conf)}
-
-
-def build_args(parser) -> argparse.ArgumentParser:
-    parser.add_argument(
-        "--config",
-        type=str,
-        required=True,
-        help="Path to config file",
-    )
-    return parser
-
-
-def parse_args(argv: list[str]) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Example training script.")
-    build_args(parser)
-    args = parser.parse_args(argv)
-    return args
 
 
 @hydra.main(version_base=None)
