@@ -74,9 +74,7 @@ def main(argv=None):
 
     engine_kwargs = setup(conf)
 
-    runner = ImageCompressionRunner(
-        config_path=args.config,
-    )
+    runner = ImageCompressionRunner()
 
     runner.train(
         **engine_kwargs,

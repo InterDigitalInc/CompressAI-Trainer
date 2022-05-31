@@ -22,15 +22,13 @@ class ImageCompressionRunner(dl.Runner):
     optimizer: dict[str, TorchOptimizer]
     metrics: dict[str, metrics.IMetric]
 
-    def __init__(self, *args, config_path=None, **kwargs):
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._config_path = config_path
 
     def on_experiment_start(self, runner):
         super().on_experiment_start(runner)
         self._log_git_diff(compressai)
         self._log_git_diff(compressai_train)
-        self.log_artifact("config", path_to_artifact=self._config_path)
 
     def on_loader_start(self, runner):
         super().on_loader_start(runner)
