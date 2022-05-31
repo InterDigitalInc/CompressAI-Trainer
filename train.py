@@ -8,6 +8,7 @@ import aim
 import catalyst
 import catalyst.callbacks
 import catalyst.utils
+import hydra
 from catalyst import dl
 from omegaconf import DictConfig, OmegaConf
 
@@ -64,14 +65,8 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     return args
 
 
-def main(argv=None):
-    if argv is None:
-        argv = sys.argv[1:]
-
-    args = parse_args(argv)
-    conf = OmegaConf.load(args.config)
-    conf = cast(DictConfig, conf)
-
+@hydra.main(version_base=None)
+def main(conf: DictConfig):
     engine_kwargs = setup(conf)
 
     runner = ImageCompressionRunner()

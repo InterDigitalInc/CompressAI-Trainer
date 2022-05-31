@@ -1,8 +1,8 @@
 variables:
   common_root: ".."
-  checkpoints_root: "${common_root}/checkpoints"
-  datasets_root: "${common_root}/datasets"
-  logs_root: "${common_root}/logs"
+  checkpoints_root: "${variables.common_root}/checkpoints"
+  datasets_root: "${variables.common_root}/datasets"
+  logs_root: "${variables.common_root}/logs"
 
 dataset:
   train:
