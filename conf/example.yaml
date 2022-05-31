@@ -87,7 +87,6 @@ engine:
       loader_key: "valid"
       metric_key: "loss"
       minimize: True
-
   loggers:
     aim: {}
     tensorboard:
