@@ -46,9 +46,7 @@ def setup(conf: DictConfig) -> dict[str, Any]:
 @hydra.main(version_base=None)
 def main(conf: DictConfig):
     engine_kwargs = setup(conf)
-
     runner = ImageCompressionRunner()
-
     runner.train(**engine_kwargs)
 
 
