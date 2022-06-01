@@ -1,0 +1,2 @@
+type: "RateDistortionLoss"
+lmbda: 0.001

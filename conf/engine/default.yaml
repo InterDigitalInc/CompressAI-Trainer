@@ -1,0 +1,30 @@
+logdir: "${variables.logs_root}/engine/${env.aim.run_hash}"
+num_epochs: 400
+valid_loader: "valid"
+valid_metric: "loss"
+minimize_valid_metric: True
+verbose: True
+check: False
+callbacks:
+  - type: "SchedulerCallback"
+    scheduler_key: "net"
+    mode: "epoch"
+    loader_key: "valid"
+    metric_key: "loss"
+  - type: "CheckpointCallback"
+    logdir: "${variables.checkpoints_root}/${env.aim.run_hash}"
+    loader_key: "valid"
+    metric_key: "loss"
+    minimize: True
+    mode: "runner"
+    resume_runner:  # "${variables.checkpoints_root}/${env.aim.run_hash}/runner.last.pth"
+    topk: 10000     # number of top-k checkpoints to keep
+  - type: "EarlyStoppingCallback"
+    patience: 50
+    loader_key: "valid"
+    metric_key: "loss"
+    minimize: True
+loggers:
+  aim: {}
+  tensorboard:
+    logdir: "${variables.logs_root}/tensorboard/${env.aim.run_hash}"

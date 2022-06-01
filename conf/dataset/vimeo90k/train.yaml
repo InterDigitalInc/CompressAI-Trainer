@@ -1,0 +1,14 @@
+train:
+  type: "Vimeo90kDataset"
+  config:
+    root: "${variables.datasets_root}/vimeo90k/vimeo_triplet"
+    split: "train"
+  loader:
+    shuffle: True
+    batch_size: 8
+    num_workers: 2
+  settings:
+    patch_size: [ 256, 256, ]
+  transforms:
+    - "RandomCrop": {size: "${dataset.train.settings.patch_size}"}
+    - "ToTensor": {}

@@ -1,0 +1,14 @@
+valid:
+  type: "Vimeo90kDataset"
+  config:
+    root: "${variables.datasets_root}/vimeo90k/vimeo_triplet"
+    split: "valid"
+  loader:
+    shuffle: False
+    batch_size: 8
+    num_workers: 2
+  settings:
+    patch_size: [ 256, 256, ]
+  transforms:
+    - "CenterCrop": {size: "${dataset.valid.settings.patch_size}"}
+    - "ToTensor": {}

@@ -1,0 +1,19 @@
+aim:
+  repo: "${variables.logs_root}/aim"
+  run_hash:
+git:
+  compressai:
+    branch:
+    hash:
+    main_hash:
+  compressai_train:
+    branch:
+    hash:
+    main_hash:
+slurm:
+  account:
+  job_id:
+  job_name:
+system:
+  hostname:
+  username:
