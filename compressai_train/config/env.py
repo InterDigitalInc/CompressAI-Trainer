@@ -13,17 +13,17 @@ from compressai_train.utils import git, system
 
 
 def get_env(conf: DictConfig) -> dict[str, Any]:
-    compressai_path = next(iter(compressai.__path__))
-    compressai_train_path = next(iter(compressai_train.__path__))
-
     return {
         "aim": {
             "repo": conf.env.aim.repo,
             "run_hash": generate_run_hash(),
         },
         "git": {
-            "compressai": _get_git_repo_info(compressai_path),
-            "compressai_train": _get_git_repo_info(compressai_train_path),
+            package.__name__: _get_git_repo_info(
+                package.__path__[0],
+                conf.env.git[package.__name__].main_branch,
+            )
+            for package in [compressai, compressai_train]
         },
         "slurm": {
             "account": os.environ.get("SLURM_JOB_ACCOUNT"),
@@ -38,10 +38,10 @@ def get_env(conf: DictConfig) -> dict[str, Any]:
     }
 
 
-def _get_git_repo_info(root: str) -> dict[str, str]:
+def _get_git_repo_info(root: str, main_branch: str) -> dict[str, str]:
     return {
         "hash": git.commit_hash(root=root)[:7],
-        "main_hash": git.common_ancestor_hash(root=root)[:7],
+        "main_hash": git.common_ancestor_hash(root=root, rev2=main_branch)[:7],
         "branch": git.branch_name(root=root),
     }
 

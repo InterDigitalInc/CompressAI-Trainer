@@ -5,10 +5,12 @@ git:
   compressai:
     branch:
     hash:
+    main_branch: "master"
     main_hash:
   compressai_train:
     branch:
     hash:
+    main_branch: "main"
     main_hash:
 slurm:
   account:
