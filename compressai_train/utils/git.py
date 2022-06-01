@@ -1,4 +1,5 @@
 import os
+import subprocess
 from shlex import quote
 from typing import Iterable, Optional
 
@@ -21,7 +22,9 @@ def common_ancestor_hash(
         f"<(git -C {quote(root)} rev-list --first-parent {quote(rev2)}) | "
         "sed -ne 's/^ //p' | head -1"
     )
-    return os.popen(cmd).read().rstrip()
+    cmd = ["bash", "-c", cmd]
+    result = subprocess.run(cmd, capture_output=True, check=True).stdout
+    return result.decode("utf-8").rstrip()
 
 
 def commit_hash(rev: str = "HEAD", short: bool = False, root: str = ".") -> str:
