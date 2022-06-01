@@ -41,5 +41,4 @@ Note down the address (e.g. `http://127.0.0.1:43800`) and then on the local mach
 ssh -L 8080:127.0.0.1:43800 USERNAME@REMOTE_SERVER
 ```
 
-Now open up a web browser on the local machine and navigate to `http://localhost:8080`. The Aim UI should now be accessible.
-
+Now open up a web browser on the local machine and navigate to [`http://localhost:8080`](http://localhost:8080). The Aim UI should now be accessible.
