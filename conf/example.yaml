@@ -10,7 +10,7 @@ defaults:
   - _self_
 
 variables:
-  common_root: ".."
+  common_root: "."
   checkpoints_root: "${variables.common_root}/checkpoints"
   datasets_root: "${variables.common_root}/datasets"
   logs_root: "${variables.common_root}/logs"
