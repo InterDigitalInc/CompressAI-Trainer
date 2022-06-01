@@ -4,6 +4,7 @@ data/
 log*/
 mlruns/
 out/
+outputs/
 
 *.jpg
 *.json
