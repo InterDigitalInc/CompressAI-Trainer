@@ -22,7 +22,7 @@ from .dataset import create_dataset_tuple
 
 
 def create_callback(conf: DictConfig) -> TCallback:
-    kwargs = OmegaConf.to_container(conf)
+    kwargs = OmegaConf.to_container(conf, resolve=True)
     kwargs = cast(Dict[str, Any], kwargs)
     del kwargs["type"]
     callback = CALLBACKS[conf.type](**kwargs)
@@ -30,7 +30,7 @@ def create_callback(conf: DictConfig) -> TCallback:
 
 
 def create_criterion(conf: DictConfig) -> TCriterion:
-    kwargs = OmegaConf.to_container(conf)
+    kwargs = OmegaConf.to_container(conf, resolve=True)
     kwargs = cast(Dict[str, Any], kwargs)
     del kwargs["type"]
     criterion = CRITERIONS[conf.type](**kwargs)
@@ -58,7 +58,7 @@ def create_scheduler(conf: DictConfig, optimizer: TOptimizer) -> dict[str, TSche
     scheduler = {}
     for optim_key, optim_conf in conf.items():
         optim_key = cast(str, optim_key)
-        kwargs = OmegaConf.to_container(optim_conf)
+        kwargs = OmegaConf.to_container(optim_conf, resolve=True)
         kwargs = cast(Dict[str, Any], kwargs)
         del kwargs["type"]
         kwargs["optimizer"] = optimizer[optim_key]
@@ -67,12 +67,12 @@ def create_scheduler(conf: DictConfig, optimizer: TOptimizer) -> dict[str, TSche
 
 
 def configure_engine(conf: DictConfig) -> dict[str, Any]:
-    engine_kwargs = OmegaConf.to_container(conf.engine)
+    engine_kwargs = OmegaConf.to_container(conf.engine, resolve=True)
     engine_kwargs = cast(Dict[str, Any], engine_kwargs)
     engine_kwargs["callbacks"] = [
         create_callback(cb_conf) for cb_conf in conf.engine.callbacks
     ]
-    engine_kwargs["hparams"] = OmegaConf.to_container(conf)
+    engine_kwargs["hparams"] = OmegaConf.to_container(conf, resolve=True)
     engine_kwargs["loggers"] = {
         "aim": AimLogger(
             experiment=conf.exp.name,
