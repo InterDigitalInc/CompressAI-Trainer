@@ -28,14 +28,13 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from .config import (
-    configure_engine,
-    create_callback,
     create_criterion,
     create_dataloaders,
     create_model,
     create_optimizer,
     create_scheduler,
 )
+from .engine import configure_engine, create_callback
 from .env import get_env
 
 __all__ = [
