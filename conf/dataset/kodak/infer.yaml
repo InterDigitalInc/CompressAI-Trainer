@@ -1,7 +1,7 @@
 infer:
   type: "ImageFolder"
   config:
-    root: "${variables.datasets_root}/kodak"
+    root: "${paths.datasets}/kodak"
     split: "test"
   loader:
     shuffle: False

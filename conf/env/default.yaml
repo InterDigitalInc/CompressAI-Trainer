@@ -1,5 +1,5 @@
 aim:
-  repo: "${variables.logs_root}/aim"
+  repo: "${paths.aim}"
   run_hash:
 git:
   compressai:

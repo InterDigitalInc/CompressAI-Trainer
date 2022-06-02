@@ -1,4 +1,5 @@
 defaults:
+  - paths: default
   - env: default
   - engine: default
   - criterion: RateDistortionLoss
@@ -9,12 +10,6 @@ defaults:
   - dataset/kodak/infer@dataset
   - misc: default
   - _self_
-
-variables:
-  common_root: "."
-  checkpoints_root: "${variables.common_root}/checkpoints"
-  datasets_root: "${variables.common_root}/datasets"
-  logs_root: "${variables.common_root}/logs"
 
 exp:
   name: "example_experiment"

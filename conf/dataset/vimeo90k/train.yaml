@@ -1,7 +1,7 @@
 train:
   type: "Vimeo90kDataset"
   config:
-    root: "${variables.datasets_root}/vimeo90k/vimeo_triplet"
+    root: "${paths.datasets}/vimeo90k/vimeo_triplet"
     split: "train"
   loader:
     shuffle: True

@@ -1,0 +1,8 @@
+_common_root:   "."
+_run_hash:      "${env.aim.run_hash}"
+datasets:       "${._common_root}/datasets"
+checkpoints:    "${._common_root}/checkpoints/${._run_hash}"
+aim:            "${._common_root}/logs/aim"
+configs:        "${._common_root}/logs/configs/${._run_hash}"
+engine:         "${._common_root}/logs/engine/${._run_hash}"
+tensorboard:    "${._common_root}/logs/tensorboard/${._run_hash}"
