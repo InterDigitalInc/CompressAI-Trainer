@@ -1,2 +1,3 @@
+config_logdir: "${variables.logs_root}/configs/${env.aim.run_hash}"
 device: "cuda"
 seed: 1234
