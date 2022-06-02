@@ -33,6 +33,7 @@ from .config import (
     create_model,
     create_optimizer,
     create_scheduler,
+    write_config,
 )
 from .engine import configure_engine, create_callback
 from .env import get_env
@@ -46,4 +47,5 @@ __all__ = [
     "create_optimizer",
     "create_scheduler",
     "get_env",
+    "write_config",
 ]

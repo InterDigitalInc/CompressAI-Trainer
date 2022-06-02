@@ -29,6 +29,7 @@
 
 from __future__ import annotations
 
+import os
 from typing import Any, Dict, cast
 
 from omegaconf import DictConfig, OmegaConf
@@ -80,3 +81,12 @@ def create_scheduler(conf: DictConfig, optimizer: TOptimizer) -> dict[str, TSche
         kwargs["optimizer"] = optimizer[optim_key]
         scheduler[optim_key] = SCHEDULERS[optim_conf.type](**kwargs)
     return scheduler
+
+
+def write_config(conf: DictConfig):
+    logdir = conf.misc.config_logdir
+    filename = "config.yaml"
+    s = OmegaConf.to_yaml(conf, resolve=False)
+    os.makedirs(logdir, exist_ok=True)
+    with open(os.path.join(logdir, filename), "w") as f:
+        f.write(s)

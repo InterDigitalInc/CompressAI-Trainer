@@ -45,6 +45,7 @@ from compressai_train.config import (
     create_optimizer,
     create_scheduler,
     get_env,
+    write_config,
 )
 from compressai_train.runners import ImageCompressionRunner
 
@@ -54,6 +55,7 @@ def setup(conf: DictConfig) -> dict[str, Any]:
     catalyst.utils.prepare_cudnn(benchmark=True)
 
     conf.env = get_env(conf)
+    write_config(conf)
 
     model = create_model(conf)
     criterion = create_criterion(conf.criterion)

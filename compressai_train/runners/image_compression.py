@@ -29,13 +29,11 @@
 
 from __future__ import annotations
 
-import os
 from types import ModuleType
 from typing import cast
 
 import compressai
 import torch
-import yaml
 from catalyst import dl, metrics
 from catalyst.typing import TorchCriterion, TorchOptimizer
 from compressai.models.google import CompressionModel
@@ -58,7 +56,6 @@ class ImageCompressionRunner(dl.Runner):
 
     def on_experiment_start(self, runner):
         super().on_experiment_start(runner)
-        self._log_config()
         self._log_git_diff(compressai)
         self._log_git_diff(compressai_train)
 
@@ -160,13 +157,6 @@ class ImageCompressionRunner(dl.Runner):
         max_norm = grad_clip.get("max_norm", None)
         if max_norm is not None:
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm)
-
-    def _log_config(self):
-        logdir = self.hparams["misc"]["config_logdir"]
-        filename = "config.yaml"
-        os.makedirs(logdir, exist_ok=True)
-        with open(os.path.join(logdir, filename), "w") as f:
-            yaml.safe_dump(self.hparams, f)
 
     def _log_git_diff(self, package: ModuleType):
         logdir = self.hparams["engine"]["logdir"]
