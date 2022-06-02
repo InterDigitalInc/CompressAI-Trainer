@@ -29,6 +29,7 @@
 
 from __future__ import annotations
 
+import os
 from types import ModuleType
 from typing import cast
 
@@ -159,8 +160,9 @@ class ImageCompressionRunner(dl.Runner):
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm)
 
     def _log_git_diff(self, package: ModuleType):
-        logdir = self.hparams["engine"]["logdir"]
-        diff_path = f"{logdir}/{package.__name__}.patch"
+        src_root = self.hparams["paths"]["src"]
+        diff_path = os.path.join(src_root, f"{package.__name__}.patch")
+        os.makedirs(src_root, exist_ok=True)
         with open(diff_path, "w") as f:
             f.write(git.diff(root=package.__path__[0]))
         self.log_artifact(
