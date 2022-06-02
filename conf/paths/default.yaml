@@ -1,7 +1,7 @@
 _common_root:   "./logs"
 _run_hash:      "${env.aim.run_hash}"
 datasets:       "${._common_root}/datasets"
-aim:            "${._common_root}/aim"
+aim:            "${._common_root}/aim/main"
 checkpoints:    "${._common_root}/runs/${._run_hash}/checkpoints"
 configs:        "${._common_root}/runs/${._run_hash}/configs"
 engine:         "${._common_root}/runs/${._run_hash}/engine"
