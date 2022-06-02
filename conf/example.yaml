@@ -7,6 +7,7 @@ defaults:
   - dataset/vimeo90k/train@dataset
   - dataset/vimeo90k/valid@dataset
   - dataset/kodak/infer@dataset
+  - misc: default
   - _self_
 
 variables:
@@ -28,7 +29,3 @@ hp:
   # Qualities 6-8
   # N: 192
   # M: 320
-
-misc:
-  device: "cuda"
-  seed: 1234
