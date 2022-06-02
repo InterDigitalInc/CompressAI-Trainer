@@ -10,5 +10,5 @@ train:
   settings:
     patch_size: [ 256, 256, ]
   transforms:
-    - "RandomCrop": {size: "${dataset.train.settings.patch_size}"}
+    - "RandomCrop": {size: "${....settings.patch_size}"}
     - "ToTensor": {}

@@ -10,5 +10,5 @@ valid:
   settings:
     patch_size: [ 256, 256, ]
   transforms:
-    - "CenterCrop": {size: "${dataset.valid.settings.patch_size}"}
+    - "CenterCrop": {size: "${....settings.patch_size}"}
     - "ToTensor": {}
