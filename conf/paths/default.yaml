@@ -1,4 +1,4 @@
-_common_root:   "."
+_common_root:   "./logs"
 _run_hash:      "${env.aim.run_hash}"
 datasets:       "${._common_root}/datasets"
 aim:            "${._common_root}/aim"
