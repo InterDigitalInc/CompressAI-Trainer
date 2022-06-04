@@ -31,6 +31,7 @@ from __future__ import annotations
 
 import os
 import warnings
+from shlex import quote
 from types import ModuleType
 from typing import TYPE_CHECKING, OrderedDict, cast
 
@@ -116,9 +117,10 @@ def _check_git_hash(conf: DictConfig, package: ModuleType, warn_only: bool):
         return
 
     message = (
-        f"Git hash for {name} does not match config. "
-        f"Expected: {expected}. "
-        f"Actual: {actual}."
+        f"Git hash for {name} does not match config.\n"
+        f"Expected: {expected}.\n"
+        f"Actual: {actual}.\n"
+        f"Please run: (cd {quote(path)} && git checkout {expected})"
     )
 
     if warn_only:
