@@ -37,6 +37,12 @@ from .config import (
 )
 from .engine import configure_engine, create_callback
 from .env import get_env
+from .load import (
+    get_checkpoint_path,
+    load_checkpoint,
+    load_config,
+    state_dict_from_checkpoint,
+)
 
 __all__ = [
     "configure_engine",
@@ -48,4 +54,9 @@ __all__ = [
     "create_scheduler",
     "get_env",
     "write_config",
+
+    "get_checkpoint_path",
+    "load_checkpoint",
+    "load_config",
+    "state_dict_from_checkpoint",
 ]
