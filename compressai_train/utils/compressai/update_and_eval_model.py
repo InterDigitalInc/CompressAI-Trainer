@@ -27,25 +27,33 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import re
+
 import compressai.utils.eval_model.__main__ as eval_model_main
 import torch
 import torch.nn as nn
 from compressai.zoo import load_state_dict
 from compressai.zoo.image import model_architectures as architectures
 
+from compressai_train.config import load_checkpoint as load_checkpoint_from_config
+from compressai_train.config import load_config, state_dict_from_checkpoint
+
 
 def load_checkpoint(arch: str, checkpoint_path: str) -> nn.Module:
-    ckpt = torch.load(checkpoint_path)
-    state_dict = (
-        ckpt["model_state_dict"]
-        if "model_state_dict" in ckpt
-        else ckpt["state_dict"]
-        if "state_dict" in ckpt
-        else ckpt
-    )
-    state_dict = load_state_dict(state_dict)
-    model = architectures[arch].from_state_dict(state_dict).eval()
-    model.update(force=True)
+    # NOTE a bit hacky
+    pattern = r"^(?P<run_root>.*/runs/(?P<run_hash>[^/]*))/checkpoints/.*$"
+    m = re.match(pattern, checkpoint_path)
+
+    if m is None:
+        ckpt = torch.load(checkpoint_path)
+        state_dict = state_dict_from_checkpoint(ckpt)
+        state_dict = load_state_dict(state_dict)  # for pre-trained models
+        model = architectures[arch].from_state_dict(state_dict).eval()
+    else:
+        run_root = m.group("run_root")
+        conf = load_config(run_root)
+        model = load_checkpoint_from_config(conf).eval()
+    model.update(force=True)  # type: ignore
     return model
 
 
