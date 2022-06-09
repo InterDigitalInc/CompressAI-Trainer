@@ -24,3 +24,7 @@ hp:
   # Qualities 6-8
   # N: 192
   # M: 320
+
+paths:
+  # To resume from checkpoint, override paths.checkpoint:
+  checkpoint: "${.checkpoints}/runner.last.pth"

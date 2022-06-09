@@ -17,7 +17,7 @@ callbacks:
     metric_key: "loss"
     minimize: True
     mode: "runner"
-    resume_runner:  # "${.logdir}/runner.last.pth"
+    resume_runner:  "${paths.checkpoint}"
     topk: 10000     # number of top-k checkpoints to keep
   - type: "EarlyStoppingCallback"
     patience: 50
