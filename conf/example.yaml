@@ -25,6 +25,6 @@ hp:
   # N: 192
   # M: 320
 
-paths:
-  # To resume from checkpoint, override paths.checkpoint:
-  # checkpoint: "${.checkpoints}/runner.last.pth"
+# To resume from checkpoint, override paths.checkpoint:
+# paths:
+#   checkpoint: "${.checkpoints}/runner.last.pth"
