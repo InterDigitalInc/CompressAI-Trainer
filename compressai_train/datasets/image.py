@@ -74,6 +74,7 @@ class Vimeo90kDataset(Dataset):
             self.samples = [
                 f"{root}/sequences/{line.rstrip()}/im{idx}.png"
                 for line in f
+                if line.strip() != ""
                 for idx in range(1, tuplet + 1)
             ]
 
