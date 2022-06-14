@@ -1,5 +1,5 @@
 logdir: "${paths.engine}"
-num_epochs: 400
+num_epochs: 500
 valid_loader: "valid"
 valid_metric: "loss"
 minimize_valid_metric: True
