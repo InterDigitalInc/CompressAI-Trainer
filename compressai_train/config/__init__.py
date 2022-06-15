@@ -33,7 +33,6 @@ from .config import (
     create_model,
     create_optimizer,
     create_scheduler,
-    write_config,
 )
 from .engine import configure_engine, create_callback
 from .env import get_env
@@ -43,6 +42,7 @@ from .load import (
     load_config,
     state_dict_from_checkpoint,
 )
+from .outputs import write_config, write_git_diff, write_outputs
 
 __all__ = [
     "configure_engine",
@@ -54,6 +54,8 @@ __all__ = [
     "create_scheduler",
     "get_env",
     "write_config",
+    "write_git_diff",
+    "write_outputs",
     "get_checkpoint_path",
     "load_checkpoint",
     "load_config",

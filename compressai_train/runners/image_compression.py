@@ -41,7 +41,6 @@ from compressai.models.google import CompressionModel
 from torch.nn.parallel import DataParallel, DistributedDataParallel
 
 import compressai_train
-from compressai_train.utils import git
 from compressai_train.utils.metrics import compute_metrics
 from compressai_train.utils.utils import inference
 
@@ -162,13 +161,7 @@ class ImageCompressionRunner(dl.Runner):
     def _log_git_diff(self, package: ModuleType):
         src_root = self.hparams["paths"]["src"]
         diff_path = os.path.join(src_root, f"{package.__name__}.patch")
-        os.makedirs(src_root, exist_ok=True)
-        with open(diff_path, "w") as f:
-            f.write(git.diff(root=package.__path__[0]))
-        self.log_artifact(
-            f"{package.__name__}_git_diff",
-            path_to_artifact=diff_path,
-        )
+        self.log_artifact(f"{package.__name__}_git_diff", path_to_artifact=diff_path)
 
 
 def _coerce_item(x):

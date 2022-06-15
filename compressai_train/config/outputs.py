@@ -27,56 +27,36 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from __future__ import annotations
+import os
+from types import ModuleType
+from typing import Any, Mapping
 
-from typing import Any, Dict, cast
-
+import compressai
 from omegaconf import DictConfig, OmegaConf
 
-from compressai_train.registry.torch import CRITERIONS, MODELS, OPTIMIZERS, SCHEDULERS
-from compressai_train.typing.torch import (
-    TCriterion,
-    TDataLoader,
-    TModel,
-    TOptimizer,
-    TScheduler,
-)
-
-from .dataset import create_dataset_tuple
+import compressai_train
+from compressai_train.utils import git
 
 
-def create_criterion(conf: DictConfig) -> TCriterion:
-    kwargs = OmegaConf.to_container(conf, resolve=True)
-    kwargs = cast(Dict[str, Any], kwargs)
-    del kwargs["type"]
-    criterion = CRITERIONS[conf.type](**kwargs)
-    return criterion
+def write_outputs(conf: DictConfig):
+    write_config(conf)
+    write_git_diff(conf, compressai_train)
+    write_git_diff(conf, compressai)
 
 
-def create_dataloaders(conf: DictConfig) -> dict[str, TDataLoader]:
-    return {
-        key: create_dataset_tuple(conf.dataset[key], conf.misc.device).loader
-        for key in ["train", "valid", "infer"]
-    }
+def write_config(conf: DictConfig):
+    logdir = conf.misc.config_logdir
+    filename = "config.yaml"
+    s = OmegaConf.to_yaml(conf, resolve=False)
+    os.makedirs(logdir, exist_ok=True)
+    with open(os.path.join(logdir, filename), "w") as f:
+        f.write(s)
 
 
-def create_model(conf: DictConfig) -> TModel:
-    model = MODELS[conf.model.name](**conf.hp)
-    model = model.to(conf.misc.device)
-    return model
-
-
-def create_optimizer(conf: DictConfig, net: TModel) -> TOptimizer:
-    return OPTIMIZERS[conf.type](conf, net)
-
-
-def create_scheduler(conf: DictConfig, optimizer: TOptimizer) -> dict[str, TScheduler]:
-    scheduler = {}
-    for optim_key, optim_conf in conf.items():
-        optim_key = cast(str, optim_key)
-        kwargs = OmegaConf.to_container(optim_conf, resolve=True)
-        kwargs = cast(Dict[str, Any], kwargs)
-        del kwargs["type"]
-        kwargs["optimizer"] = optimizer[optim_key]
-        scheduler[optim_key] = SCHEDULERS[optim_conf.type](**kwargs)
-    return scheduler
+def write_git_diff(conf: Mapping[str, Any], package: ModuleType) -> str:
+    src_root = conf["paths"]["src"]
+    diff_path = os.path.join(src_root, f"{package.__name__}.patch")
+    os.makedirs(src_root, exist_ok=True)
+    with open(diff_path, "w") as f:
+        f.write(git.diff(root=package.__path__[0]))
+    return diff_path
