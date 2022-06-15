@@ -41,10 +41,12 @@ from compressai.models.google import CompressionModel
 from torch.nn.parallel import DataParallel, DistributedDataParallel
 
 import compressai_train
+from compressai_train.registry import register_runner
 from compressai_train.utils.metrics import compute_metrics
 from compressai_train.utils.utils import inference
 
 
+@register_runner("ImageCompressionRunner")
 class ImageCompressionRunner(dl.Runner):
     criterion: TorchCriterion
     model: CompressionModel | DataParallel | DistributedDataParallel

@@ -2,6 +2,7 @@ defaults:
   - paths: default
   - env: default
   - engine: default
+  - runner: ImageCompressionRunner
   - criterion: RateDistortionLoss
   - optimizer: net_aux
   - scheduler: ReduceLROnPlateau

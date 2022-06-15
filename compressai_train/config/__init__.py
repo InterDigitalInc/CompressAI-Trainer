@@ -34,7 +34,7 @@ from .config import (
     create_optimizer,
     create_scheduler,
 )
-from .engine import configure_engine, create_callback
+from .engine import configure_engine, create_callback, create_runner
 from .env import get_env
 from .load import (
     get_checkpoint_path,
@@ -51,6 +51,7 @@ __all__ = [
     "create_dataloaders",
     "create_model",
     "create_optimizer",
+    "create_runner",
     "create_scheduler",
     "get_env",
     "write_config",

@@ -43,14 +43,15 @@ from compressai_train.config import (
     create_dataloaders,
     create_model,
     create_optimizer,
+    create_runner,
     create_scheduler,
     get_env,
     write_outputs,
 )
-from compressai_train.runners import ImageCompressionRunner
+from compressai_train.typing import TRunner
 
 
-def setup(conf: DictConfig) -> dict[str, Any]:
+def setup(conf: DictConfig) -> tuple[TRunner, dict[str, Any]]:
     catalyst.utils.set_global_seed(conf.misc.seed)
     catalyst.utils.prepare_cudnn(benchmark=True)
 
@@ -70,14 +71,16 @@ def setup(conf: DictConfig) -> dict[str, Any]:
         scheduler=scheduler,
         loaders=loaders,
     )
+    engine_kwargs = {**d, **configure_engine(conf)}
 
-    return {**d, **configure_engine(conf)}
+    runner = create_runner(conf)
+
+    return runner, engine_kwargs
 
 
 @hydra.main(version_base=None)
 def main(conf: DictConfig):
-    engine_kwargs = setup(conf)
-    runner = ImageCompressionRunner()
+    runner, engine_kwargs = setup(conf)
     runner.train(**engine_kwargs)
 
 

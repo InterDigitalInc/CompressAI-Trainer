@@ -27,6 +27,12 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from typing import TypeVar
+
 import catalyst.callbacks
+import catalyst.dl
 
 TCallback = catalyst.callbacks.Callback
+TRunner = catalyst.dl.Runner
+
+TRunner_b = TypeVar("TRunner_b", bound=TRunner)

@@ -35,8 +35,8 @@ import aim
 from catalyst import dl
 from omegaconf import DictConfig, OmegaConf
 
-from compressai_train.registry.catalyst import CALLBACKS
-from compressai_train.typing.catalyst import TCallback
+from compressai_train.registry.catalyst import CALLBACKS, RUNNERS
+from compressai_train.typing.catalyst import TCallback, TRunner
 from compressai_train.utils.catalyst import AimLogger
 
 
@@ -46,6 +46,14 @@ def create_callback(conf: DictConfig) -> TCallback:
     del kwargs["type"]
     callback = CALLBACKS[conf.type](**kwargs)
     return callback
+
+
+def create_runner(conf: DictConfig) -> TRunner:
+    kwargs = OmegaConf.to_container(conf, resolve=True)
+    kwargs = cast(Dict[str, Any], kwargs)
+    del kwargs["type"]
+    runner = RUNNERS[conf.type](**kwargs)
+    return runner
 
 
 def configure_engine(conf: DictConfig) -> dict[str, Any]:

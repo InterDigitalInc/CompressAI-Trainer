@@ -27,7 +27,7 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from .catalyst import CALLBACKS
+from .catalyst import CALLBACKS, RUNNERS, register_runner
 from .torch import (
     CRITERIONS,
     DATASETS,
@@ -44,6 +44,8 @@ from .torchvision import TRANSFORMS
 
 __all__ = [
     "CALLBACKS",
+    "RUNNERS",
+    "register_runner",
     "CRITERIONS",
     "DATASETS",
     "MODELS",
