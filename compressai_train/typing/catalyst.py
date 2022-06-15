@@ -35,4 +35,5 @@ import catalyst.dl
 TCallback = catalyst.callbacks.Callback
 TRunner = catalyst.dl.Runner
 
+TCallback_b = TypeVar("TCallback_b", bound=TCallback)
 TRunner_b = TypeVar("TRunner_b", bound=TRunner)

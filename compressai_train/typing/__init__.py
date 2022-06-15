@@ -27,7 +27,7 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from .catalyst import TCallback, TRunner, TRunner_b
+from .catalyst import TCallback, TCallback_b, TRunner, TRunner_b
 from .torch import (
     TCriterion,
     TCriterion_b,
@@ -45,6 +45,7 @@ from .torch import (
 
 __all__ = [
     "TCallback",
+    "TCallback_b",
     "TRunner",
     "TRunner_b",
     "TCriterion",

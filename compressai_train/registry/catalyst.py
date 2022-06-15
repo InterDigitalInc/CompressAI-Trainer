@@ -31,12 +31,22 @@ from __future__ import annotations
 
 import catalyst.callbacks
 
-from compressai_train.typing import TRunner, TRunner_b
+from compressai_train.typing import TCallback, TCallback_b, TRunner, TRunner_b
 
-CALLBACKS: dict[str, type[catalyst.callbacks.Callback]] = {
+CALLBACKS: dict[str, type[TCallback]] = {
     k: v for k, v in catalyst.callbacks.__dict__.items() if k[0].isupper()
 }
 RUNNERS: dict[str, type[TRunner]] = {}
+
+
+def register_callback(name: str):
+    """Decorator for registering a callback."""
+
+    def decorator(cls: type[TCallback_b]) -> type[TCallback_b]:
+        CALLBACKS[name] = cls
+        return cls
+
+    return decorator
 
 
 def register_runner(name: str):
