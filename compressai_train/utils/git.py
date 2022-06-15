@@ -51,8 +51,8 @@ def common_ancestor_hash(
         f"<(git -C {quote(root)} rev-list --first-parent {quote(rev2)}) | "
         "sed -ne 's/^ //p' | head -1"
     )
-    cmd = ["bash", "-c", cmd]
-    result = subprocess.run(cmd, capture_output=True, check=True).stdout
+    cmd_args = ["bash", "-c", cmd]
+    result = subprocess.run(cmd_args, capture_output=True, check=True).stdout
     return result.decode("utf-8").rstrip()
 
 
