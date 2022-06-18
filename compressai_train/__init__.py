@@ -27,15 +27,28 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from . import datasets, losses, models, optimizers, registry, runners, utils, zoo
+from . import (
+    config,
+    datasets,
+    losses,
+    models,
+    optimizers,
+    registry,
+    runners,
+    typing,
+    utils,
+    zoo,
+)
 
 __all__ = [
+    "config",
     "datasets",
     "losses",
     "models",
     "optimizers",
     "registry",
     "runners",
+    "typing",
     "utils",
     "zoo",
 ]
