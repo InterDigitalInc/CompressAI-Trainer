@@ -29,10 +29,7 @@
 
 from . import (
     config,
-    datasets,
-    losses,
     models,
-    optimizers,
     registry,
     runners,
     typing,
@@ -42,10 +39,7 @@ from . import (
 
 __all__ = [
     "config",
-    "datasets",
-    "losses",
     "models",
-    "optimizers",
     "registry",
     "runners",
     "typing",
