@@ -27,19 +27,20 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from __future__ import annotations
+from compressai.typing.torch import (
+    TCriterion,
+    TDataLoader,
+    TDataset,
+    TModel,
+    TOptimizer,
+    TScheduler,
+)
 
-from typing import Dict, Union
-
-import torch.nn as nn
-from torch.optim import Optimizer
-from torch.optim.lr_scheduler import ReduceLROnPlateau, _LRScheduler
-from torch.utils.data import DataLoader, Dataset
-
-TCriterion = nn.Module
-TDataLoader = DataLoader
-TDataset = Dataset
-TModel = nn.Module
-TOptimizer = Dict[str, Optimizer]
-TScheduler = Union[ReduceLROnPlateau, _LRScheduler]
-TSchedulerDict = Dict[str, TScheduler]
+__all__ = [
+    "TCriterion",
+    "TDataLoader",
+    "TDataset",
+    "TModel",
+    "TOptimizer",
+    "TScheduler",
+]

@@ -27,81 +27,28 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from __future__ import annotations
-
-from typing import Callable, TypeVar
-
-import compressai.zoo.image as cai_zoo_img
-from torch.optim import lr_scheduler
-
-from compressai_train.typing import (
-    TCriterion,
-    TDataset,
-    TModel,
-    TOptimizer,
-    TScheduler,
+from compressai.registry.torch import (
+    CRITERIONS,
+    DATASETS,
+    MODELS,
+    OPTIMIZERS,
+    SCHEDULERS,
+    register_criterion,
+    register_dataset,
+    register_model,
+    register_optimizer,
+    register_scheduler,
 )
 
-CRITERIONS: dict[str, Callable[..., TCriterion]] = {}
-DATASETS: dict[str, Callable[..., TDataset]] = {}
-MODELS: dict[str, Callable[..., TModel]] = cai_zoo_img.model_architectures
-OPTIMIZERS: dict[str, Callable[..., TOptimizer]] = {}
-SCHEDULERS: dict[str, Callable[..., TScheduler]] = {
-    k: v for k, v in lr_scheduler.__dict__.items() if k[0].isupper()
-}
-
-TCriterion_b = TypeVar("TCriterion_b", bound=TCriterion)
-TDataset_b = TypeVar("TDataset_b", bound=TDataset)
-TModel_b = TypeVar("TModel_b", bound=TModel)
-TOptimizer_b = TypeVar("TOptimizer_b", bound=TOptimizer)
-TScheduler_b = TypeVar("TScheduler_b", bound=TScheduler)
-
-
-def register_criterion(name: str):
-    """Decorator for registering a criterion."""
-
-    def decorator(cls: type[TCriterion_b]) -> type[TCriterion_b]:
-        CRITERIONS[name] = cls
-        return cls
-
-    return decorator
-
-
-def register_dataset(name: str):
-    """Decorator for registering a dataset."""
-
-    def decorator(cls: type[TDataset_b]) -> type[TDataset_b]:
-        DATASETS[name] = cls
-        return cls
-
-    return decorator
-
-
-def register_model(name: str):
-    """Decorator for registering a model."""
-
-    def decorator(cls: type[TModel_b]) -> type[TModel_b]:
-        MODELS[name] = cls
-        return cls
-
-    return decorator
-
-
-def register_optimizer(name: str):
-    """Decorator for registering a optimizer."""
-
-    def decorator(cls: Callable[..., TOptimizer_b]) -> Callable[..., TOptimizer_b]:
-        OPTIMIZERS[name] = cls
-        return cls
-
-    return decorator
-
-
-def register_scheduler(name: str):
-    """Decorator for registering a scheduler."""
-
-    def decorator(cls: type[TScheduler_b]) -> type[TScheduler_b]:
-        SCHEDULERS[name] = cls
-        return cls
-
-    return decorator
+__all__ = [
+    "CRITERIONS",
+    "DATASETS",
+    "MODELS",
+    "OPTIMIZERS",
+    "SCHEDULERS",
+    "register_criterion",
+    "register_dataset",
+    "register_model",
+    "register_optimizer",
+    "register_scheduler",
+]
