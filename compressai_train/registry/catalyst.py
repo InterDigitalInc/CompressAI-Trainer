@@ -29,14 +29,19 @@
 
 from __future__ import annotations
 
+from typing import TypeVar
+
 import catalyst.callbacks
 
-from compressai_train.typing import TCallback, TCallback_b, TRunner, TRunner_b
+from compressai_train.typing import TCallback, TRunner
 
 CALLBACKS: dict[str, type[TCallback]] = {
     k: v for k, v in catalyst.callbacks.__dict__.items() if k[0].isupper()
 }
 RUNNERS: dict[str, type[TRunner]] = {}
+
+TCallback_b = TypeVar("TCallback_b", bound=TCallback)
+TRunner_b = TypeVar("TRunner_b", bound=TRunner)
 
 
 def register_callback(name: str):

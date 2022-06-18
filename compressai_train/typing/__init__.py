@@ -27,38 +27,24 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from .catalyst import TCallback, TCallback_b, TRunner, TRunner_b
+from .catalyst import TCallback, TRunner
 from .torch import (
     TCriterion,
-    TCriterion_b,
     TDataLoader,
-    TDataLoader_b,
     TDataset,
-    TDataset_b,
     TModel,
-    TModel_b,
     TOptimizer,
-    TOptimizer_b,
     TScheduler,
-    TScheduler_b,
 )
 
 __all__ = [
     "TCallback",
-    "TCallback_b",
     "TRunner",
-    "TRunner_b",
     "TCriterion",
-    "TCriterion_b",
     "TDataLoader",
-    "TDataLoader_b",
     "TDataset",
-    "TDataset_b",
     "TModel",
-    "TModel_b",
     "TOptimizer",
-    "TOptimizer_b",
     "TRunner",
     "TScheduler",
-    "TScheduler_b",
 ]

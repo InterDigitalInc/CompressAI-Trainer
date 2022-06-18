@@ -29,22 +29,17 @@
 
 from __future__ import annotations
 
-from typing import Callable
+from typing import Callable, TypeVar
 
 import compressai.zoo.image as cai_zoo_img
 from torch.optim import lr_scheduler
 
 from compressai_train.typing import (
     TCriterion,
-    TCriterion_b,
     TDataset,
-    TDataset_b,
     TModel,
-    TModel_b,
     TOptimizer,
-    TOptimizer_b,
     TScheduler,
-    TScheduler_b,
 )
 
 CRITERIONS: dict[str, Callable[..., TCriterion]] = {}
@@ -54,6 +49,12 @@ OPTIMIZERS: dict[str, Callable[..., TOptimizer]] = {}
 SCHEDULERS: dict[str, Callable[..., TScheduler]] = {
     k: v for k, v in lr_scheduler.__dict__.items() if k[0].isupper()
 }
+
+TCriterion_b = TypeVar("TCriterion_b", bound=TCriterion)
+TDataset_b = TypeVar("TDataset_b", bound=TDataset)
+TModel_b = TypeVar("TModel_b", bound=TModel)
+TOptimizer_b = TypeVar("TOptimizer_b", bound=TOptimizer)
+TScheduler_b = TypeVar("TScheduler_b", bound=TScheduler)
 
 
 def register_criterion(name: str):
