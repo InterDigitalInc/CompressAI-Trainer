@@ -44,17 +44,17 @@ from .torchvision import TRANSFORMS
 
 __all__ = [
     "CALLBACKS",
-    "RUNNERS",
-    "register_runner",
     "CRITERIONS",
     "DATASETS",
     "MODELS",
     "OPTIMIZERS",
+    "RUNNERS",
     "SCHEDULERS",
+    "TRANSFORMS",
     "register_criterion",
     "register_dataset",
     "register_model",
     "register_optimizer",
+    "register_runner",
     "register_scheduler",
-    "TRANSFORMS",
 ]
