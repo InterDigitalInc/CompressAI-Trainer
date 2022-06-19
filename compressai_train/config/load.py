@@ -33,7 +33,7 @@ import os
 import warnings
 from shlex import quote
 from types import ModuleType
-from typing import TYPE_CHECKING, OrderedDict, cast
+from typing import TYPE_CHECKING, Any, Mapping, OrderedDict, cast
 
 import catalyst.utils
 import compressai
@@ -82,7 +82,7 @@ def load_checkpoint(conf: DictConfig) -> nn.Module:
     return model
 
 
-def get_checkpoint_path(conf: DictConfig | dict, epoch: int | str = "best") -> str:
+def get_checkpoint_path(conf: Mapping[str, Any], epoch: int | str = "best") -> str:
     """Returns checkpoint path for given conf.
 
     Args:
