@@ -73,7 +73,7 @@ def setup(conf: DictConfig) -> tuple[TRunner, dict[str, Any]]:
     )
     engine_kwargs = {**d, **configure_engine(conf)}
 
-    runner = create_runner(conf)
+    runner = create_runner(conf.runner)
 
     return runner, engine_kwargs
 
