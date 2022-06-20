@@ -67,7 +67,7 @@ def create_model(conf: DictConfig) -> TModel:
 
 
 def create_optimizer(conf: DictConfig, net: TModel) -> TOptimizer:
-    return OPTIMIZERS[conf.type](conf, net)
+    return OPTIMIZERS[conf.type](net, conf)
 
 
 def create_scheduler(conf: DictConfig, optimizer: TOptimizer) -> dict[str, TScheduler]:
