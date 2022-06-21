@@ -87,6 +87,7 @@ class ImageCompressionRunner(BaseRunner):
             self.optimizer["net"].step()
 
         aux_loss = CompressionModel.aux_loss(self.model)  # type: ignore
+        aux_loss = cast(torch.Tensor, aux_loss)
 
         if self.is_train_loader:
             aux_loss.backward()
