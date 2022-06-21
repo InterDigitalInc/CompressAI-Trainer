@@ -29,25 +29,21 @@
 
 from __future__ import annotations
 
-import os
-from types import ModuleType
-from typing import cast
-
-import compressai
 import torch
-from catalyst import dl, metrics
+from catalyst import metrics
 from catalyst.typing import TorchCriterion, TorchOptimizer
 from compressai.models.google import CompressionModel
 from torch.nn.parallel import DataParallel, DistributedDataParallel
 
-import compressai_train
 from compressai_train.registry import register_runner
 from compressai_train.utils.metrics import compute_metrics
 from compressai_train.utils.utils import inference
 
+from .base import BaseRunner
+
 
 @register_runner("ImageCompressionRunner")
-class ImageCompressionRunner(dl.Runner):
+class ImageCompressionRunner(BaseRunner):
     criterion: TorchCriterion
     model: CompressionModel | DataParallel | DistributedDataParallel
     optimizer: dict[str, TorchOptimizer]
@@ -55,11 +51,6 @@ class ImageCompressionRunner(dl.Runner):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-    def on_experiment_start(self, runner):
-        super().on_experiment_start(runner)
-        self._log_git_diff(compressai)
-        self._log_git_diff(compressai_train)
 
     def on_loader_start(self, runner):
         super().on_loader_start(runner)
@@ -142,16 +133,6 @@ class ImageCompressionRunner(dl.Runner):
             self.loader_metrics[key] = self.meters[key].compute()[0]
         super().on_loader_end(runner)
 
-    def on_epoch_end(self, runner):
-        self.epoch_metrics["_epoch_"]["epoch"] = self.epoch_step
-        super().on_epoch_end(runner)
-
-    @property
-    def model_module(self) -> CompressionModel:
-        if isinstance(self.model, (DataParallel, DistributedDataParallel)):
-            return cast(CompressionModel, self.model.module)
-        return self.model
-
     def _grad_clip(self):
         grad_clip = self.hparams["optimizer"].get("grad_clip", None)
         if grad_clip is None:
@@ -159,11 +140,6 @@ class ImageCompressionRunner(dl.Runner):
         max_norm = grad_clip.get("max_norm", None)
         if max_norm is not None:
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm)
-
-    def _log_git_diff(self, package: ModuleType):
-        src_root = self.hparams["paths"]["src"]
-        diff_path = os.path.join(src_root, f"{package.__name__}.patch")
-        self.log_artifact(f"{package.__name__}_git_diff", path_to_artifact=diff_path)
 
 
 def _coerce_item(x):

@@ -27,10 +27,47 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from .base import BaseRunner
-from .image_compression import ImageCompressionRunner
+from __future__ import annotations
 
-__all__ = [
-    "BaseRunner",
-    "ImageCompressionRunner",
-]
+import os
+from types import ModuleType
+from typing import cast
+
+import compressai
+from catalyst import dl, metrics
+from catalyst.typing import TorchCriterion, TorchOptimizer
+from compressai.models.google import CompressionModel
+from torch.nn.parallel import DataParallel, DistributedDataParallel
+
+import compressai_train
+
+
+class BaseRunner(dl.Runner):
+    criterion: TorchCriterion
+    model: CompressionModel | DataParallel | DistributedDataParallel
+    optimizer: dict[str, TorchOptimizer]
+    metrics: dict[str, metrics.IMetric]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def on_experiment_start(self, runner):
+        super().on_experiment_start(runner)
+        self._log_git_diff(compressai)
+        self._log_git_diff(compressai_train)
+
+    def on_epoch_end(self, runner):
+        self.epoch_metrics["_epoch_"]["epoch"] = self.epoch_step
+        super().on_epoch_end(runner)
+
+    @property
+    def model_module(self) -> CompressionModel:
+        """Returns model instance."""
+        if isinstance(self.model, (DataParallel, DistributedDataParallel)):
+            return cast(CompressionModel, self.model.module)
+        return self.model
+
+    def _log_git_diff(self, package: ModuleType):
+        src_root = self.hparams["paths"]["src"]
+        diff_path = os.path.join(src_root, f"{package.__name__}.patch")
+        self.log_artifact(f"{package.__name__}_git_diff", path_to_artifact=diff_path)
