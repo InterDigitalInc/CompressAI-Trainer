@@ -34,7 +34,7 @@ from types import ModuleType
 from typing import cast
 
 import compressai
-from catalyst import dl, metrics
+from catalyst import dl
 from catalyst.typing import TorchCriterion, TorchOptimizer
 from compressai.models.google import CompressionModel
 from torch.nn.parallel import DataParallel, DistributedDataParallel
@@ -46,7 +46,6 @@ class BaseRunner(dl.Runner):
     criterion: TorchCriterion
     model: CompressionModel | DataParallel | DistributedDataParallel
     optimizer: dict[str, TorchOptimizer]
-    metrics: dict[str, metrics.IMetric]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

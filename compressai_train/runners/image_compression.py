@@ -33,9 +33,7 @@ from typing import cast
 
 import torch
 from catalyst import metrics
-from catalyst.typing import TorchCriterion, TorchOptimizer
 from compressai.models.google import CompressionModel
-from torch.nn.parallel import DataParallel, DistributedDataParallel
 
 from compressai_train.registry import register_runner
 from compressai_train.utils.metrics import compute_metrics
@@ -60,11 +58,6 @@ INFER_METRICS = [
 
 @register_runner("ImageCompressionRunner")
 class ImageCompressionRunner(BaseRunner):
-    criterion: TorchCriterion
-    model: CompressionModel | DataParallel | DistributedDataParallel
-    optimizer: dict[str, TorchOptimizer]
-    metrics: dict[str, metrics.IMetric]
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
