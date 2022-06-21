@@ -29,6 +29,8 @@
 
 from __future__ import annotations
 
+from typing import cast
+
 import torch
 from catalyst import metrics
 from catalyst.typing import TorchCriterion, TorchOptimizer
@@ -40,6 +42,20 @@ from compressai_train.utils.metrics import compute_metrics
 from compressai_train.utils.utils import inference
 
 from .base import BaseRunner
+
+METRICS = [
+    "loss",
+    "aux_loss",
+    "bpp_loss",
+    "mse_loss",
+    "lmbda",
+]
+
+INFER_METRICS = [
+    "bpp",
+    "psnr",
+    "ms-ssim",
+]
 
 
 @register_runner("ImageCompressionRunner")
@@ -54,14 +70,7 @@ class ImageCompressionRunner(BaseRunner):
 
     def on_loader_start(self, runner):
         super().on_loader_start(runner)
-        keys = ["loss", "aux_loss", "bpp_loss", "mse_loss", "lmbda"]
-        if self.is_infer_loader:
-            keys += ["psnr", "ms-ssim"]
-            keys += ["bpp"]
-            self.model_module.update()
-        self.batch_meters = {
-            key: metrics.AdditiveMetric(compute_on_call=False) for key in keys
-        }
+        self._setup_meters()
 
     def handle_batch(self, batch):
         if self.is_infer_loader:
@@ -121,3 +130,11 @@ class ImageCompressionRunner(BaseRunner):
         max_norm = grad_clip.get("max_norm", None)
         if max_norm is not None:
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm)
+
+    def _setup_meters(self):
+        keys = list(METRICS)
+        if self.is_infer_loader:
+            keys += INFER_METRICS
+        self.batch_meters = {
+            key: metrics.AdditiveMetric(compute_on_call=False) for key in keys
+        }
