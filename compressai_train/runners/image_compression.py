@@ -85,20 +85,13 @@ class ImageCompressionRunner(BaseRunner):
             self.optimizer["net"].zero_grad()
             self.optimizer["aux"].zero_grad()
 
-        d = {
+        batch_metrics = {
             "loss": loss,
             "aux_loss": aux_loss,
             **out_criterion,
             "lmbda": self.criterion.lmbda,
         }
-
-        self.batch_metrics.update(d)
-
-        for key in self.meters.keys():
-            self.meters[key].update(
-                _coerce_item(self.batch_metrics[key]),
-                self.batch_size,
-            )
+        self._update_batch_metrics(batch_metrics)
 
     def predict_batch(self, batch):
         x = batch.to(self.engine.device)
@@ -111,7 +104,7 @@ class ImageCompressionRunner(BaseRunner):
         loss = out_criterion["loss"]
         aux_loss = self.model_module.aux_loss()
 
-        d = {
+        batch_metrics = {
             "loss": loss,
             "aux_loss": aux_loss,
             **out_criterion,
@@ -119,9 +112,10 @@ class ImageCompressionRunner(BaseRunner):
             **out_metrics,
             "bpp": out_infer["bpp"],
         }
+        self._update_batch_metrics(batch_metrics)
 
-        self.batch_metrics.update(d)
-
+    def _update_batch_metrics(self, batch_metrics):
+        self.batch_metrics.update(batch_metrics)
         for key in self.meters.keys():
             self.meters[key].update(
                 _coerce_item(self.batch_metrics[key]),
