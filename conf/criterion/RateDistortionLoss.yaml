@@ -1,2 +1,2 @@
 type: "RateDistortionLoss"
-lmbda: 0.001
+lmbda: 0.01
