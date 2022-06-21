@@ -56,9 +56,18 @@ class BaseRunner(dl.Runner):
         self._log_git_diff(compressai)
         self._log_git_diff(compressai_train)
 
+    def on_loader_start(self, runner):
+        super().on_loader_start(runner)
+        self.batch_meters = {}
+
     def on_epoch_end(self, runner):
         self.epoch_metrics["_epoch_"]["epoch"] = self.epoch_step
         super().on_epoch_end(runner)
+
+    def on_loader_end(self, runner):
+        for key in self.batch_meters.keys():
+            self.loader_metrics[key] = self.batch_meters[key].compute()[0]
+        super().on_loader_end(runner)
 
     @property
     def model_module(self) -> CompressionModel:
@@ -67,7 +76,19 @@ class BaseRunner(dl.Runner):
             return cast(CompressionModel, self.model.module)
         return self.model
 
+    def _update_batch_metrics(self, batch_metrics):
+        self.batch_metrics.update(batch_metrics)
+        for key in self.batch_meters.keys():
+            self.batch_meters[key].update(
+                _coerce_item(self.batch_metrics[key]),
+                self.batch_size,
+            )
+
     def _log_git_diff(self, package: ModuleType):
         src_root = self.hparams["paths"]["src"]
         diff_path = os.path.join(src_root, f"{package.__name__}.patch")
         self.log_artifact(f"{package.__name__}_git_diff", path_to_artifact=diff_path)
+
+
+def _coerce_item(x):
+    return x.item() if hasattr(x, "item") else x

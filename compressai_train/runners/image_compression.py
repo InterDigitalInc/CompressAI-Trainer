@@ -59,7 +59,7 @@ class ImageCompressionRunner(BaseRunner):
             keys += ["psnr", "ms-ssim"]
             keys += ["bpp"]
             self.model_module.update()
-        self.meters = {
+        self.batch_meters = {
             key: metrics.AdditiveMetric(compute_on_call=False) for key in keys
         }
 
@@ -114,19 +114,6 @@ class ImageCompressionRunner(BaseRunner):
         }
         self._update_batch_metrics(batch_metrics)
 
-    def _update_batch_metrics(self, batch_metrics):
-        self.batch_metrics.update(batch_metrics)
-        for key in self.meters.keys():
-            self.meters[key].update(
-                _coerce_item(self.batch_metrics[key]),
-                self.batch_size,
-            )
-
-    def on_loader_end(self, runner):
-        for key in self.meters.keys():
-            self.loader_metrics[key] = self.meters[key].compute()[0]
-        super().on_loader_end(runner)
-
     def _grad_clip(self):
         grad_clip = self.hparams["optimizer"].get("grad_clip", None)
         if grad_clip is None:
@@ -134,7 +121,3 @@ class ImageCompressionRunner(BaseRunner):
         max_norm = grad_clip.get("max_norm", None)
         if max_norm is not None:
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm)
-
-
-def _coerce_item(x):
-    return x.item() if hasattr(x, "item") else x
