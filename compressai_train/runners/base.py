@@ -61,14 +61,14 @@ class BaseRunner(dl.Runner):
             self.model_module.update()
         self.batch_meters = {}
 
-    def on_epoch_end(self, runner):
-        self.epoch_metrics["_epoch_"]["epoch"] = self.epoch_step
-        super().on_epoch_end(runner)
-
     def on_loader_end(self, runner):
         for key in self.batch_meters.keys():
             self.loader_metrics[key] = self.batch_meters[key].compute()[0]
         super().on_loader_end(runner)
+
+    def on_epoch_end(self, runner):
+        self.epoch_metrics["_epoch_"]["epoch"] = self.epoch_step
+        super().on_epoch_end(runner)
 
     @property
     def model_module(self) -> CompressionModel:
