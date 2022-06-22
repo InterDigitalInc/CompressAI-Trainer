@@ -41,7 +41,7 @@ from compressai_train.utils.utils import inference
 
 from .base import BaseRunner
 
-METRICS = [
+METERS = [
     "loss",
     "aux_loss",
     "bpp_loss",
@@ -49,7 +49,7 @@ METRICS = [
     "lmbda",
 ]
 
-INFER_METRICS = [
+INFER_METERS = [
     "bpp",
     "psnr",
     "ms-ssim",
@@ -126,9 +126,9 @@ class ImageCompressionRunner(BaseRunner):
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm)
 
     def _setup_meters(self):
-        keys = list(METRICS)
+        keys = list(METERS)
         if self.is_infer_loader:
-            keys += INFER_METRICS
+            keys += INFER_METERS
         self.batch_meters = {
             key: metrics.AdditiveMetric(compute_on_call=False) for key in keys
         }
