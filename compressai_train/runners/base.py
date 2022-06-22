@@ -55,6 +55,9 @@ class BaseRunner(dl.Runner):
         self._log_git_diff(compressai)
         self._log_git_diff(compressai_train)
 
+    def on_epoch_start(self, runner):
+        super().on_epoch_start(runner)
+
     def on_loader_start(self, runner):
         super().on_loader_start(runner)
         if self.is_infer_loader:
@@ -69,6 +72,9 @@ class BaseRunner(dl.Runner):
     def on_epoch_end(self, runner):
         self.epoch_metrics["_epoch_"]["epoch"] = self.epoch_step
         super().on_epoch_end(runner)
+
+    def on_experiment_end(self, runner):
+        super().on_experiment_end(runner)
 
     @property
     def model_module(self) -> CompressionModel:
