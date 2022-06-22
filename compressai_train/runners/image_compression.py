@@ -29,8 +29,6 @@
 
 from __future__ import annotations
 
-from typing import cast
-
 import torch
 from catalyst import metrics
 from compressai.models.google import CompressionModel
@@ -72,25 +70,25 @@ class ImageCompressionRunner(BaseRunner):
         x = batch
         out_net = self.model(x)
         out_criterion = self.criterion(out_net, x)
-        loss = out_criterion["loss"]
+        loss = {}
+        loss["net"] = out_criterion["loss"]
 
         if self.is_train_loader:
-            loss.backward()
+            loss["net"].backward()
             self._grad_clip()
             self.optimizer["net"].step()
 
-        aux_loss = CompressionModel.aux_loss(self.model)  # type: ignore
-        aux_loss = cast(torch.Tensor, aux_loss)
+        loss["aux"] = CompressionModel.aux_loss(self.model)  # type: ignore
 
         if self.is_train_loader:
-            aux_loss.backward()
+            loss["aux"].backward()  # type: ignore
             self.optimizer["aux"].step()
             self.optimizer["net"].zero_grad()
             self.optimizer["aux"].zero_grad()
 
         batch_metrics = {
-            "loss": loss,
-            "aux_loss": aux_loss,
+            "loss": loss["net"],
+            "aux_loss": loss["aux"],
             **out_criterion,
             "lmbda": self.criterion.lmbda,
         }
@@ -104,12 +102,13 @@ class ImageCompressionRunner(BaseRunner):
         out_criterion = self.criterion(out_net, x)
         out_metrics = compute_metrics(x, out_net["x_hat"], ["psnr", "ms-ssim"])
 
-        loss = out_criterion["loss"]
-        aux_loss = self.model_module.aux_loss()
+        loss = {}
+        loss["net"] = out_criterion["loss"]
+        loss["aux"] = self.model_module.aux_loss()
 
         batch_metrics = {
-            "loss": loss,
-            "aux_loss": aux_loss,
+            "loss": loss["net"],
+            "aux_loss": loss["aux"],
             **out_criterion,
             "lmbda": self.criterion.lmbda,
             **out_metrics,
