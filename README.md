@@ -33,12 +33,7 @@ aim up
 
 If the logs are on a remote host, then on the remote host, navigate to the directory containing the `.aim` repository and run:
 ```bash
-aim up
+aim up --host=0.0.0.0
 ```
 
-Note down the address (e.g. `http://127.0.0.1:43800`) and then on the local machine, run:
-```bash
-ssh -L 8080:127.0.0.1:43800 USERNAME@REMOTE_SERVER
-```
-
-Now open up a web browser on the local machine and navigate to [`http://localhost:8080`](http://localhost:8080). The Aim UI should now be accessible.
+Note down the port (e.g. `PORT=43800` for the address `http://0.0.0.0:43800`) and then open up a web browser on the local machine and navigate to `http://USERNAME@REMOTE_SERVER:PORT`. The Aim UI should now be accessible.
