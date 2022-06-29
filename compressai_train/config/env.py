@@ -45,7 +45,9 @@ def get_env(conf: DictConfig) -> dict[str, Any]:
     return {
         "aim": {
             "repo": conf.env.aim.repo,
-            "run_hash": generate_run_hash(),
+            "run_hash": (
+                conf.env.aim.run_hash if conf.env.aim.run_hash else generate_run_hash()
+            ),
         },
         "git": {
             package.__name__: _get_git_repo_info(

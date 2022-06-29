@@ -29,3 +29,8 @@ hp:
 # To resume from checkpoint, override paths.checkpoint:
 # paths:
 #   checkpoint: "${.checkpoints}/runner.last.pth"
+#
+# To continue as part of a previous run, also override env.aim.run_hash:
+# env:
+#   aim:
+#     run_hash: "e4e6d4d5e5c59c69f3bd7be2"  # replace this with your run hash
