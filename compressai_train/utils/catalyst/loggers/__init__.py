@@ -27,54 +27,8 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from __future__ import annotations
+from .aim import AimLogger
 
-from typing import Any, Dict, cast
-
-import aim
-from catalyst import dl
-from omegaconf import DictConfig, OmegaConf
-
-from compressai_train.registry.catalyst import CALLBACKS, RUNNERS
-from compressai_train.typing.catalyst import TCallback, TRunner
-from compressai_train.utils.catalyst.loggers import AimLogger
-
-
-def create_callback(conf: DictConfig) -> TCallback:
-    kwargs = OmegaConf.to_container(conf, resolve=True)
-    kwargs = cast(Dict[str, Any], kwargs)
-    del kwargs["type"]
-    callback = CALLBACKS[conf.type](**kwargs)
-    return callback
-
-
-def create_runner(conf: DictConfig) -> TRunner:
-    kwargs = OmegaConf.to_container(conf, resolve=True)
-    kwargs = cast(Dict[str, Any], kwargs)
-    del kwargs["type"]
-    runner = RUNNERS[conf.type](**kwargs)
-    return runner
-
-
-def configure_engine(conf: DictConfig) -> dict[str, Any]:
-    engine_kwargs = OmegaConf.to_container(conf.engine, resolve=True)
-    engine_kwargs = cast(Dict[str, Any], engine_kwargs)
-    engine_kwargs["callbacks"] = [
-        create_callback(cb_conf) for cb_conf in conf.engine.callbacks
-    ]
-    engine_kwargs["hparams"] = OmegaConf.to_container(conf, resolve=True)
-    engine_kwargs["loggers"] = {
-        "aim": AimLogger(
-            experiment=conf.exp.name,
-            run_hash=conf.env.aim.run_hash,
-            repo=aim.Repo(
-                conf.env.aim.repo,
-                init=not aim.Repo.exists(conf.env.aim.repo),
-            ),
-            **conf.engine.loggers.aim,
-        ),
-        "tensorboard": dl.TensorboardLogger(
-            **conf.engine.loggers.tensorboard,
-        ),
-    }
-    return engine_kwargs
+__all__ = [
+    "AimLogger",
+]
