@@ -118,8 +118,8 @@ class AimLogger(ILogger):
         tag: str,
         runner: "IRunner",
         artifact: object = None,
-        path_to_artifact: str = None,
-        scope: str = None,
+        path_to_artifact: Optional[str] = None,
+        scope: Optional[str] = None,
         kind: str = "text",
         artifact_kwargs: Dict[str, Any] = {},
     ) -> None:
@@ -141,9 +141,9 @@ class AimLogger(ILogger):
     def log_image(
         self,
         tag: str,
-        image: np.ndarray,
+        image,
         runner: "IRunner",
-        scope: str = None,
+        scope: Optional[str] = None,
         image_kwargs: Dict[str, Any] = {},
     ) -> None:
         """Logs image to Aim for current scope on current step."""
@@ -192,7 +192,7 @@ class AimLogger(ILogger):
         tag: str,
         fig: Any,
         runner: "IRunner",
-        scope: str = None,
+        scope: Optional[str] = None,
         kwargs: Dict[str, Any] = {},
     ) -> None:
         """Logs figure to Aim for current scope on current step."""
