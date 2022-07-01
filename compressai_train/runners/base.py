@@ -31,7 +31,7 @@ from __future__ import annotations
 
 import os
 from types import ModuleType
-from typing import cast
+from typing import Any, cast
 
 import compressai
 from catalyst import dl, metrics
@@ -40,6 +40,8 @@ from compressai.models.google import CompressionModel
 from torch.nn.parallel import DataParallel, DistributedDataParallel
 
 import compressai_train
+from compressai_train.plot import plot_rd
+from compressai_train.utils.utils import compressai_result
 
 
 class BaseRunner(dl.Runner):
@@ -91,6 +93,14 @@ class BaseRunner(dl.Runner):
             return cast(CompressionModel, self.model.module)
         return self.model
 
+    @property
+    def _current_series(self):
+        return dict(
+            name=self.hparams["model"]["name"],
+            x=[self.loader_metrics["bpp"]],
+            y=[self.loader_metrics["psnr"]],
+        )
+
     def _update_batch_metrics(self, batch_metrics):
         self.batch_metrics.update(batch_metrics)
         for key in self.batch_meters.keys():
@@ -103,6 +113,27 @@ class BaseRunner(dl.Runner):
         src_root = self.hparams["paths"]["src"]
         diff_path = os.path.join(src_root, f"{package.__name__}.patch")
         self.log_artifact(f"{package.__name__}_git_diff", path_to_artifact=diff_path)
+
+    def _log_rd_figure(self, reference_codecs: list[str], dataset: str, **kwargs):
+        series_list = _compressai_dataframes(reference_codecs, dataset=dataset)
+        series_list.append(self._current_series)
+        fig = plot_rd(series_list, **kwargs)
+        self.log_figure(f"rd-curves-{dataset}-psnr", fig)
+
+
+def _compressai_dataframes(
+    reference_codecs: list[str], **kwargs
+) -> list[dict[str, Any]]:
+    ds = []
+    for name in reference_codecs:
+        data = compressai_result(name, **kwargs)
+        d = dict(
+            x=data["results"]["bpp"],
+            y=data["results"]["psnr"],
+            name=name,
+        )
+        ds.append(d)
+    return ds
 
 
 def _coerce_item(x):
