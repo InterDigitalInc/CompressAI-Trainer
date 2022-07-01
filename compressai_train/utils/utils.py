@@ -29,8 +29,10 @@
 
 from __future__ import annotations
 
+import json
 from typing import Any
 
+import compressai
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -106,3 +108,18 @@ def _get_pad(h, w):
     unpad = (-left, -right, -top, -bottom)
 
     return pad, unpad
+
+
+def compressai_result(
+    model_name: str,
+    dataset: str = "kodak",
+    opt_metric: str = "mse",
+    device: str = "cuda",
+) -> dict[str, Any]:
+    path = (
+        f"{compressai.__path__[0]}/../results/{dataset}/"
+        f"compressai-{model_name}_{opt_metric}_{device}.json"
+    )
+
+    with open(path) as f:
+        return json.load(f)

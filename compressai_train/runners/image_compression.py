@@ -29,13 +29,16 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 import torch
 from catalyst import metrics
 from compressai.models.google import CompressionModel
 
+from compressai_train.plot import plot_rd
 from compressai_train.registry import register_runner
 from compressai_train.utils.metrics import compute_metrics
-from compressai_train.utils.utils import inference
+from compressai_train.utils.utils import compressai_result, inference
 
 from .base import BaseRunner
 
@@ -116,6 +119,19 @@ class ImageCompressionRunner(BaseRunner):
         }
         self._update_batch_metrics(batch_metrics)
 
+    def on_loader_end(self, runner):
+        super().on_loader_end(runner)
+        if self.is_infer_loader:
+            self._log_rd_figure()
+
+    @property
+    def _current_series(self):
+        return dict(
+            name=self.hparams["model"]["name"],
+            x=[self.loader_metrics["bpp"]],
+            y=[self.loader_metrics["psnr"]],
+        )
+
     def _grad_clip(self):
         grad_clip = self.hparams["optimizer"].get("grad_clip", None)
         if grad_clip is None:
@@ -124,6 +140,13 @@ class ImageCompressionRunner(BaseRunner):
         if max_norm is not None:
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm)
 
+    def _log_rd_figure(self):
+        series_list = _compressai_dataframes()
+        series_list.append(self._current_series)
+        title = "Performance evaluation on Kodak - PSNR (RGB)"
+        fig = plot_rd(series_list, title=title)
+        self.log_figure("rd-curves-kodak-psnr", fig)
+
     def _setup_meters(self):
         keys = list(METERS)
         if self.is_infer_loader:
@@ -131,3 +154,27 @@ class ImageCompressionRunner(BaseRunner):
         self.batch_meters = {
             key: metrics.AdditiveMetric(compute_on_call=False) for key in keys
         }
+
+
+def _compressai_dataframes(**kwargs) -> list[dict[str, Any]]:
+    model_names = [
+        "bmshj2018-factorized",
+        "bmshj2018-hyperprior",
+        "mbt2018",
+        "cheng2020-anchor",
+    ]
+
+    ds = []
+
+    for model_name in model_names:
+        data = compressai_result(model_name, **kwargs)
+
+        d = dict(
+            x=data["results"]["bpp"],
+            y=data["results"]["psnr"],
+            name=model_name,
+        )
+
+        ds.append(d)
+
+    return ds

@@ -27,15 +27,4 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from . import config, models, plot, registry, runners, typing, utils, zoo
-
-__all__ = [
-    "config",
-    "models",
-    "plot",
-    "registry",
-    "runners",
-    "typing",
-    "utils",
-    "zoo",
-]
+from .plot import plot_rd

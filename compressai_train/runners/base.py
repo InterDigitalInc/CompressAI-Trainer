@@ -77,6 +77,13 @@ class BaseRunner(dl.Runner):
     def on_experiment_end(self, runner):
         super().on_experiment_end(runner)
 
+    def log_figure(self, *args, **kwargs) -> None:
+        """Logs figure to available loggers."""
+        for logger in self.loggers.values():
+            if not hasattr(logger, "log_figure"):
+                continue
+            logger.log_figure(*args, **kwargs, runner=self)  # type: ignore
+
     @property
     def model_module(self) -> CompressionModel:
         """Returns model instance."""

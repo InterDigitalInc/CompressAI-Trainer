@@ -27,15 +27,27 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from . import config, models, plot, registry, runners, typing, utils, zoo
 
-__all__ = [
-    "config",
-    "models",
-    "plot",
-    "registry",
-    "runners",
-    "typing",
-    "utils",
-    "zoo",
-]
+from __future__ import annotations
+
+from typing import Any
+
+from plotly.subplots import make_subplots
+
+
+def plot_rd(series_list: list[dict[str, Any]], **layout_kwargs):
+    fig = make_subplots()
+
+    for series in series_list:
+        fig.add_scatter(name=series["name"], x=series["x"], y=series["y"])
+
+    default_kwargs = dict(
+        xaxis_title="Bit-rate [bpp]",
+        yaxis_title="PSNR [dB]",
+        xaxis=dict(range=[0.0, 2.25], tick0=0.0, dtick=0.25),
+        yaxis=dict(range=[26, 41], tick0=26, dtick=1),
+    )
+    layout_kwargs = {**default_kwargs, **layout_kwargs}
+    fig.update_layout(**layout_kwargs)
+
+    return fig

@@ -187,6 +187,19 @@ class AimLogger(ILogger):
                     scope=scope,
                 )
 
+    def log_figure(
+        self,
+        tag: str,
+        fig: Any,
+        runner: "IRunner",
+        scope: str = None,
+        kwargs: Dict[str, Any] = {},
+    ) -> None:
+        """Logs image to Aim for current scope on current step."""
+        value = aim.Figure(fig, **kwargs)
+        context, kwargs = _aim_context(runner, scope)
+        self.run.track(value, tag, context=context, **kwargs)
+
     def close_log(self) -> None:
         """End an active Aim run."""
         self.run.close()
