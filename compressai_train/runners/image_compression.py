@@ -58,7 +58,7 @@ INFER_METERS = [
 RD_PLOT_SETTINGS: dict[str, Any] = dict(
     title="Performance evaluation on Kodak - PSNR (RGB)",
     dataset="kodak",
-    reference_codecs=[
+    codecs=[
         "bmshj2018-factorized",
         "bmshj2018-hyperprior",
         "mbt2018",

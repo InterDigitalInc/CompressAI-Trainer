@@ -32,7 +32,16 @@ from __future__ import annotations
 
 from typing import Any
 
+import pandas as pd
+import plotly.express as px
 from plotly.subplots import make_subplots
+
+PLOT_RD_SCATTER_SETTINGS = dict(
+    x="bpp",
+    y="psnr",
+    color="name",
+    hover_data=["psnr", "ms-ssim", "epoch"],
+)
 
 PLOT_RD_LAYOUT_SETTINGS = dict(
     xaxis_title="Bit-rate [bpp]",
@@ -42,13 +51,10 @@ PLOT_RD_LAYOUT_SETTINGS = dict(
 )
 
 
-def plot_rd(series_list: list[dict[str, Any]], **layout_kwargs):
-    fig = make_subplots()
-
-    for series in series_list:
-        fig.add_scatter(name=series["name"], x=series["x"], y=series["y"])
-
+def plot_rd(df: pd.DataFrame, scatter_kwargs: dict[str, Any] = {}, **layout_kwargs):
+    scatter_kwargs = {**PLOT_RD_SCATTER_SETTINGS, **scatter_kwargs}
     layout_kwargs = {**PLOT_RD_LAYOUT_SETTINGS, **layout_kwargs}
+    fig = make_subplots()
+    fig = px.line(df, **scatter_kwargs, markers=True)
     fig.update_layout(**layout_kwargs)
-
     return fig

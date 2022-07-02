@@ -31,9 +31,10 @@ from __future__ import annotations
 
 import os
 from types import ModuleType
-from typing import Any, cast
+from typing import cast
 
 import compressai
+import pandas as pd
 from catalyst import dl, metrics
 from catalyst.typing import TorchCriterion, TorchOptimizer
 from compressai.models.google import CompressionModel
@@ -94,12 +95,15 @@ class BaseRunner(dl.Runner):
         return self.model
 
     @property
-    def _current_series(self):
-        return dict(
-            name=self.hparams["model"]["name"],
-            x=[self.loader_metrics["bpp"]],
-            y=[self.loader_metrics["psnr"]],
+    def _current_dataframe(self):
+        d = dict(
+            name=[self.hparams["model"]["name"]],
+            bpp=[self.loader_metrics["bpp"]],
+            psnr=[self.loader_metrics["psnr"]],
+            epoch=[self.epoch_step],
         )
+        df = pd.DataFrame.from_dict(d)
+        return df
 
     def _update_batch_metrics(self, batch_metrics):
         self.batch_metrics.update(batch_metrics)
@@ -114,26 +118,20 @@ class BaseRunner(dl.Runner):
         diff_path = os.path.join(src_root, f"{package.__name__}.patch")
         self.log_artifact(f"{package.__name__}_git_diff", path_to_artifact=diff_path)
 
-    def _log_rd_figure(self, reference_codecs: list[str], dataset: str, **kwargs):
-        series_list = _compressai_dataframes(reference_codecs, dataset=dataset)
-        series_list.append(self._current_series)
-        fig = plot_rd(series_list, **kwargs)
+    def _log_rd_figure(self, codecs: list[str], dataset: str, **kwargs):
+        dfs = [_compressai_dataframe(name, dataset=dataset) for name in codecs]
+        dfs.append(self._current_dataframe)
+        dfs = pd.concat(dfs)
+        fig = plot_rd(dfs, **kwargs)
         self.log_figure(f"rd-curves-{dataset}-psnr", fig)
 
 
-def _compressai_dataframes(
-    reference_codecs: list[str], **kwargs
-) -> list[dict[str, Any]]:
-    ds = []
-    for name in reference_codecs:
-        data = compressai_result(name, **kwargs)
-        d = dict(
-            x=data["results"]["bpp"],
-            y=data["results"]["psnr"],
-            name=name,
-        )
-        ds.append(d)
-    return ds
+def _compressai_dataframe(name, **kwargs):
+    d = compressai_result(name, **kwargs)
+    df = pd.DataFrame.from_dict(d["results"])
+    df["name"] = d["name"]
+    df["description"] = d["description"]
+    return df
 
 
 def _coerce_item(x):
