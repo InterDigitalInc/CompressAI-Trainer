@@ -195,7 +195,7 @@ class AimLogger(ILogger):
         scope: str = None,
         kwargs: Dict[str, Any] = {},
     ) -> None:
-        """Logs image to Aim for current scope on current step."""
+        """Logs figure to Aim for current scope on current step."""
         value = aim.Figure(fig, **kwargs)
         context, kwargs = _aim_context(runner, scope)
         self.run.track(value, tag, context=context, **kwargs)
