@@ -10,7 +10,7 @@ git:
   compressai_train:
     branch:
     hash:
-    main_branch: "main"
+    main_branch: "master"
     main_hash:
 slurm:
   account:
