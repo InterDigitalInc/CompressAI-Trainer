@@ -43,3 +43,7 @@ line-length = 88
 profile = "black"
 skip_gitignore = true
 known_third_party = "PIL,pytorch_msssim,torchvision,torch"
+
+[tool.mypy]
+allow_redefinition = true
+ignore_missing_imports = true
