@@ -82,7 +82,7 @@ class AimLogger(ILogger):
         runner = CustomRunner().run()
     """
 
-    exclude: Optional[List[str]]
+    exclude: List[str]
     run: aim.Run
 
     def __init__(
@@ -151,14 +151,14 @@ class AimLogger(ILogger):
         context, kwargs = _aim_context(runner, scope)
         self.run.track(value, tag, context=context, **kwargs)
 
-    def log_hparams(self, hparams: Dict, runner: "IRunner" = None) -> None:
+    def log_hparams(self, hparams: Dict, runner: "Optional[IRunner]" = None) -> None:
         """Logs parameters for current scope.
 
         Args:
             hparams: Parameters to log.
             runner: experiment runner
         """
-        d = {}
+        d: dict[str, Any] = {}
         _build_params_dict(hparams, d, self.exclude)
         for k, v in d.items():
             self.run[k] = v
@@ -181,7 +181,7 @@ class AimLogger(ILogger):
         elif scope == "epoch" and self.log_epoch_metrics:
             for loader_key, per_loader_metrics in metrics.items():
                 self._log_metrics(
-                    metrics=per_loader_metrics,
+                    metrics=per_loader_metrics,  # type: ignore
                     runner=runner,
                     loader_key=loader_key,
                     scope=scope,
