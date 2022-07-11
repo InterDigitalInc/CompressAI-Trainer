@@ -35,8 +35,8 @@ from shlex import quote
 from types import ModuleType
 from typing import TYPE_CHECKING, Any, Mapping, OrderedDict, cast
 
-import catalyst.utils
 import compressai
+import torch
 from omegaconf import DictConfig, OmegaConf
 from torch import Tensor
 
@@ -73,9 +73,10 @@ def load_checkpoint(conf: DictConfig, *, warn_only: bool = True) -> nn.Module:
     _check_git_hash(conf, compressai, warn_only=warn_only)
     _check_git_hash(conf, compressai_train, warn_only=warn_only)
 
+    device = torch.device(conf.misc.device)
     model = create_model(conf)
     ckpt_path = get_checkpoint_path(conf)
-    ckpt = catalyst.utils.load_checkpoint(ckpt_path)
+    ckpt = torch.load(ckpt_path, map_location=device)
     state_dict = state_dict_from_checkpoint(ckpt)
     model.load_state_dict(state_dict)
 
