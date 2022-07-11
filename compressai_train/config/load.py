@@ -58,7 +58,7 @@ def load_config(run_root: str) -> DictConfig:
     return cast(DictConfig, conf)
 
 
-def load_checkpoint(conf: DictConfig) -> nn.Module:
+def load_checkpoint(conf: DictConfig, *, warn_only: bool = True) -> nn.Module:
     """Loads particular checkpoint for given conf.
 
     A particular model is a function of:
@@ -70,8 +70,8 @@ def load_checkpoint(conf: DictConfig) -> nn.Module:
     This tries to reassemble/verify the same environment.
     """
     # If git hashes are different, raise error/warning.
-    _check_git_hash(conf, compressai, warn_only=False)
-    _check_git_hash(conf, compressai_train, warn_only=True)
+    _check_git_hash(conf, compressai, warn_only=warn_only)
+    _check_git_hash(conf, compressai_train, warn_only=warn_only)
 
     model = create_model(conf)
     ckpt_path = get_checkpoint_path(conf)
