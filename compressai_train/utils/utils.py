@@ -132,3 +132,26 @@ def compressai_result(
 
     with open(path) as f:
         return json.load(f)
+
+
+def arg_pareto_optimal_set(xs, objectives):
+    """Returns pareto-optimal set indexes."""
+    if len(xs) != 2:
+        raise NotImplementedError
+
+    x, y = xs
+    xo, yo = [-1 if o == "min" else 1 for o in objectives]
+    perm = x.argsort()
+    if xo == 1:
+        perm = perm[::-1]
+    yp = y[perm]
+    best_y = -yo * np.inf
+    idxs = []
+
+    for curr_p, curr_y in zip(perm, yp):
+        if yo * (curr_y - best_y) <= 0:
+            continue
+        best_y = curr_y
+        idxs.append(curr_p)
+
+    return idxs
