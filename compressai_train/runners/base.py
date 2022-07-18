@@ -42,7 +42,7 @@ from torch.nn.parallel import DataParallel, DistributedDataParallel
 
 import compressai_train
 from compressai_train.plot import plot_rd
-from compressai_train.utils.utils import compressai_result
+from compressai_train.utils.utils import compressai_dataframe
 
 
 class BaseRunner(dl.Runner):
@@ -97,13 +97,12 @@ class BaseRunner(dl.Runner):
     @property
     def _current_dataframe(self):
         d = dict(
-            name=[self.hparams["model"]["name"]],
-            bpp=[self.loader_metrics["bpp"]],
-            psnr=[self.loader_metrics["psnr"]],
-            epoch=[self.epoch_step],
+            name=self.hparams["model"]["name"],
+            bpp=self.loader_metrics["bpp"],
+            psnr=self.loader_metrics["psnr"],
+            epoch=self.epoch_step,
         )
-        df = pd.DataFrame.from_dict(d)
-        return df
+        return pd.DataFrame.from_dict([d])
 
     def _update_batch_metrics(self, batch_metrics):
         self.batch_metrics.update(batch_metrics)
@@ -119,19 +118,11 @@ class BaseRunner(dl.Runner):
         self.log_artifact(f"{package.__name__}_git_diff", path_to_artifact=diff_path)
 
     def _log_rd_figure(self, codecs: list[str], dataset: str, **kwargs):
-        dfs = [_compressai_dataframe(name, dataset=dataset) for name in codecs]
+        dfs = [compressai_dataframe(name, dataset=dataset) for name in codecs]
         dfs.append(self._current_dataframe)
         dfs = pd.concat(dfs)
         fig = plot_rd(dfs, **kwargs)
         self.log_figure(f"rd-curves-{dataset}-psnr", fig)
-
-
-def _compressai_dataframe(name, **kwargs):
-    d = compressai_result(name, **kwargs)
-    df = pd.DataFrame.from_dict(d["results"])
-    df["name"] = d["name"]
-    df["description"] = d["description"]
-    return df
 
 
 def _coerce_item(x):

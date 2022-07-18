@@ -34,6 +34,7 @@ from typing import Any
 
 import compressai
 import numpy as np
+import pandas as pd
 import torch
 import torch.nn.functional as F
 
@@ -108,6 +109,14 @@ def _get_pad(h, w):
     unpad = (-left, -right, -top, -bottom)
 
     return pad, unpad
+
+
+def compressai_dataframe(model_name: str, **kwargs):
+    d = compressai_result(model_name, **kwargs)
+    df = pd.DataFrame.from_dict(d["results"])
+    df["name"] = d["name"]
+    df["description"] = d["description"]
+    return df
 
 
 def compressai_result(
