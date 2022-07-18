@@ -51,7 +51,7 @@ def get_runs_dataframe(
     y: str = "psnr",
     identifiers: list[str] = ["model.name"],
     to_df: Callable[[dict[str, Any]], pd.DataFrame] = (
-        lambda d: pd.DataFrame.from_dict([d])
+        lambda d: pd.DataFrame.from_records([d])
     ),
 ):
     """Returns dataframe of best model metrics for filtered runs.
