@@ -29,7 +29,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Callable, Optional, Sequence, TypeVar
+from typing import Any, Callable, Mapping, Optional, Sequence, TypeVar
 
 import aim
 import numpy as np
@@ -43,7 +43,7 @@ T = TypeVar("T")
 
 def get_runs_dataframe(
     repo: aim.Repo,
-    conf: dict[str, Any],
+    conf: Mapping[str, Any],
     *,
     min_metric: str = "loss",
     metrics: list[str] = ["bpp", "psnr", "ms-ssim"],
@@ -103,7 +103,7 @@ def pareto_optimal_dataframe(
 
 
 def runs_by_identifiers(
-    conf: dict[str, Any], repo: aim.Repo, identifiers: list[str]
+    conf: Mapping[str, Any], repo: aim.Repo, identifiers: list[str]
 ) -> list[aim.Run]:
     """Returns runs that match the same identifiers present in conf."""
     if identifiers == []:
