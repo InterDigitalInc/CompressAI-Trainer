@@ -67,13 +67,6 @@ HOVER_DATA = [
 ]
 
 
-def style_trace_by_idx(trace, idx, key, default, replacement):
-    n = len(trace.customdata)
-    v = np.full(n, default, dtype=object)
-    v[idx] = replacement
-    trace[key] = v.tolist()
-
-
 def create_dataframe(repo, conf, args, run_hash, identifiers):
     metrics = sorted(set(_needed_metrics(args.y_metrics, "y")) | {args.x, args.y})
     df = get_runs_dataframe(
@@ -100,20 +93,14 @@ def _needed_metrics(xs, key) -> Iterable[str]:
         yield from xk
 
 
-def plot_dataframe(df, run_hash, args):
-    run_hash_col = next(i for i, x in enumerate(HOVER_DATA) if x == "run_hash")
+def plot_dataframe(df, args):
     scatter_kwargs = dict(
         x=args.x,
         y=args.y,
         hover_data=HOVER_DATA,
     )
+
     fig = plot_rd(df, scatter_kwargs=scatter_kwargs, title=TITLE)
-    traces = list(fig.select_traces())
-
-    for trace in traces:
-        (idx,) = (trace.customdata[:, run_hash_col] == run_hash).nonzero()
-        style_trace_by_idx(trace, idx, "marker.symbol", trace.marker.symbol, "x")
-
     print(fig)
 
     if args.show:
@@ -147,7 +134,7 @@ def main(argv):
     df = create_dataframe(
         repo, conf, args, run_hash, identifiers=args.identifiers.split(",")
     )
-    plot_dataframe(df, run_hash, args)
+    plot_dataframe(df, args)
 
 
 if __name__ == "__main__":
