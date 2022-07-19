@@ -35,7 +35,6 @@ import sys
 from typing import Iterable, cast
 
 import aim
-import numpy as np
 import pandas as pd
 from omegaconf import DictConfig, OmegaConf
 from plotly.offline import plot
