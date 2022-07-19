@@ -59,9 +59,6 @@ def get_runs_dataframe(
     Filters runs based on given identifiers.
     For each run, determines epoch at which a min_metric is minimum,
     and accumulates infer metric values at that epoch into a dataframe.
-    Keeps only pareto-optimal data points in that dataframe based
-    on given x and y and their corresponding objectives (min, max).
-    Optionally, also keeps data points that are part of a given run.
     """
     metrics = list(set(metrics + [x, y]))
     runs = runs_by_identifiers(conf, repo, identifiers=identifiers)
