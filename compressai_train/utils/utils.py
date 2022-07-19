@@ -155,3 +155,46 @@ def arg_pareto_optimal_set(xs, objectives):
         idxs.append(curr_p)
 
     return idxs
+
+
+def format_dataframe(
+    df: pd.DataFrame, y: str, y_metrics: list[dict[str, Any]]
+) -> pd.DataFrame:
+    """Returns dataframe prepared for plotting multiple metrics.
+
+    Args:
+        df: Dataframe.
+        y: Destination y series.
+        y_metrics:
+            Source y series. Useful for plotting multiple curves of the
+            same unit scale (e.g. dB) on the same plot.
+
+    Examples:
+
+    .. code-block:: python
+
+        # Basic, single curve.
+        [{"suffix": "", "y": "psnr"}]
+
+        # Multiple series with different suffixes.
+        [
+            {"suffix": " (psnr_x)", "y": "psnr_x"},
+            {"suffix": " (psnr_s)", "y": "psnr_s"},
+        ]
+
+        # Flatten multiple psnrs onto a single curve.
+        [{"suffix": "", "y": ["psnr_0", "psnr_1", "psnr_2"]}]
+    """
+    records = []
+    for record in df.to_dict("records"):
+        for y_metric in y_metrics:
+            base_record = dict(record)
+            base_record["name"] = record["name"] + y_metric["suffix"]
+            y_srcs = y_metric["y"]
+            if isinstance(y_srcs, str):
+                y_srcs = [y_srcs]
+            for y_src in y_srcs:
+                r = dict(base_record)
+                r[y] = record[y_src]
+                records.append(r)
+    return pd.DataFrame.from_records(records)

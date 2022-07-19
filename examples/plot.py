@@ -28,6 +28,8 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
+from __future__ import annotations
+
 import argparse
 import sys
 from typing import cast
@@ -43,7 +45,7 @@ from compressai_train.utils.aim.query import (
     get_runs_dataframe,
     pareto_optimal_dataframe,
 )
-from compressai_train.utils.utils import compressai_dataframe
+from compressai_train.utils.utils import compressai_dataframe, format_dataframe
 
 TITLE = "Performance evaluation on Kodak - PSNR (RGB)"
 
@@ -74,9 +76,10 @@ def style_trace_by_idx(trace, idx, key, default, replacement):
     trace[key] = v.tolist()
 
 
-def create_dataframe(repo, conf, run_hash, identifiers):
+def create_dataframe(repo, conf, args, run_hash, identifiers):
     current_df = get_runs_dataframe(repo=repo, conf=conf, identifiers=identifiers)
-    current_df = pareto_optimal_dataframe(current_df, keep_run_hash=run_hash)
+    current_df = format_dataframe(current_df, args.y, args.y_metrics)
+    current_df = pareto_optimal_dataframe(current_df, y=args.y, keep_run_hash=run_hash)
     return pd.concat([REFERENCE_DF, current_df])
 
 
@@ -104,6 +107,8 @@ def build_args(argv):
     parser.add_argument("--identifiers", type=str, default="model.name")
     parser.add_argument("--out_file", type=str, default="plot_result.html")
     parser.add_argument("--show", action="store_true", help="Show figure in browser.")
+    parser.add_argument("--y", type=str, default="psnr")
+    parser.add_argument("--y_metrics", type=str, default='[{"suffix": "", "y": "psnr"}')
     args = parser.parse_args(argv)
     return args
 
@@ -113,7 +118,10 @@ def main(argv):
     conf = cast(DictConfig, OmegaConf.load(args.conf))
     repo = aim.Repo(conf.paths.aim)
     run_hash = conf.env.aim.run_hash
-    df = create_dataframe(repo, conf, run_hash, identifiers=args.identifiers.split(","))
+    args.y_metrics = eval(args.y_metrics)  # WARNING: unsafe!
+    df = create_dataframe(
+        repo, conf, args, run_hash, identifiers=args.identifiers.split(",")
+    )
     plot_dataframe(df, run_hash, args)
 
 
