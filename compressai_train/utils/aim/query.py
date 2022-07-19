@@ -29,7 +29,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Callable, Mapping, Optional, Sequence, TypeVar
+from typing import Any, Callable, Literal, Mapping, Optional, Sequence, TypeVar
 
 import aim
 import numpy as np
@@ -51,6 +51,7 @@ def get_runs_dataframe(
     to_df: Callable[[dict[str, Any]], pd.DataFrame] = (
         lambda d: pd.DataFrame.from_records([d])
     ),
+    choose_metric: Literal["best"] | Literal["last"] = "best",
 ):
     """Returns dataframe of best model metrics for filtered runs.
 
@@ -59,7 +60,12 @@ def get_runs_dataframe(
     and accumulates infer metric values at that epoch into a dataframe.
     """
     runs = runs_by_identifiers(conf, repo, identifiers=identifiers)
-    idxs = [best_metric_index(run, min_metric) for run in runs]
+    if choose_metric == "best":
+        idxs = [best_metric_index(run, min_metric) for run in runs]
+    elif choose_metric == "last":
+        idxs = [-1 for _ in runs]
+    else:
+        raise ValueError(f"Unknown choose_metric={choose_metric}.")
     dfs = [
         to_df(metrics_at_index(run, metrics, idx))
         for run, idx in zip(runs, idxs)
@@ -115,7 +121,7 @@ def runs_by_identifiers(
 def metrics_at_index(
     run: aim.Run,
     metrics: list[str],
-    index: np.intp,
+    index: int | np.intp,
     loader: str = "infer",
     scope: str = "epoch",
 ) -> dict[str, Any]:

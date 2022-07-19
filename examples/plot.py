@@ -73,6 +73,7 @@ def create_dataframe(repo, conf, args, run_hash, identifiers):
         conf=conf,
         identifiers=identifiers,
         metrics=metrics,
+        choose_metric="best",
     )
     df = format_dataframe(df, args.y, args.y_metrics)
     df = pareto_optimal_dataframe(df, x=args.x, y=args.y)
