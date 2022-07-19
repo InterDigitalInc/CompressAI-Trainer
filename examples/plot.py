@@ -77,9 +77,14 @@ def style_trace_by_idx(trace, idx, key, default, replacement):
 
 
 def create_dataframe(repo, conf, args, run_hash, identifiers):
-    current_df = get_runs_dataframe(repo=repo, conf=conf, identifiers=identifiers)
-    current_df = format_dataframe(current_df, args.y, args.y_metrics)
-    current_df = pareto_optimal_dataframe(current_df, y=args.y, keep_run_hash=run_hash)
+    df = get_runs_dataframe(repo=repo, conf=conf, identifiers=identifiers)
+    df = format_dataframe(df, args.y, args.y_metrics)
+    df = pareto_optimal_dataframe(df, y=args.y)
+    if run_hash:
+        df_run = df[df["run_hash"] == run_hash].copy()
+        df_run["name"] = df_run["name"].apply(lambda x: x + " (current)")
+        df = pd.concat([df, df_run])
+    current_df = df
     return pd.concat([REFERENCE_DF, current_df])
 
 
