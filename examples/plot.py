@@ -79,7 +79,7 @@ def style_trace_by_idx(trace, idx, key, default, replacement):
 def create_dataframe(repo, conf, args, run_hash, identifiers):
     df = get_runs_dataframe(repo=repo, conf=conf, identifiers=identifiers)
     df = format_dataframe(df, args.y, args.y_metrics)
-    df = pareto_optimal_dataframe(df, y=args.y)
+    df = pareto_optimal_dataframe(df, x=args.x, y=args.y)
     if run_hash:
         df_run = df[df["run_hash"] == run_hash].copy()
         df_run["name"] = df_run["name"].apply(lambda x: x + " (current)")
@@ -90,7 +90,12 @@ def create_dataframe(repo, conf, args, run_hash, identifiers):
 
 def plot_dataframe(df, run_hash, args):
     run_hash_col = next(i for i, x in enumerate(HOVER_DATA) if x == "run_hash")
-    fig = plot_rd(df, scatter_kwargs=dict(hover_data=HOVER_DATA), title=TITLE)
+    scatter_kwargs = dict(
+        x=args.x,
+        y=args.y,
+        hover_data=HOVER_DATA,
+    )
+    fig = plot_rd(df, scatter_kwargs=scatter_kwargs, title=TITLE)
     traces = list(fig.select_traces())
 
     for trace in traces:
@@ -112,6 +117,7 @@ def build_args(argv):
     parser.add_argument("--identifiers", type=str, default="model.name")
     parser.add_argument("--out_file", type=str, default="plot_result.html")
     parser.add_argument("--show", action="store_true", help="Show figure in browser.")
+    parser.add_argument("--x", type=str, default="bpp")
     parser.add_argument("--y", type=str, default="psnr")
     parser.add_argument(
         "--y_metrics", type=str, default='[{"suffix": "", "y": "psnr"}]'
