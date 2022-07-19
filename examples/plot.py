@@ -113,7 +113,9 @@ def build_args(argv):
     parser.add_argument("--out_file", type=str, default="plot_result.html")
     parser.add_argument("--show", action="store_true", help="Show figure in browser.")
     parser.add_argument("--y", type=str, default="psnr")
-    parser.add_argument("--y_metrics", type=str, default='[{"suffix": "", "y": "psnr"}')
+    parser.add_argument(
+        "--y_metrics", type=str, default='[{"suffix": "", "y": "psnr"}]'
+    )
     args = parser.parse_args(argv)
     return args
 
