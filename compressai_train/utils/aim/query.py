@@ -65,9 +65,11 @@ def get_runs_dataframe(
     """
     metrics = list(set(metrics + [x, y]))
     runs = runs_by_identifiers(conf, repo, identifiers=identifiers)
+    idxs = [best_metric_index(run, min_metric) for run in runs]
     dfs = [
-        to_df(metrics_at_index(r, metrics, best_metric_index(r, min_metric)))
-        for r in runs
+        to_df(metrics_at_index(run, metrics, idx))
+        for run, idx in zip(runs, idxs)
+        if idx is not None
     ]
     df = pd.concat(dfs)
     df.sort_values(["name", x], inplace=True)
@@ -147,11 +149,12 @@ def best_metric_index(
     min_metric: str = "loss",
     loader: str = "valid",
     scope: str = "epoch",
-) -> np.intp:
+) -> Optional[np.intp]:
     """Returns step index at which a given metric is minimized."""
     context = Context({"loader": loader, "scope": scope})
     metric = run.get_metric(min_metric, context)
-    assert metric is not None
+    if metric is None:
+        return None
     _, metric_values = metric.values.sparse_numpy()
     return metric_values.argmin()
 
