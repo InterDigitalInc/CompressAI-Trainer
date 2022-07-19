@@ -47,8 +47,6 @@ def get_runs_dataframe(
     *,
     min_metric: str = "loss",
     metrics: list[str] = ["bpp", "psnr", "ms-ssim"],
-    x: str = "bpp",
-    y: str = "psnr",
     identifiers: list[str] = ["model.name"],
     to_df: Callable[[dict[str, Any]], pd.DataFrame] = (
         lambda d: pd.DataFrame.from_records([d])
@@ -60,7 +58,6 @@ def get_runs_dataframe(
     For each run, determines epoch at which a min_metric is minimum,
     and accumulates infer metric values at that epoch into a dataframe.
     """
-    metrics = list(set(metrics + [x, y]))
     runs = runs_by_identifiers(conf, repo, identifiers=identifiers)
     idxs = [best_metric_index(run, min_metric) for run in runs]
     dfs = [
@@ -69,7 +66,7 @@ def get_runs_dataframe(
         if idx is not None
     ]
     df = pd.concat(dfs)
-    df.sort_values(["name", x], inplace=True)
+    df.sort_values(["name"], inplace=True)
     df.reset_index(drop=True, inplace=True)
     return df
 
