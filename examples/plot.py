@@ -32,7 +32,7 @@ from __future__ import annotations
 
 import argparse
 import sys
-from typing import cast
+from typing import Iterable, cast
 
 import aim
 import numpy as np
@@ -63,8 +63,6 @@ REFERENCE_DF = pd.concat(
 HOVER_DATA = [
     "run_hash",
     "experiment",
-    "psnr",
-    "ms-ssim",
     "epoch",
 ]
 
@@ -77,7 +75,13 @@ def style_trace_by_idx(trace, idx, key, default, replacement):
 
 
 def create_dataframe(repo, conf, args, run_hash, identifiers):
-    df = get_runs_dataframe(repo=repo, conf=conf, identifiers=identifiers)
+    metrics = sorted(set(_needed_metrics(args.y_metrics, "y")) | {args.x, args.y})
+    df = get_runs_dataframe(
+        repo=repo,
+        conf=conf,
+        identifiers=identifiers,
+        metrics=metrics,
+    )
     df = format_dataframe(df, args.y, args.y_metrics)
     df = pareto_optimal_dataframe(df, x=args.x, y=args.y)
     if run_hash:
@@ -86,6 +90,14 @@ def create_dataframe(repo, conf, args, run_hash, identifiers):
         df = pd.concat([df, df_run])
     current_df = df
     return pd.concat([REFERENCE_DF, current_df])
+
+
+def _needed_metrics(xs, key) -> Iterable[str]:
+    for x in xs:
+        xk = x[key]
+        if isinstance(xk, str):
+            yield xk
+        yield from xk
 
 
 def plot_dataframe(df, run_hash, args):
