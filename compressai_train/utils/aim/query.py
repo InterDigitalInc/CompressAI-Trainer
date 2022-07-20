@@ -46,9 +46,6 @@ def get_runs_dataframe(
     *,
     min_metric: str = "loss",
     metrics: list[str] = ["bpp", "psnr", "ms-ssim"],
-    to_df: Callable[[dict[str, Any]], pd.DataFrame] = (
-        lambda d: pd.DataFrame.from_records([d])
-    ),
     choose_metric: Literal["best"] | Literal["last"] = "best",
 ):
     """Returns dataframe of best model metrics for runs.
@@ -62,12 +59,12 @@ def get_runs_dataframe(
         idxs = [-1 for _ in runs]
     else:
         raise ValueError(f"Unknown choose_metric={choose_metric}.")
-    dfs = [
-        to_df(metrics_at_index(run, metrics, idx))
+    records = [
+        metrics_at_index(run, metrics, idx)
         for run, idx in zip(runs, idxs)
         if idx is not None
     ]
-    df = pd.concat(dfs)
+    df = pd.DataFrame.from_records(records)
     df.sort_values(["name"], inplace=True)
     df.reset_index(drop=True, inplace=True)
     return df
