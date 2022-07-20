@@ -32,17 +32,17 @@ from __future__ import annotations
 
 import argparse
 import sys
-from typing import Iterable, cast
+from typing import Iterable
 
 import aim
 import pandas as pd
-from omegaconf import DictConfig, OmegaConf
 from plotly.offline import plot
 
 from compressai_train.plot import plot_rd
 from compressai_train.utils.aim.query import (
     get_runs_dataframe,
     pareto_optimal_dataframe,
+    runs_by_query,
 )
 from compressai_train.utils.utils import compressai_dataframe, format_dataframe
 
@@ -66,19 +66,18 @@ HOVER_DATA = [
 ]
 
 
-def create_dataframe(repo, conf, args, run_hash, identifiers):
+def create_dataframe(repo, args):
     metrics = sorted(set(_needed_metrics(args.y_metrics, "y")) | {args.x, args.y})
+    runs = runs_by_query(repo, args.query)
     df = get_runs_dataframe(
-        repo=repo,
-        conf=conf,
-        identifiers=identifiers,
+        runs=runs,
         metrics=metrics,
         choose_metric="best",
     )
     df = format_dataframe(df, args.y, args.y_metrics)
     df = pareto_optimal_dataframe(df, x=args.x, y=args.y)
-    if run_hash:
-        df_run = df[df["run_hash"] == run_hash].copy()
+    if args.run_hash:
+        df_run = df[df["run_hash"] == args.run_hash].copy()
         df_run["name"] = df_run["name"].apply(lambda x: x + " (current)")
         df = pd.concat([df, df_run])
     current_df = df
@@ -112,10 +111,11 @@ def plot_dataframe(df, args):
 
 def build_args(argv):
     parser = argparse.ArgumentParser(description="Plot.")
-    parser.add_argument("--conf", type=str)
-    parser.add_argument("--identifiers", type=str, default="model.name")
+    parser.add_argument("--aim_repo", type=str, required=True)
+    parser.add_argument("--run_hash", type=str, default=None)
     parser.add_argument("--out_file", type=str, default="plot_result.html")
     parser.add_argument("--show", action="store_true", help="Show figure in browser.")
+    parser.add_argument("--query", type=str, default="")
     parser.add_argument("--x", type=str, default="bpp")
     parser.add_argument("--y", type=str, default="psnr")
     parser.add_argument(
@@ -127,13 +127,9 @@ def build_args(argv):
 
 def main(argv):
     args = build_args(argv)
-    conf = cast(DictConfig, OmegaConf.load(args.conf))
-    repo = aim.Repo(conf.paths.aim)
-    run_hash = conf.env.aim.run_hash
+    repo = aim.Repo(args.aim_repo)
     args.y_metrics = eval(args.y_metrics)  # WARNING: unsafe!
-    df = create_dataframe(
-        repo, conf, args, run_hash, identifiers=args.identifiers.split(",")
-    )
+    df = create_dataframe(repo, args)
     plot_dataframe(df, args)
 
 

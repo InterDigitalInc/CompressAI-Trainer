@@ -29,7 +29,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Callable, Literal, Mapping, Optional, Sequence, TypeVar
+from typing import Any, Callable, Literal, Optional, Sequence, TypeVar
 
 import aim
 import numpy as np
@@ -42,24 +42,20 @@ T = TypeVar("T")
 
 
 def get_runs_dataframe(
-    repo: aim.Repo,
-    conf: Mapping[str, Any],
+    runs: list[aim.Run],
     *,
     min_metric: str = "loss",
     metrics: list[str] = ["bpp", "psnr", "ms-ssim"],
-    identifiers: list[str] = ["model.name"],
     to_df: Callable[[dict[str, Any]], pd.DataFrame] = (
         lambda d: pd.DataFrame.from_records([d])
     ),
     choose_metric: Literal["best"] | Literal["last"] = "best",
 ):
-    """Returns dataframe of best model metrics for filtered runs.
+    """Returns dataframe of best model metrics for runs.
 
-    Filters runs based on given identifiers.
     For each run, determines epoch at which a min_metric is minimum,
     and accumulates infer metric values at that epoch into a dataframe.
     """
-    runs = runs_by_identifiers(conf, repo, identifiers=identifiers)
     if choose_metric == "best":
         idxs = [best_metric_index(run, min_metric) for run in runs]
     elif choose_metric == "last":
@@ -104,16 +100,10 @@ def pareto_optimal_dataframe(
     return df
 
 
-def runs_by_identifiers(
-    conf: Mapping[str, Any], repo: aim.Repo, identifiers: list[str]
-) -> list[aim.Run]:
-    """Returns runs that match the same identifiers present in conf."""
-    if identifiers == []:
+def runs_by_query(repo: aim.Repo, query: str) -> list[aim.Run]:
+    """Returns runs that match given query."""
+    if query == "":
         return list(repo.iter_runs())
-    targets = tuple(_get_path(conf, path.split(".")) for path in identifiers)
-    query = " and ".join(
-        f"run.{key} == {repr(value)}" for key, value in zip(identifiers, targets)
-    )
     runs = [x.run for x in repo.query_runs(query).iter_runs()]  # type: ignore
     return runs
 
