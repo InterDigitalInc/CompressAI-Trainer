@@ -121,8 +121,9 @@ def plot_dataframe(df, args):
         hover_data=HOVER_DATA,
     )
 
+    print(df)
+
     fig = plot_rd(df, scatter_kwargs=scatter_kwargs, title=TITLE)
-    print(fig)
 
     if args.show:
         fig.show()
