@@ -77,11 +77,13 @@ HOVER_DATA += HOVER_HPARAMS + HOVER_METRICS
 
 
 def create_dataframe(repo, args):
-    assert len(args.query) == len(args.name) == len(args.y_metrics)
+    assert len(args.query) == len(args.name) == len(args.xy_metrics)
     dfs = []
-    for name, query, y_metrics in zip(args.name, args.query, args.y_metrics):
+    for name, query, xy_metrics in zip(args.name, args.query, args.xy_metrics):
         metrics = sorted(
-            set(_needed_metrics(y_metrics, "y")) | {args.x, args.y, *HOVER_METRICS}
+            {args.x, args.y, *HOVER_METRICS}
+            | set(_needed_metrics(xy_metrics, "x"))
+            | set(_needed_metrics(xy_metrics, "y"))
         )
         hparams = HOVER_HPARAMS
         runs = runs_by_query(repo, query)
@@ -93,7 +95,7 @@ def create_dataframe(repo, args):
         )
         if name:
             df["name"] = name
-        df = format_dataframe(df, args.y, y_metrics)
+        df = format_dataframe(df, args.x, args.y, xy_metrics)
         df = pareto_optimal_dataframe(df, x=args.x, y=args.y)
         dfs.append(df)
     df = pd.concat(dfs)
@@ -154,10 +156,10 @@ def build_args(argv):
         ),
     )
     parser.add_argument(
-        "--y_metrics",
-        "-ym",
+        "--xy_metrics",
+        "-xym",
         action="append",
-        help='Default: [{"suffix": "", "y": "psnr"}]',
+        help='Default: [{"suffix": "", "x": "bpp", "y": "psnr"}]',
         default=[],
     )
     args = parser.parse_args(argv)
@@ -168,9 +170,9 @@ def build_args(argv):
         args.name = [""]
     if len(args.query) != len(args.name):
         raise RuntimeError("--query and --name should appear the same number of times.")
-    args.y_metrics = [eval(x) for x in args.y_metrics]  # WARNING: unsafe!
-    args.y_metrics += [[{"suffix": "", "y": "psnr"}]] * (
-        len(args.query) - len(args.y_metrics)
+    args.xy_metrics = [eval(x) for x in args.xy_metrics]  # WARNING: unsafe!
+    args.xy_metrics += [[{"suffix": "", "x": "bpp", "y": "psnr"}]] * (
+        len(args.query) - len(args.xy_metrics)
     )
 
     return args

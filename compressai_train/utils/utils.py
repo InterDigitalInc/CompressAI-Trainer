@@ -158,16 +158,18 @@ def arg_pareto_optimal_set(xs, objectives):
 
 
 def format_dataframe(
-    df: pd.DataFrame, y: str, y_metrics: list[dict[str, Any]]
+    df: pd.DataFrame, x: str, y: str, xy_metrics: list[dict[str, Any]]
 ) -> pd.DataFrame:
     """Returns dataframe prepared for plotting multiple metrics.
 
     Args:
         df: Dataframe.
+        x: Destination x series.
         y: Destination y series.
-        y_metrics:
+        xy_metrics:
             Source y series. Useful for plotting multiple curves of the
             same unit scale (e.g. dB) on the same plot.
+        skip_nan: Skip accumulating NaN values into x, y series.
 
     Examples:
 
@@ -178,23 +180,35 @@ def format_dataframe(
 
         # Multiple series with different suffixes.
         [
-            {"suffix": " (psnr_x)", "y": "psnr_x"},
-            {"suffix": " (psnr_s)", "y": "psnr_s"},
+            {"suffix": " (psnr_x)", "x": "bpp" "y": "psnr_x"},
+            {"suffix": " (psnr_s)", "x": "bpp" "y": "psnr_s"},
         ]
 
-        # Flatten multiple psnrs onto a single curve.
-        [{"suffix": "", "y": ["psnr_0", "psnr_1", "psnr_2"]}]
+        # Flatten multiple bpps/psnrs onto a single curve.
+        [
+            {
+                "suffix": "",
+                "x": ["bpp_0", "bpp_1", "bpp_2"],
+                "y": ["psnr_0", "psnr_1", "psnr_2"],
+            }
+        ]
     """
     records = []
     for record in df.to_dict("records"):
-        for y_metric in y_metrics:
+        for xy_metric in xy_metrics:
             base_record = dict(record)
-            base_record["name"] = record["name"] + y_metric["suffix"]
-            y_srcs = y_metric["y"]
-            if isinstance(y_srcs, str):
-                y_srcs = [y_srcs]
-            for y_src in y_srcs:
+            base_record["name"] = record["name"] + xy_metric.get("suffix", "")
+            for x_src, y_src in zip(
+                _coerce_list(xy_metric["x"]), _coerce_list(xy_metric["y"])
+            ):
                 r = dict(base_record)
+                r[x] = record[x_src]
                 r[y] = record[y_src]
                 records.append(r)
     return pd.DataFrame.from_records(records)
+
+
+def _coerce_list(x):
+    if isinstance(x, list):
+        return x
+    return [x]
