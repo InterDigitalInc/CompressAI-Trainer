@@ -96,6 +96,7 @@ def _needed_metrics(xs, key) -> Iterable[str]:
         xk = x[key]
         if isinstance(xk, str):
             yield xk
+            continue
         yield from xk
 
 
