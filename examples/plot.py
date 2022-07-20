@@ -95,7 +95,7 @@ def create_dataframe(repo, args):
         )
         if name:
             df["name"] = name
-        df = format_dataframe(df, args.x, args.y, xy_metrics)
+        df = format_dataframe(df, args.x, args.y, xy_metrics, skip_nan=True)
         df = pareto_optimal_dataframe(df, x=args.x, y=args.y)
         dfs.append(df)
     df = pd.concat(dfs)

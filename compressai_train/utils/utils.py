@@ -139,6 +139,9 @@ def arg_pareto_optimal_set(xs, objectives):
     if len(xs) != 2:
         raise NotImplementedError
 
+    if np.isnan(xs).any():
+        raise ValueError("xs contains NaN values.")
+
     x, y = xs
     xo, yo = [-1 if o == "min" else 1 for o in objectives]
     perm = x.argsort()
@@ -158,7 +161,11 @@ def arg_pareto_optimal_set(xs, objectives):
 
 
 def format_dataframe(
-    df: pd.DataFrame, x: str, y: str, xy_metrics: list[dict[str, Any]]
+    df: pd.DataFrame,
+    x: str,
+    y: str,
+    xy_metrics: list[dict[str, Any]],
+    skip_nan: bool = True,
 ) -> pd.DataFrame:
     """Returns dataframe prepared for plotting multiple metrics.
 
@@ -204,6 +211,8 @@ def format_dataframe(
                 r = dict(base_record)
                 r[x] = record[x_src]
                 r[y] = record[y_src]
+                if skip_nan and (np.isnan(r[x]) or np.isnan(r[y])):
+                    continue
                 records.append(r)
     return pd.DataFrame.from_records(records)
 
