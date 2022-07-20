@@ -59,22 +59,36 @@ REFERENCE_DF = pd.concat(
     [compressai_dataframe(name, dataset="kodak") for name in COMPRESSAI_CODECS]
 )
 
+HOVER_HPARAMS = [
+    "criterion.lmbda",
+]
+
+HOVER_METRICS = [
+    #
+]
+
 HOVER_DATA = [
     "run_hash",
     "experiment",
     "epoch",
 ]
 
+HOVER_DATA += HOVER_HPARAMS + HOVER_METRICS
+
 
 def create_dataframe(repo, args):
     assert len(args.query) == len(args.name) == len(args.y_metrics)
     dfs = []
     for name, query, y_metrics in zip(args.name, args.query, args.y_metrics):
-        metrics = sorted(set(_needed_metrics(y_metrics, "y")) | {args.x, args.y})
+        metrics = sorted(
+            set(_needed_metrics(y_metrics, "y")) | {args.x, args.y, *HOVER_METRICS}
+        )
+        hparams = HOVER_HPARAMS
         runs = runs_by_query(repo, query)
         df = get_runs_dataframe(
             runs=runs,
             metrics=metrics,
+            hparams=hparams,
             choose_metric="best",
         )
         if name:

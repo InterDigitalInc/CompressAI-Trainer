@@ -46,6 +46,7 @@ def get_runs_dataframe(
     *,
     min_metric: str = "loss",
     metrics: list[str] = ["bpp", "psnr", "ms-ssim"],
+    hparams: list[str] = [],
     choose_metric: Literal["best"] | Literal["last"] = "best",
 ):
     """Returns dataframe of best model metrics for runs.
@@ -60,7 +61,7 @@ def get_runs_dataframe(
     else:
         raise ValueError(f"Unknown choose_metric={choose_metric}.")
     records = [
-        metrics_at_index(run, metrics, idx)
+        metrics_at_index(run, metrics, hparams, idx)
         for run, idx in zip(runs, idxs)
         if idx is not None
     ]
@@ -108,19 +109,21 @@ def runs_by_query(repo: aim.Repo, query: str) -> list[aim.Run]:
 def metrics_at_index(
     run: aim.Run,
     metrics: list[str],
+    hparams: list[str],
     index: int | np.intp,
     loader: str = "infer",
     scope: str = "epoch",
 ) -> dict[str, Any]:
     """Returns metrics logged at a particular step index."""
     context = Context({"loader": loader, "scope": scope})
-    results = {
+    metric_results = {
         metric: _map_none(
             lambda x: x.values.sparse_numpy()[1][index],
             run.get_metric(metric, context),
         )
         for metric in metrics
     }
+    hparam_results = {hparam: _get_path(run, hparam.split(".")) for hparam in hparams}
     info = {
         "name": run["model", "name"],
         "run_hash": run.hash,
@@ -128,7 +131,7 @@ def metrics_at_index(
         "model.name": run["model", "name"],
         "epoch": index + 1,  # TODO not always true
     }
-    return {**info, **results}
+    return {**info, **metric_results, **hparam_results}
 
 
 def best_metric_index(
