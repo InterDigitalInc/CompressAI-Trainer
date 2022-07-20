@@ -68,17 +68,21 @@ HOVER_DATA = [
 
 def create_dataframe(repo, args):
     metrics = sorted(set(_needed_metrics(args.y_metrics, "y")) | {args.x, args.y})
-    name, query = args.name, args.query
-    runs = runs_by_query(repo, query)
-    df = get_runs_dataframe(
-        runs=runs,
-        metrics=metrics,
-        choose_metric="best",
-    )
-    if name:
-        df["name"] = name
-    df = format_dataframe(df, args.y, args.y_metrics)
-    df = pareto_optimal_dataframe(df, x=args.x, y=args.y)
+    assert len(args.query) == len(args.name) == len(args.y_metrics)
+    dfs = []
+    for name, query in zip(args.name, args.query):
+        runs = runs_by_query(repo, query)
+        df = get_runs_dataframe(
+            runs=runs,
+            metrics=metrics,
+            choose_metric="best",
+        )
+        if name:
+            df["name"] = name
+        df = format_dataframe(df, args.y, args.y_metrics)
+        df = pareto_optimal_dataframe(df, x=args.x, y=args.y)
+        dfs.append(df)
+    df = pd.concat(dfs)
     if args.run_hash:
         df_run = df[df["run_hash"] == args.run_hash].copy()
         df_run["name"] = df_run["name"].apply(lambda x: x + " (current)")
@@ -120,19 +124,45 @@ def build_args(argv):
     parser.add_argument("--show", action="store_true", help="Show figure in browser.")
     parser.add_argument("--x", type=str, default="bpp")
     parser.add_argument("--y", type=str, default="psnr")
-    parser.add_argument("--query", "-q", type=str, default="")
-    parser.add_argument("--name", "-n", type=str, default="")
+    parser.add_argument("--name", "-n", action="append", default=[])
     parser.add_argument(
-        "--y_metrics", "-ym", type=str, default='[{"suffix": "", "y": "psnr"}]'
+        "--query",
+        "-q",
+        action="append",
+        default=[],
+        help=(
+            "Example: '"
+            'run.model.name == "bmshj2018-factorized" and '
+            'run.exp.name == "example-experiment"'
+            "'"
+        ),
+    )
+    parser.add_argument(
+        "--y_metrics",
+        "-ym",
+        action="append",
+        help='Default: [{"suffix": "", "y": "psnr"}]',
+        default=[],
     )
     args = parser.parse_args(argv)
+
+    if len(args.query) == 0:
+        args.query = [""]
+    if len(args.name) == 0:
+        args.name = [""]
+    if len(args.query) != len(args.name):
+        raise RuntimeError("--query and --name should appear the same number of times.")
+    args.y_metrics = [eval(x) for x in args.y_metrics]  # WARNING: unsafe!
+    args.y_metrics += [{"suffix": "", "y": "psnr"}] * (
+        len(args.query) - len(args.y_metrics)
+    )
+
     return args
 
 
 def main(argv):
     args = build_args(argv)
     repo = aim.Repo(args.aim_repo)
-    args.y_metrics = eval(args.y_metrics)  # WARNING: unsafe!
     df = create_dataframe(repo, args)
     plot_dataframe(df, args)
 
