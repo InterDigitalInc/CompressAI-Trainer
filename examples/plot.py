@@ -68,12 +68,15 @@ HOVER_DATA = [
 
 def create_dataframe(repo, args):
     metrics = sorted(set(_needed_metrics(args.y_metrics, "y")) | {args.x, args.y})
-    runs = runs_by_query(repo, args.query)
+    name, query = args.name, args.query
+    runs = runs_by_query(repo, query)
     df = get_runs_dataframe(
         runs=runs,
         metrics=metrics,
         choose_metric="best",
     )
+    if name:
+        df["name"] = name
     df = format_dataframe(df, args.y, args.y_metrics)
     df = pareto_optimal_dataframe(df, x=args.x, y=args.y)
     if args.run_hash:
@@ -115,11 +118,12 @@ def build_args(argv):
     parser.add_argument("--run_hash", type=str, default=None)
     parser.add_argument("--out_file", type=str, default="plot_result.html")
     parser.add_argument("--show", action="store_true", help="Show figure in browser.")
-    parser.add_argument("--query", type=str, default="")
     parser.add_argument("--x", type=str, default="bpp")
     parser.add_argument("--y", type=str, default="psnr")
+    parser.add_argument("--query", "-q", type=str, default="")
+    parser.add_argument("--name", "-n", type=str, default="")
     parser.add_argument(
-        "--y_metrics", type=str, default='[{"suffix": "", "y": "psnr"}]'
+        "--y_metrics", "-ym", type=str, default='[{"suffix": "", "y": "psnr"}]'
     )
     args = parser.parse_args(argv)
     return args
