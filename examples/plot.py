@@ -67,10 +67,10 @@ HOVER_DATA = [
 
 
 def create_dataframe(repo, args):
-    metrics = sorted(set(_needed_metrics(args.y_metrics, "y")) | {args.x, args.y})
     assert len(args.query) == len(args.name) == len(args.y_metrics)
     dfs = []
-    for name, query in zip(args.name, args.query):
+    for name, query, y_metrics in zip(args.name, args.query, args.y_metrics):
+        metrics = sorted(set(_needed_metrics(y_metrics, "y")) | {args.x, args.y})
         runs = runs_by_query(repo, query)
         df = get_runs_dataframe(
             runs=runs,
@@ -79,7 +79,7 @@ def create_dataframe(repo, args):
         )
         if name:
             df["name"] = name
-        df = format_dataframe(df, args.y, args.y_metrics)
+        df = format_dataframe(df, args.y, y_metrics)
         df = pareto_optimal_dataframe(df, x=args.x, y=args.y)
         dfs.append(df)
     df = pd.concat(dfs)
@@ -154,7 +154,7 @@ def build_args(argv):
     if len(args.query) != len(args.name):
         raise RuntimeError("--query and --name should appear the same number of times.")
     args.y_metrics = [eval(x) for x in args.y_metrics]  # WARNING: unsafe!
-    args.y_metrics += [{"suffix": "", "y": "psnr"}] * (
+    args.y_metrics += [[{"suffix": "", "y": "psnr"}]] * (
         len(args.query) - len(args.y_metrics)
     )
 
