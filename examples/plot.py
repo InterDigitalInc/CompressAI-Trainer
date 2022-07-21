@@ -104,10 +104,6 @@ def create_dataframe(repo, args):
             df = pareto_optimal_dataframe(df, x=args.x, y=args.y)
         dfs.append(df)
     df = pd.concat(dfs)
-    if args.run_hash:
-        df_run = df[df["run_hash"] == args.run_hash].copy()
-        df_run["name"] = df_run["name"].apply(lambda x: x + " (current)")
-        df = pd.concat([df, df_run])
     current_df = df
     df = pd.concat([REFERENCE_DF, current_df])
     df = _reorder_dataframe_columns(df)
@@ -154,7 +150,6 @@ def plot_dataframe(df: pd.DataFrame, args):
 def build_args(argv):
     parser = argparse.ArgumentParser(description="Plot.")
     parser.add_argument("--aim_repo", type=str, required=True)
-    parser.add_argument("--run_hash", type=str, default=None)
     parser.add_argument("--out_html", type=str, default="plot_result.html")
     parser.add_argument("--out_csv", type=str, default="plot_result.csv")
     parser.add_argument("--show", action="store_true", help="Show figure in browser.")
