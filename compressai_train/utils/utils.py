@@ -212,7 +212,6 @@ def format_dataframe(
                 r = dict(base_record)
                 r[x] = record[x_src]
                 r[y] = record[y_src]
-                print(r, x_src, y_src)
                 if skip_nan and (_is_nan(r[x]) or _is_nan(r[y])):
                     continue
                 records.append(r)
