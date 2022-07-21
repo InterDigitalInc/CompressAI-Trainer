@@ -47,19 +47,15 @@ def get_runs_dataframe(
     min_metric: str = "loss",
     metrics: list[str] = ["bpp", "psnr", "ms-ssim"],
     hparams: list[str] = [],
-    choose_metric: Literal["best"] | Literal["last"] = "best",
+    epoch: int | Literal["best"] | Literal["last"] = "best",
 ):
     """Returns dataframe of best model metrics for runs.
 
-    For each run, determines epoch at which a min_metric is minimum,
-    and accumulates infer metric values at that epoch into a dataframe.
+    For each run, accumulates infer metric values at a particular epoch
+    into a dataframe.
+    If epoch == "best", the epoch minimizing the min_metric is chosen.
     """
-    if choose_metric == "best":
-        idxs = [best_metric_index(run, min_metric) for run in runs]
-    elif choose_metric == "last":
-        idxs = [-1 for _ in runs]
-    else:
-        raise ValueError(f"Unknown choose_metric={choose_metric}.")
+    idxs = [_find_index(run, epoch, min_metric) for run in runs]
     records = [
         metrics_at_index(run, metrics, hparams, idx)
         for run, idx in zip(runs, idxs)
@@ -110,7 +106,7 @@ def metrics_at_index(
     run: aim.Run,
     metrics: list[str],
     hparams: list[str],
-    index: int | np.intp,
+    index: int,
     loader: str = "infer",
     scope: str = "epoch",
 ) -> dict[str, Any]:
@@ -139,14 +135,30 @@ def best_metric_index(
     min_metric: str = "loss",
     loader: str = "valid",
     scope: str = "epoch",
-) -> Optional[np.intp]:
+) -> Optional[int]:
     """Returns step index at which a given metric is minimized."""
     context = Context({"loader": loader, "scope": scope})
     metric = run.get_metric(min_metric, context)
     if metric is None:
         return None
     _, metric_values = metric.values.sparse_numpy()
-    return metric_values.argmin()
+    return int(metric_values.argmin())
+
+
+def _find_index(
+    run: aim.Run,
+    epoch: int | Literal["best"] | Literal["last"] = "best",
+    min_metric: str = "loss",
+    loader: str = "valid",
+    scope: str = "epoch",
+):
+    if epoch == "best":
+        return best_metric_index(run, min_metric, loader=loader, scope=scope)
+    if epoch == "last":
+        return -1
+    if isinstance(epoch, int):
+        return epoch
+    raise ValueError(f"Unknown epoch={epoch}.")
 
 
 def _map_none(f: Callable[[T], T], x: Optional[T]) -> Optional[T]:

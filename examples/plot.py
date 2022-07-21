@@ -102,7 +102,7 @@ def _create_dataframe(repo, x, y, name, query, curves, pareto):
         runs=runs,
         metrics=metrics,
         hparams=hparams,
-        choose_metric="best",
+        epoch="best",
     )
     if name:
         df["name"] = name
