@@ -119,7 +119,7 @@ def _needed_metrics(xs, key) -> Iterable[str]:
         yield from xk
 
 
-def plot_dataframe(df, args):
+def plot_dataframe(df: pd.DataFrame, args):
     scatter_kwargs = dict(
         x=args.x,
         y=args.y,
@@ -128,20 +128,24 @@ def plot_dataframe(df, args):
 
     print(df)
 
+    if args.out_csv:
+        df.to_csv(args.out_csv, index=False)
+
     fig = plot_rd(df, scatter_kwargs=scatter_kwargs, title=TITLE)
+
+    if args.out_html:
+        plot(fig, auto_open=False, filename=args.out_html)
 
     if args.show:
         fig.show()
-
-    if args.out_file:
-        plot(fig, auto_open=False, filename=args.out_file)
 
 
 def build_args(argv):
     parser = argparse.ArgumentParser(description="Plot.")
     parser.add_argument("--aim_repo", type=str, required=True)
     parser.add_argument("--run_hash", type=str, default=None)
-    parser.add_argument("--out_file", type=str, default="plot_result.html")
+    parser.add_argument("--out_html", type=str, default="plot_result.html")
+    parser.add_argument("--out_csv", type=str, default="plot_result.csv")
     parser.add_argument("--show", action="store_true", help="Show figure in browser.")
     parser.add_argument("--x", type=str, default="bpp")
     parser.add_argument("--y", type=str, default="psnr")
