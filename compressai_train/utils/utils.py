@@ -213,7 +213,7 @@ def format_dataframe(
         for curve in curves:
             for x_src, y_src in zip(_coerce_list(curve["x"]), _coerce_list(curve["y"])):
                 r = dict(record)
-                fmt = curve.get("name", "{model.name}")
+                fmt = curve.get("name", "{name}")
                 r["name"] = formatter.vformat(fmt, [], record)
                 r["name"] += curve.get("suffix", "")
                 r[x] = record[x_src]
