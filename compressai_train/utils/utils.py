@@ -30,6 +30,7 @@
 from __future__ import annotations
 
 import json
+import math
 from typing import Any
 
 import compressai
@@ -211,10 +212,15 @@ def format_dataframe(
                 r = dict(base_record)
                 r[x] = record[x_src]
                 r[y] = record[y_src]
-                if skip_nan and (np.isnan(r[x]) or np.isnan(r[y])):
+                print(r, x_src, y_src)
+                if skip_nan and (_is_nan(r[x]) or _is_nan(r[y])):
                     continue
                 records.append(r)
     return pd.DataFrame.from_records(records)
+
+
+def _is_nan(x):
+    return x is None or math.isnan(x)
 
 
 def _coerce_list(x):
