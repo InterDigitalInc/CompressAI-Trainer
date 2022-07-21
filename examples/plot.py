@@ -79,7 +79,9 @@ HOVER_DATA += HOVER_HPARAMS + HOVER_METRICS
 def create_dataframe(repo, args):
     assert len(args.query) == len(args.name) == len(args.xy_metrics)
     dfs = []
-    for name, query, xy_metrics in zip(args.name, args.query, args.xy_metrics):
+    for name, query, xy_metrics, pareto in zip(
+        args.name, args.query, args.xy_metrics, args.pareto
+    ):
         metrics = sorted(
             {args.x, args.y, *HOVER_METRICS}
             | set(_needed_metrics(xy_metrics, "x"))
@@ -96,7 +98,8 @@ def create_dataframe(repo, args):
         if name:
             df["name"] = name
         df = format_dataframe(df, args.x, args.y, xy_metrics, skip_nan=True)
-        df = pareto_optimal_dataframe(df, x=args.x, y=args.y)
+        if pareto:
+            df = pareto_optimal_dataframe(df, x=args.x, y=args.y)
         dfs.append(df)
     df = pd.concat(dfs)
     if args.run_hash:
@@ -162,6 +165,7 @@ def build_args(argv):
         help='Default: [{"suffix": "", "x": "bpp", "y": "psnr"}]',
         default=[],
     )
+    parser.add_argument("--pareto", action="append", default=[])
     args = parser.parse_args(argv)
 
     if len(args.query) == 0:
@@ -174,6 +178,7 @@ def build_args(argv):
     args.xy_metrics += [[{"suffix": "", "x": "bpp", "y": "psnr"}]] * (
         len(args.query) - len(args.xy_metrics)
     )
+    args.pareto += [False] * (len(args.query) - len(args.pareto))
 
     return args
 
