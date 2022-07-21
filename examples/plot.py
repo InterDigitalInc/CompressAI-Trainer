@@ -175,14 +175,12 @@ def build_args(argv):
 
     if len(args.query) == 0:
         args.query = [""]
-    if len(args.name) == 0:
-        args.name = [""]
-    if len(args.query) != len(args.name):
-        raise RuntimeError("--query and --name should appear the same number of times.")
+    num_queries = len(args.query)
     curves_default = [{"name": "{name}", "suffix": "", "x": "bpp", "y": "psnr"}]
     args.curves = [eval(x) for x in args.curves]  # WARNING: unsafe!
-    args.curves += [curves_default] * (len(args.query) - len(args.curves))
-    args.pareto += [False] * (len(args.query) - len(args.pareto))
+    args.curves += [curves_default] * (num_queries - len(args.curves))
+    args.name += [""] * (num_queries - len(args.name))
+    args.pareto += [False] * (num_queries - len(args.pareto))
 
     return args
 
