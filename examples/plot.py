@@ -77,15 +77,15 @@ HOVER_DATA += HOVER_HPARAMS + HOVER_METRICS
 
 
 def create_dataframe(repo, args):
-    assert len(args.query) == len(args.name) == len(args.xy_metrics)
+    assert len(args.query) == len(args.name) == len(args.curves)
     dfs = []
-    for name, query, xy_metrics, pareto in zip(
-        args.name, args.query, args.xy_metrics, args.pareto
+    for name, query, curves, pareto in zip(
+        args.name, args.query, args.curves, args.pareto
     ):
         metrics = sorted(
             {args.x, args.y, *HOVER_METRICS}
-            | set(_needed_metrics(xy_metrics, "x"))
-            | set(_needed_metrics(xy_metrics, "y"))
+            | set(_needed_metrics(curves, "x"))
+            | set(_needed_metrics(curves, "y"))
         )
         hparams = HOVER_HPARAMS
         runs = runs_by_query(repo, query)
@@ -97,7 +97,7 @@ def create_dataframe(repo, args):
         )
         if name:
             df["name"] = name
-        df = format_dataframe(df, args.x, args.y, xy_metrics, skip_nan=True)
+        df = format_dataframe(df, args.x, args.y, curves, skip_nan=True)
         if pareto:
             df = pareto_optimal_dataframe(df, x=args.x, y=args.y)
         dfs.append(df)
@@ -159,8 +159,8 @@ def build_args(argv):
         ),
     )
     parser.add_argument(
-        "--xy_metrics",
-        "-xym",
+        "--curves",
+        "-c",
         action="append",
         help=(
             'Default: [{"name": "{model.name}", "suffix": "", "x": "bpp", "y": "psnr"}]'
@@ -176,10 +176,10 @@ def build_args(argv):
         args.name = [""]
     if len(args.query) != len(args.name):
         raise RuntimeError("--query and --name should appear the same number of times.")
-    args.xy_metrics = [eval(x) for x in args.xy_metrics]  # WARNING: unsafe!
-    args.xy_metrics += [
+    args.curves = [eval(x) for x in args.curves]  # WARNING: unsafe!
+    args.curves += [
         [{"name": "{model.name}", "suffix": "", "x": "bpp", "y": "psnr"}]
-    ] * (len(args.query) - len(args.xy_metrics))
+    ] * (len(args.query) - len(args.curves))
     args.pareto += [False] * (len(args.query) - len(args.pareto))
 
     return args

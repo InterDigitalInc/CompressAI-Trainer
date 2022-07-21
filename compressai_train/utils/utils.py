@@ -171,7 +171,7 @@ def format_dataframe(
     df: pd.DataFrame,
     x: str,
     y: str,
-    xy_metrics: list[dict[str, Any]],
+    curves: list[dict[str, Any]],
     skip_nan: bool = True,
 ) -> pd.DataFrame:
     """Returns dataframe prepared for plotting multiple metrics.
@@ -180,7 +180,7 @@ def format_dataframe(
         df: Dataframe.
         x: Destination x series.
         y: Destination y series.
-        xy_metrics:
+        curves:
             Source y series. Useful for plotting multiple curves of the
             same unit scale (e.g. dB) on the same plot.
         skip_nan: Skip accumulating NaN values into x, y series.
@@ -210,14 +210,12 @@ def format_dataframe(
     formatter = ConfigStringFormatter()
     records = []
     for record in df.to_dict("records"):
-        for xy_metric in xy_metrics:
-            for x_src, y_src in zip(
-                _coerce_list(xy_metric["x"]), _coerce_list(xy_metric["y"])
-            ):
+        for curve in curves:
+            for x_src, y_src in zip(_coerce_list(curve["x"]), _coerce_list(curve["y"])):
                 r = dict(record)
-                fmt = xy_metric.get("name", "{model.name}")
+                fmt = curve.get("name", "{model.name}")
                 r["name"] = formatter.vformat(fmt, [], record)
-                r["name"] += xy_metric.get("suffix", "")
+                r["name"] += curve.get("suffix", "")
                 r[x] = record[x_src]
                 r[y] = record[y_src]
                 if skip_nan and (_is_nan(r[x]) or _is_nan(r[y])):
