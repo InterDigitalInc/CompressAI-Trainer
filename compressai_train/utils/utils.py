@@ -31,6 +31,7 @@ from __future__ import annotations
 
 import json
 import math
+import string
 from typing import Any
 
 import compressai
@@ -38,6 +39,11 @@ import numpy as np
 import pandas as pd
 import torch
 import torch.nn.functional as F
+
+
+class ConfigStringFormatter(string.Formatter):
+    def get_field(self, field_name, args, kwargs):
+        return self.get_value(field_name, args, kwargs), field_name
 
 
 def preprocess_img(img: np.ndarray) -> torch.Tensor:
@@ -201,15 +207,17 @@ def format_dataframe(
             }
         ]
     """
+    formatter = ConfigStringFormatter()
     records = []
     for record in df.to_dict("records"):
         for xy_metric in xy_metrics:
-            base_record = dict(record)
-            base_record["name"] = record["name"] + xy_metric.get("suffix", "")
             for x_src, y_src in zip(
                 _coerce_list(xy_metric["x"]), _coerce_list(xy_metric["y"])
             ):
-                r = dict(base_record)
+                r = dict(record)
+                fmt = xy_metric.get("name", "{model.name}")
+                r["name"] = formatter.vformat(fmt, [], record)
+                r["name"] += xy_metric.get("suffix", "")
                 r[x] = record[x_src]
                 r[y] = record[y_src]
                 if skip_nan and (_is_nan(r[x]) or _is_nan(r[y])):

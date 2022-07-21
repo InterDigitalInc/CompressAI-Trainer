@@ -162,7 +162,9 @@ def build_args(argv):
         "--xy_metrics",
         "-xym",
         action="append",
-        help='Default: [{"suffix": "", "x": "bpp", "y": "psnr"}]',
+        help=(
+            'Default: [{"name": "{model.name}", "suffix": "", "x": "bpp", "y": "psnr"}]'
+        ),
         default=[],
     )
     parser.add_argument("--pareto", action="append", default=[])
@@ -175,9 +177,9 @@ def build_args(argv):
     if len(args.query) != len(args.name):
         raise RuntimeError("--query and --name should appear the same number of times.")
     args.xy_metrics = [eval(x) for x in args.xy_metrics]  # WARNING: unsafe!
-    args.xy_metrics += [[{"suffix": "", "x": "bpp", "y": "psnr"}]] * (
-        len(args.query) - len(args.xy_metrics)
-    )
+    args.xy_metrics += [
+        [{"name": "{model.name}", "suffix": "", "x": "bpp", "y": "psnr"}]
+    ] * (len(args.query) - len(args.xy_metrics))
     args.pareto += [False] * (len(args.query) - len(args.pareto))
 
     return args
