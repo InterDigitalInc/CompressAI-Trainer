@@ -153,8 +153,8 @@ def build_args(argv):
     parser.add_argument("--out_html", type=str, default="plot_result.html")
     parser.add_argument("--out_csv", type=str, default="plot_result.csv")
     parser.add_argument("--show", action="store_true", help="Show figure in browser.")
-    parser.add_argument("--x", type=str, default="bpp")
-    parser.add_argument("--y", type=str, default="psnr")
+    parser.add_argument("--x", "-x", type=str, default="bpp")
+    parser.add_argument("--y", "-y", type=str, default="psnr")
     parser.add_argument("--name", "-n", action="append", default=[])
     parser.add_argument(
         "--query",
