@@ -79,34 +79,36 @@ HOVER_DATA += HOVER_HPARAMS + HOVER_METRICS
 
 
 def create_dataframe(repo, args):
-    assert len(args.query) == len(args.name) == len(args.curves)
-    dfs = []
-    for name, query, curves, pareto in zip(
-        args.name, args.query, args.curves, args.pareto
-    ):
-        metrics = sorted(
-            {args.x, args.y, *HOVER_METRICS}
-            | set(_needed_metrics(curves, "x"))
-            | set(_needed_metrics(curves, "y"))
+    dfs = [
+        _create_dataframe(repo, args.x, args.y, name, query, curves, pareto)
+        for name, query, curves, pareto in zip(
+            args.name, args.query, args.curves, args.pareto
         )
-        hparams = HOVER_HPARAMS
-        runs = runs_by_query(repo, query)
-        df = get_runs_dataframe(
-            runs=runs,
-            metrics=metrics,
-            hparams=hparams,
-            choose_metric="best",
-        )
-        if name:
-            df["name"] = name
-        df = format_dataframe(df, args.x, args.y, curves, skip_nan=True)
-        if pareto:
-            df = pareto_optimal_dataframe(df, x=args.x, y=args.y)
-        dfs.append(df)
-    df = pd.concat(dfs)
-    current_df = df
-    df = pd.concat([REFERENCE_DF, current_df])
+    ]
+    df = pd.concat([REFERENCE_DF, *dfs])
     df = _reorder_dataframe_columns(df)
+    return df
+
+
+def _create_dataframe(repo, x, y, name, query, curves, pareto):
+    runs = runs_by_query(repo, query)
+    metrics = sorted(
+        {x, y, *HOVER_METRICS}
+        | set(_needed_metrics(curves, "x"))
+        | set(_needed_metrics(curves, "y"))
+    )
+    hparams = HOVER_HPARAMS
+    df = get_runs_dataframe(
+        runs=runs,
+        metrics=metrics,
+        hparams=hparams,
+        choose_metric="best",
+    )
+    if name:
+        df["name"] = name
+    df = format_dataframe(df, x, y, curves, skip_nan=True)
+    if pareto:
+        df = pareto_optimal_dataframe(df, x=x, y=y)
     return df
 
 
@@ -148,32 +150,25 @@ def plot_dataframe(df: pd.DataFrame, args):
 
 
 def build_args(argv):
+    help = {
+        "show": "Show figure in browser.",
+        "query": 'Example: \'run.model.name == "bmshj2018-factorized" and run.exp.name == "example-experiment"\'',
+        "curves": 'Default: [{"name": "{name}", "suffix": "", "x": "bpp", "y": "psnr"}]',
+    }
+
     parser = argparse.ArgumentParser(description="Plot.")
     parser.add_argument("--aim_repo", type=str, required=True)
     parser.add_argument("--out_html", type=str, default="plot_result.html")
     parser.add_argument("--out_csv", type=str, default="plot_result.csv")
-    parser.add_argument("--show", action="store_true", help="Show figure in browser.")
+    parser.add_argument("--show", action="store_true", help=help["show"])
     parser.add_argument("--x", "-x", type=str, default="bpp")
     parser.add_argument("--y", "-y", type=str, default="psnr")
     parser.add_argument("--name", "-n", action="append", default=[])
     parser.add_argument(
-        "--query",
-        "-q",
-        action="append",
-        default=[],
-        help=(
-            "Example: '"
-            'run.model.name == "bmshj2018-factorized" and '
-            'run.exp.name == "example-experiment"'
-            "'"
-        ),
+        "--query", "-q", action="append", default=[], help=help["query"]
     )
     parser.add_argument(
-        "--curves",
-        "-c",
-        action="append",
-        help='Default: [{"name": "{name}", "suffix": "", "x": "bpp", "y": "psnr"}]',
-        default=[],
+        "--curves", "-c", action="append", default=[], help=help["curves"]
     )
     parser.add_argument("--pareto", action="append", default=[])
     args = parser.parse_args(argv)
@@ -184,10 +179,9 @@ def build_args(argv):
         args.name = [""]
     if len(args.query) != len(args.name):
         raise RuntimeError("--query and --name should appear the same number of times.")
+    curves_default = [{"name": "{name}", "suffix": "", "x": "bpp", "y": "psnr"}]
     args.curves = [eval(x) for x in args.curves]  # WARNING: unsafe!
-    args.curves += [[{"name": "{name}", "suffix": "", "x": "bpp", "y": "psnr"}]] * (
-        len(args.query) - len(args.curves)
-    )
+    args.curves += [curves_default] * (len(args.query) - len(args.curves))
     args.pareto += [False] * (len(args.query) - len(args.pareto))
 
     return args
