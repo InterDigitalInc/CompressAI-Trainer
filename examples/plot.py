@@ -69,6 +69,8 @@ HOVER_METRICS = [
 
 HOVER_DATA = [
     "run_hash",
+    "name",
+    "model.name",
     "experiment",
     "epoch",
 ]
@@ -107,7 +109,9 @@ def create_dataframe(repo, args):
         df_run["name"] = df_run["name"].apply(lambda x: x + " (current)")
         df = pd.concat([df, df_run])
     current_df = df
-    return pd.concat([REFERENCE_DF, current_df])
+    df = pd.concat([REFERENCE_DF, current_df])
+    df = _reorder_dataframe_columns(df)
+    return df
 
 
 def _needed_metrics(xs, key) -> Iterable[str]:
@@ -117,6 +121,13 @@ def _needed_metrics(xs, key) -> Iterable[str]:
             yield xk
             continue
         yield from xk
+
+
+def _reorder_dataframe_columns(df: pd.DataFrame) -> pd.DataFrame:
+    head = HOVER_DATA
+    head_set = set(head)
+    columns = head + [x for x in df.columns if x not in head_set]
+    return df[columns]
 
 
 def plot_dataframe(df: pd.DataFrame, args):

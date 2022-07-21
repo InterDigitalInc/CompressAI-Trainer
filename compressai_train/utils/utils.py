@@ -122,6 +122,7 @@ def compressai_dataframe(model_name: str, **kwargs):
     d = compressai_result(model_name, **kwargs)
     df = pd.DataFrame.from_dict(d["results"])
     df["name"] = d["name"]
+    df["model.name"] = d["name"]
     df["description"] = d["description"]
     return df
 
