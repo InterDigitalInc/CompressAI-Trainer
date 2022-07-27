@@ -24,7 +24,7 @@ seaborn = "^0.11.2"
 tensorboard = "^2.9.0"
 toml = "^0.10.2"
 torch = "^1.8.0"
-torchvision = "^0.9.0"
+torchvision = ">=0.9.0,<1.0"
 typing-extensions = "^3.10.0"
 
 [tool.poetry.dev-dependencies]
