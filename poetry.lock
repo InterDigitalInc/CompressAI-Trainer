@@ -30,14 +30,14 @@ test_trackers = ["wandb", "comet-ml", "tensorboard"]
 
 [[package]]
 name = "aim"
-version = "3.11.1"
+version = "3.12.0"
 description = "A super-easy way to record, search and compare AI experiments."
 category = "main"
 optional = false
 python-versions = ">=3.6.0"
 
 [package.dependencies]
-aim-ui = "3.11.1"
+aim-ui = "3.12.0"
 aimrecords = "0.0.7"
 aimrocks = "0.2.1"
 aiofiles = ">=0.5.0"
@@ -46,7 +46,7 @@ cachetools = ">=4.0.0"
 click = ">=7.0"
 cryptography = ">=3.0"
 fastapi = ">=0.65.0,<0.68.0"
-filelock = ">=3.0.0"
+filelock = ">=3.3.0"
 grpcio = "1.42.0"
 jinja2 = ">=2.10.0"
 numpy = ">=1.12.0"
@@ -65,7 +65,7 @@ uvicorn = ">=0.12.0"
 
 [[package]]
 name = "aim-ui"
-version = "3.11.1"
+version = "3.12.0"
 description = "Aim UI"
 category = "main"
 optional = false
@@ -1196,25 +1196,8 @@ accelerate = [
     {file = "accelerate-0.10.0-py3-none-any.whl", hash = "sha256:8f38773d5234e342b7b72333861fdb67549abda90c07a5408d24028fb21db84c"},
     {file = "accelerate-0.10.0.tar.gz", hash = "sha256:e9eb1e2b8bccf03a821db49a8720f518289980dc2a1da9e5a8e633a8d9023a58"},
 ]
-aim = [
-    {file = "aim-3.11.1-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:693ebf7405ab579e47a72c992fd673aef9d5da915fc907c70f7f2c6101069aaa"},
-    {file = "aim-3.11.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:24bfa31dadf07f4c4bb59c9ede9f15ac018414ca75e0c11945cc70d38832efa0"},
-    {file = "aim-3.11.1-cp310-cp310-manylinux_2_24_x86_64.whl", hash = "sha256:f9969bc09f62e50482339267369f0c2882f5ccf3f75271cb7f0e20019b6aa889"},
-    {file = "aim-3.11.1-cp36-cp36m-macosx_10_14_x86_64.whl", hash = "sha256:824a5c5afa6183b06b22d8b779257fc5efc23bff1d484c6e208248f0e580084d"},
-    {file = "aim-3.11.1-cp36-cp36m-manylinux_2_24_x86_64.whl", hash = "sha256:2f83e632cb04ec3dc8ef04c559a239b18ff73525d0f13678701a00e6892cdc4d"},
-    {file = "aim-3.11.1-cp37-cp37m-macosx_10_14_x86_64.whl", hash = "sha256:b4fba497cb454e80dc0f4b6f4e932b2f64185e619b9633e9b55638afcd3a28b8"},
-    {file = "aim-3.11.1-cp37-cp37m-manylinux_2_24_x86_64.whl", hash = "sha256:6feecd54651af83ed263279096d5d6d11f848ef8a93eede6ed9f00efb46b9431"},
-    {file = "aim-3.11.1-cp38-cp38-macosx_10_14_x86_64.whl", hash = "sha256:7e2b7a58517866ed8db189a53386a01e4e4b8b0dfb956ef4d782176508e8e583"},
-    {file = "aim-3.11.1-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:223f9f4509459e17a1b5933bdc1d1510e9c88f91866aedc51cb06a2d804346da"},
-    {file = "aim-3.11.1-cp38-cp38-manylinux_2_24_x86_64.whl", hash = "sha256:530c7f4a006595397b22b39236b7dca1582cf66f26184a6abe14dc2943478cf0"},
-    {file = "aim-3.11.1-cp39-cp39-macosx_10_14_x86_64.whl", hash = "sha256:00e9fe6b0046b7576af0bf8b594a9f0e3bd431dd52b16ac1ad362f4824e638df"},
-    {file = "aim-3.11.1-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:5d05017ed7324347a2355582586c8b80fc8176123ec38e705d092c0a4feda756"},
-    {file = "aim-3.11.1-cp39-cp39-manylinux_2_24_x86_64.whl", hash = "sha256:847bcbfd40e78c65d964ae279ca92f8bb8a771f80a4e7a27a85ced9ca1ff5a80"},
-    {file = "aim-3.11.1.tar.gz", hash = "sha256:176923340a609210a842d3c4761c51d83f51b2e3799329445cc803eff09b067a"},
-]
-aim-ui = [
-    {file = "aim-ui-3.11.1.tar.gz", hash = "sha256:cd4de2752b4fd71273d498cf3a1b434cb23e8e98f275f858229d0a03be7fab70"},
-]
+aim = []
+aim-ui = []
 aimrecords = [
     {file = "aimrecords-0.0.7-py2.py3-none-any.whl", hash = "sha256:b9276890891c5fd68f817e20fc5d466a80c01e22fa468eaa979331448a75d601"},
     {file = "aimrecords-0.0.7.tar.gz", hash = "sha256:9b562fa5b5109b4b3dd4f83be0061cadbac63fa8031f281b8b5c8ae29967072f"},
