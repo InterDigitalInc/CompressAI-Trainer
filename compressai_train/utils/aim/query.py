@@ -113,18 +113,11 @@ def metrics_at_index(
     """Returns metrics logged at a particular step index."""
     context = Context({"loader": loader, "scope": scope})
     metric_results = {
-        metric: _map_none(
-            lambda x: x.values.sparse_numpy()[1][index],
-            run.get_metric(metric, context),
-        )
-        for metric in metrics
+        metric: _metric_at_index(run, metric, context, index) for metric in metrics
     }
     hparam_results = {hparam: _get_path(run, hparam.split(".")) for hparam in hparams}
     context = Context({"loader": "_epoch_", "scope": "epoch"})
-    epoch = _map_none(
-        lambda x: x.values.sparse_numpy()[1][index],
-        run.get_metric("epoch", context),
-    )
+    epoch = _metric_at_index(run, "epoch", context, index)
     info = {
         "name": run["model", "name"],
         "run_hash": run.hash,
@@ -143,11 +136,10 @@ def best_metric_index(
 ) -> Optional[int]:
     """Returns step index at which a given metric is minimized."""
     context = Context({"loader": loader, "scope": scope})
-    metric = run.get_metric(min_metric, context)
-    if metric is None:
+    values = _metric_series(run, min_metric, context)
+    if values is None:
         return None
-    _, metric_values = metric.values.sparse_numpy()
-    return int(metric_values.argmin())
+    return int(values.argmin())
 
 
 def _find_index(
@@ -164,6 +156,22 @@ def _find_index(
     if isinstance(epoch, int):
         return epoch
     raise ValueError(f"Unknown epoch={epoch}.")
+
+
+def _metric_series(run: aim.Run, metric: str, context: Context):
+    m = run.get_metric(metric, context)
+    if m is None:
+        return None
+    _, values = m.values.sparse_numpy()
+    return values
+
+
+def _metric_at_index(run: aim.Run, metric: str, context: Context, index: int):
+    m = run.get_metric(metric, context)
+    if m is None:
+        return None
+    _, values = m.values.sparse_numpy()
+    return values[index]
 
 
 def _map_none(f: Callable[[T], T], x: Optional[T]) -> Optional[T]:
