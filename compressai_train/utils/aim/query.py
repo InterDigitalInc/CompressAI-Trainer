@@ -120,12 +120,17 @@ def metrics_at_index(
         for metric in metrics
     }
     hparam_results = {hparam: _get_path(run, hparam.split(".")) for hparam in hparams}
+    context = Context({"loader": "_epoch_", "scope": "epoch"})
+    epoch = _map_none(
+        lambda x: x.values.sparse_numpy()[1][index],
+        run.get_metric("epoch", context),
+    )
     info = {
         "name": run["model", "name"],
         "run_hash": run.hash,
         "experiment": run.experiment,
         "model.name": run["model", "name"],
-        "epoch": index + 1,  # TODO not always true
+        "epoch": epoch,
     }
     return {**info, **metric_results, **hparam_results}
 
