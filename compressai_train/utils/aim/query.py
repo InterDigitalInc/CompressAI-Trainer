@@ -41,6 +41,14 @@ from compressai_train.utils.utils import arg_pareto_optimal_set
 T = TypeVar("T")
 
 
+def runs_by_query(repo: aim.Repo, query: str) -> list[aim.Run]:
+    """Returns runs that match given query."""
+    if query == "":
+        return list(repo.iter_runs())
+    runs = [x.run for x in repo.query_runs(query).iter_runs()]  # type: ignore
+    return runs
+
+
 def get_runs_dataframe(
     runs: list[aim.Run],
     *,
@@ -92,14 +100,6 @@ def pareto_optimal_dataframe(
     df = df.iloc[idxs]
     df.reset_index(drop=True, inplace=True)
     return df
-
-
-def runs_by_query(repo: aim.Repo, query: str) -> list[aim.Run]:
-    """Returns runs that match given query."""
-    if query == "":
-        return list(repo.iter_runs())
-    runs = [x.run for x in repo.query_runs(query).iter_runs()]  # type: ignore
-    return runs
 
 
 def metrics_at_index(
