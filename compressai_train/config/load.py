@@ -58,7 +58,9 @@ def load_config(run_root: str) -> DictConfig:
     return cast(DictConfig, conf)
 
 
-def load_checkpoint(conf: DictConfig, *, warn_only: bool = True) -> nn.Module:
+def load_checkpoint(
+    conf: DictConfig, *, epoch: int | str = "best", warn_only: bool = True
+) -> nn.Module:
     """Loads particular checkpoint for given conf.
 
     A particular model is a function of:
@@ -75,7 +77,7 @@ def load_checkpoint(conf: DictConfig, *, warn_only: bool = True) -> nn.Module:
 
     device = torch.device(conf.misc.device)
     model = create_model(conf)
-    ckpt_path = get_checkpoint_path(conf)
+    ckpt_path = get_checkpoint_path(conf, epoch)
     ckpt = torch.load(ckpt_path, map_location=device)
     state_dict = state_dict_from_checkpoint(ckpt)
     model.load_state_dict(state_dict)
