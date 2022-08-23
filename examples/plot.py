@@ -107,6 +107,8 @@ def _create_dataframe(repo, x, y, name, query, curves, pareto):
     if name:
         df["name"] = name
     df = format_dataframe(df, x, y, curves, skip_nan=True)
+    df.sort_values(["name", x, y], inplace=True)
+    df.reset_index(drop=True, inplace=True)
     if pareto:
         df = pareto_optimal_dataframe(df, x=x, y=y)
     return df

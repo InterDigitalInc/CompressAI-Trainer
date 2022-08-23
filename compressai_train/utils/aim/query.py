@@ -91,7 +91,7 @@ def pareto_optimal_dataframe(
     Optionally, also keeps data points that are part of a given run.
     """
     df = df.copy()
-    df.sort_values(["name", x], inplace=True)
+    df.sort_values(["name", x, y], inplace=True)
     df.reset_index(drop=True, inplace=True)
     idxs = arg_pareto_optimal_set([df[x], df[y]], [x_objective, y_objective])
     if keep_run_hash is not None:
