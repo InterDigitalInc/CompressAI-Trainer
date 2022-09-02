@@ -30,14 +30,14 @@ test_trackers = ["wandb", "comet-ml", "tensorboard"]
 
 [[package]]
 name = "aim"
-version = "3.12.0"
+version = "3.13.1"
 description = "A super-easy way to record, search and compare AI experiments."
 category = "main"
 optional = false
 python-versions = ">=3.6.0"
 
 [package.dependencies]
-aim-ui = "3.12.0"
+aim-ui = "3.13.1"
 aimrecords = "0.0.7"
 aimrocks = "0.2.1"
 aiofiles = ">=0.5.0"
@@ -47,7 +47,6 @@ click = ">=7.0"
 cryptography = ">=3.0"
 fastapi = ">=0.65.0,<0.68.0"
 filelock = ">=3.3.0"
-grpcio = "1.42.0"
 jinja2 = ">=2.10.0"
 numpy = ">=1.12.0"
 Pillow = ">=8.0.0"
@@ -65,7 +64,7 @@ uvicorn = ">=0.12.0"
 
 [[package]]
 name = "aim-ui"
-version = "3.12.0"
+version = "3.13.1"
 description = "Aim UI"
 category = "main"
 optional = false
@@ -1196,8 +1195,30 @@ accelerate = [
     {file = "accelerate-0.10.0-py3-none-any.whl", hash = "sha256:8f38773d5234e342b7b72333861fdb67549abda90c07a5408d24028fb21db84c"},
     {file = "accelerate-0.10.0.tar.gz", hash = "sha256:e9eb1e2b8bccf03a821db49a8720f518289980dc2a1da9e5a8e633a8d9023a58"},
 ]
-aim = []
-aim-ui = []
+aim = [
+    {file = "aim-3.13.1-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:fea5ef364e92d6b63a7f81100669b41e4d57239ad0f75442b7ea57a222d6c13d"},
+    {file = "aim-3.13.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:f40c666db13683d70c32811a053e2d892c8c2733b6d88d8e6e8f6b723f8699d9"},
+    {file = "aim-3.13.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:d6cd80fffd0c49b3f464bfb106a74db3560a3f2092bb4cad963d2ee92fe1330b"},
+    {file = "aim-3.13.1-cp310-cp310-manylinux_2_24_x86_64.whl", hash = "sha256:4862e59156f3d37372ac7e0e5d194ad33cf40ce2a401204496e171d673825d40"},
+    {file = "aim-3.13.1-cp36-cp36m-macosx_10_14_x86_64.whl", hash = "sha256:1b0015df1b191d484a40dfdf0c704dde493a589cbfb871b6cf7f869c62a393d5"},
+    {file = "aim-3.13.1-cp36-cp36m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:e2faf27276984d5f47927c2bb3a55211716b288e2d0af71a66b2255173a00f8e"},
+    {file = "aim-3.13.1-cp36-cp36m-manylinux_2_24_x86_64.whl", hash = "sha256:6c273490f8b973fc7cfa481cd33e0536696c4b925c4eca471f2cc74f5f4145f3"},
+    {file = "aim-3.13.1-cp37-cp37m-macosx_10_14_x86_64.whl", hash = "sha256:041137d3d36a44ff6cab0ccb016090da8c90fe963443cd455d138d85baffdf11"},
+    {file = "aim-3.13.1-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:bd6c10b6e739f63dcbe6a7bd0b24ae65bca23abef925aed7d3e0be713b9377a0"},
+    {file = "aim-3.13.1-cp37-cp37m-manylinux_2_24_x86_64.whl", hash = "sha256:24d968f9578abb9578279137da8b7984af7b04c5deddf11e7457c5434761e335"},
+    {file = "aim-3.13.1-cp38-cp38-macosx_10_14_x86_64.whl", hash = "sha256:11e70a236e6162570d094ceaf71609f8c16037f8478380ab3aaa21236813e5b4"},
+    {file = "aim-3.13.1-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:6201ed309a2bdfd781bfb41f99839f25507cf2fe51804b92219b6e6580d654af"},
+    {file = "aim-3.13.1-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:d3b5616fa5c23a429bda0d5ba7e3943b6f9ff93865a454db31677f0d6edb70ad"},
+    {file = "aim-3.13.1-cp38-cp38-manylinux_2_24_x86_64.whl", hash = "sha256:94b0c2612a72eb51fe86868e6fe712b2c03fde5870f4edd6a61744dc31fb7819"},
+    {file = "aim-3.13.1-cp39-cp39-macosx_10_14_x86_64.whl", hash = "sha256:d9970d88cf4048440fcfc290725910f131ddc81627c5bd2681a46c26d388c5e5"},
+    {file = "aim-3.13.1-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:2b7a60e10e8014f6358288c51dd29640df8bd2229ac24b1e052a6c25f17b8918"},
+    {file = "aim-3.13.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6838d7f3e08426fda95b3deac88a2b7ed08bd5f30525e53068dbe68a5041230b"},
+    {file = "aim-3.13.1-cp39-cp39-manylinux_2_24_x86_64.whl", hash = "sha256:581ef42e7456306a0944976d7de4d33822fd53e7a385041bd925f71fc9df64d7"},
+    {file = "aim-3.13.1.tar.gz", hash = "sha256:a729851da886ff24605c6ad67f7147afd2b30dea0028906af05565008e17a6e3"},
+]
+aim-ui = [
+    {file = "aim-ui-3.13.1.tar.gz", hash = "sha256:a1b90576338ac791d607f1e34c77720613561d6789c6fc6ea524a641b2d531f5"},
+]
 aimrecords = [
     {file = "aimrecords-0.0.7-py2.py3-none-any.whl", hash = "sha256:b9276890891c5fd68f817e20fc5d466a80c01e22fa468eaa979331448a75d601"},
     {file = "aimrecords-0.0.7.tar.gz", hash = "sha256:9b562fa5b5109b4b3dd4f83be0061cadbac63fa8031f281b8b5c8ae29967072f"},
