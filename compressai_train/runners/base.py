@@ -42,7 +42,7 @@ from torch.nn.parallel import DataParallel, DistributedDataParallel
 
 import compressai_train
 from compressai_train.plot import plot_rd
-from compressai_train.utils.utils import compressai_dataframe
+from compressai_train.utils.utils import compressai_dataframe, num_parameters
 
 
 class BaseRunner(dl.Runner):
@@ -58,6 +58,7 @@ class BaseRunner(dl.Runner):
         super().on_experiment_start(runner)
         self._log_git_diff(compressai)
         self._log_git_diff(compressai_train)
+        self._log_stats()
 
     def on_epoch_start(self, runner):
         super().on_epoch_start(runner)
@@ -123,6 +124,12 @@ class BaseRunner(dl.Runner):
         dfs = pd.concat(dfs)
         fig = plot_rd(dfs, **kwargs)
         self.log_figure(f"rd-curves-{dataset}-psnr", fig)
+
+    def _log_stats(self):
+        stats = {
+            "num_params": num_parameters(self.model),
+        }
+        self.log_hparams({"stats": stats})
 
 
 def _coerce_item(x):

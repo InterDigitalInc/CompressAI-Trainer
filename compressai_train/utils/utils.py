@@ -38,6 +38,7 @@ import compressai
 import numpy as np
 import pandas as pd
 import torch
+import torch.nn as nn
 import torch.nn.functional as F
 
 
@@ -116,6 +117,11 @@ def _get_pad(h, w):
     unpad = (-left, -right, -top, -bottom)
 
     return pad, unpad
+
+
+def num_parameters(net: nn.Module, predicate=lambda x: x.requires_grad) -> int:
+    unique = {x.data_ptr(): x for x in net.parameters() if predicate(x)}.values()
+    return sum(x.numel() for x in unique)
 
 
 def compressai_dataframe(model_name: str, **kwargs):
