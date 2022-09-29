@@ -82,6 +82,13 @@ class BaseRunner(dl.Runner):
     def on_experiment_end(self, runner):
         super().on_experiment_end(runner)
 
+    def log_distribution(self, *args, **kwargs) -> None:
+        """Logs distribution to available loggers."""
+        for logger in self.loggers.values():
+            if not hasattr(logger, "log_distribution"):
+                continue
+            logger.log_distribution(*args, **kwargs, runner=self)  # type: ignore
+
     def log_figure(self, *args, **kwargs) -> None:
         """Logs figure to available loggers."""
         for logger in self.loggers.values():

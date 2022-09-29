@@ -31,6 +31,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 import aim
 import numpy as np
+from aim.storage.object import CustomObject
 from catalyst.core.logger import ILogger
 from catalyst.settings import SETTINGS
 
@@ -187,6 +188,22 @@ class AimLogger(ILogger):
                     scope=scope,
                 )
 
+    def log_distribution(
+        self,
+        tag: str,
+        unused: Any,
+        runner: "IRunner",
+        scope: Optional[str] = None,
+        context: Optional[Dict] = None,
+        **kwargs,
+    ) -> None:
+        """Logs distribution to Aim for current scope on current step."""
+        assert unused is None
+        value = aim.Distribution(**kwargs)
+        context_default, kwargs = _aim_context(runner, scope)
+        context = context_default if context is None else context
+        self.run.track(value, tag, context=context, **kwargs)
+
     def log_figure(
         self,
         tag: str,
@@ -252,3 +269,52 @@ def _build_params_dict(
             _build_params_dict(value, prefix[name], exclude)
         else:
             prefix[name] = value
+
+
+@CustomObject.alias("aim.distribution", exist_ok=True)
+class Distribution(aim.Distribution):
+    """Distribution object used to store distribution objects in Aim repository.
+
+    Args:
+        data (:obj:): Optional array-like object of data sampled from a distribution.
+        hist (:obj:): Optional array-like object representing bin frequency counts.
+            Must be specified alongside `bin_edges`. `data` must not be specified.
+        bin_edges (:obj:): Optional array-like object representing bin edges.
+            Must be specified alongside `hist`. `data` must not be specified.
+        bin_count (:obj:`int`, optional): Optional distribution bin count for
+            binning `data`. 64 by default, max 512.
+    """
+
+    AIM_NAME = "aim.distribution"
+
+    def __init__(self, data=None, *, hist=None, bin_edges=None, bin_count=64):
+        CustomObject.__init__(self)
+
+        if not isinstance(bin_count, int):
+            raise TypeError("`bin_count` must be an integer.")
+        if 1 > bin_count > 512:
+            raise ValueError("Supported range for `bin_count` is [1, 512].")
+        self.storage["bin_count"] = bin_count
+
+        np_histogram = self._to_np_histogram(data, hist, bin_edges, bin_count)
+        self._from_np_histogram(np_histogram)
+
+    def _to_np_histogram(self, data, hist, bin_edges, bin_count):
+        if data is None:
+            if hist is None or bin_edges is None:
+                raise ValueError("Both `hist` and `bin_edges` must be specified.")
+            return np.asanyarray(hist), np.asanyarray(bin_edges)
+        if hist is not None or bin_edges is not None:
+            raise ValueError(
+                "`hist` and `bin_edges` may not be specified if `data` is."
+            )
+        # convert to np.histogram
+        try:
+            return np.histogram(data, bins=bin_count)
+        except TypeError:
+            raise TypeError(
+                f"Cannot convert to aim.Distribution. Unsupported type {type(data)}."
+            )
+
+
+aim.Distribution = Distribution
