@@ -32,6 +32,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 import aim
 import numpy as np
 from aim.storage.object import CustomObject
+from aim.storage.types import BLOB
 from catalyst.core.logger import ILogger
 from catalyst.settings import SETTINGS
 
@@ -272,49 +273,59 @@ def _build_params_dict(
 
 
 @CustomObject.alias("aim.distribution", exist_ok=True)
-class Distribution(aim.Distribution):
+class Distribution(CustomObject):
     """Distribution object used to store distribution objects in Aim repository.
 
     Args:
-        data (:obj:): Optional array-like object of data sampled from a distribution.
-        hist (:obj:): Optional array-like object representing bin frequency counts.
+        hist (:obj:): Array-like object representing bin frequency counts.
             Must be specified alongside `bin_edges`. `data` must not be specified.
-        bin_edges (:obj:): Optional array-like object representing bin edges.
+        bin_edges (:obj:): Array-like object representing bin edges.
             Must be specified alongside `hist`. `data` must not be specified.
-        bin_count (:obj:`int`, optional): Optional distribution bin count for
-            binning `data`. 64 by default, max 512.
+            Max 512 bins allowed.
     """
 
     AIM_NAME = "aim.distribution"
 
-    def __init__(self, data=None, *, hist=None, bin_edges=None, bin_count=64):
-        CustomObject.__init__(self)
+    def __init__(self, hist, bin_edges):
+        super().__init__()
+        hist = np.asanyarray(hist)
+        bin_edges = np.asanyarray(bin_edges)
+        self._from_np_histogram(hist, bin_edges)
 
-        if not isinstance(bin_count, int):
-            raise TypeError("`bin_count` must be an integer.")
+    @classmethod
+    def from_histogram(cls, hist, bin_edges):
+        """Create Distribution object from histogram.
+
+        Args:
+            hist (:obj:): Array-like object representing bin frequency counts.
+                Must be specified alongside `bin_edges`. `data` must not be specified.
+            bin_edges (:obj:): Array-like object representing bin edges.
+                Must be specified alongside `hist`. `data` must not be specified.
+                Max 512 bins allowed.
+        """
+        return cls(hist, bin_edges)
+
+    @classmethod
+    def from_samples(cls, samples, bin_count=64):
+        """Create Distribution object from data samples.
+
+        Args:
+            samples (:obj:): Array-like object of data sampled from a distribution.
+            bin_count (:obj:`int`, optional): Optional distribution bin count for
+                binning `samples`. 64 by default, max 512.
+        """
+        hist, bin_edges = np.histogram(samples, bins=bin_count)
+        return cls(hist, bin_edges)
+
+    def _from_np_histogram(self, hist, bin_edges):
+        bin_count = len(bin_edges) - 1
         if 1 > bin_count > 512:
             raise ValueError("Supported range for `bin_count` is [1, 512].")
+
+        self.storage["data"] = BLOB(data=hist.tobytes())
+        self.storage["dtype"] = str(hist.dtype)
         self.storage["bin_count"] = bin_count
-
-        np_histogram = self._to_np_histogram(data, hist, bin_edges, bin_count)
-        self._from_np_histogram(np_histogram)
-
-    def _to_np_histogram(self, data, hist, bin_edges, bin_count):
-        if data is None:
-            if hist is None or bin_edges is None:
-                raise ValueError("Both `hist` and `bin_edges` must be specified.")
-            return np.asanyarray(hist), np.asanyarray(bin_edges)
-        if hist is not None or bin_edges is not None:
-            raise ValueError(
-                "`hist` and `bin_edges` may not be specified if `data` is."
-            )
-        # convert to np.histogram
-        try:
-            return np.histogram(data, bins=bin_count)
-        except TypeError:
-            raise TypeError(
-                f"Cannot convert to aim.Distribution. Unsupported type {type(data)}."
-            )
+        self.storage["range"] = [bin_edges[0].item(), bin_edges[-1].item()]
 
 
 aim.Distribution = Distribution
