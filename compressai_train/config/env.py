@@ -59,6 +59,7 @@ def get_env(conf: DictConfig) -> dict[str, Any]:
         "slurm": {
             "account": os.environ.get("SLURM_JOB_ACCOUNT"),
             "job_id": os.environ.get("SLURM_JOB_ID"),
+            "job_array_task_id": os.environ.get("SLURM_ARRAY_TASK_ID"),
             "job_name": os.environ.get("SLURM_JOB_NAME"),
         },
         "system": {

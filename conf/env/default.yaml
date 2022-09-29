@@ -15,6 +15,7 @@ git:
 slurm:
   account:
   job_id:
+  job_array_task_id:
   job_name:
 system:
   hostname:
