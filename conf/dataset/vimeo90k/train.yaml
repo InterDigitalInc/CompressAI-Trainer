@@ -12,3 +12,6 @@ train:
   transforms:
     - "RandomCrop": {size: "${....settings.patch_size}"}
     - "ToTensor": {}
+  meta:
+    num_samples: 153936  # = 51312 * 3
+    steps_per_epoch:

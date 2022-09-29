@@ -10,3 +10,6 @@ infer:
   settings:
   transforms:
     - "ToTensor": {}
+  meta:
+    num_samples: 24
+    steps_per_epoch:

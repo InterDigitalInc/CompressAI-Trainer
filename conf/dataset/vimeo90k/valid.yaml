@@ -12,3 +12,6 @@ valid:
   transforms:
     - "CenterCrop": {size: "${....settings.patch_size}"}
     - "ToTensor": {}
+  meta:
+    num_samples: 11346  # = 3782 * 3
+    steps_per_epoch:

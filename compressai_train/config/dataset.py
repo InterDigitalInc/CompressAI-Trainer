@@ -29,6 +29,7 @@
 
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from typing import Callable, cast
 
@@ -65,6 +66,9 @@ def create_dataset(conf: DictConfig, transform: Callable) -> TDataset:
 
 
 def create_dataloader(conf: DictConfig, dataset: TDataset, device: str) -> TDataLoader:
+    drop_last = conf.loader.get("drop_last", False)
+    to_int = math.floor if drop_last else math.ceil
+    conf.meta.steps_per_epoch = to_int(conf.meta.num_samples / conf.loader.batch_size)
     return DataLoader(dataset, **conf.loader, pin_memory=(device == "cuda"))
 
 
