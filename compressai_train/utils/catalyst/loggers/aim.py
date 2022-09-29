@@ -121,7 +121,7 @@ class AimLogger(ILogger):
         path_to_artifact: Optional[str] = None,
         scope: Optional[str] = None,
         kind: str = "text",
-        artifact_kwargs: Dict[str, Any] = {},
+        **kwargs,
     ) -> None:
         """Logs a local file or directory as an artifact to the logger."""
         if path_to_artifact:
@@ -134,7 +134,7 @@ class AimLogger(ILogger):
             "image": aim.Image,
             "text": aim.Text,
         }
-        value = kind_dict[kind](artifact, **artifact_kwargs)
+        value = kind_dict[kind](artifact, **kwargs)
         context, kwargs = _aim_context(runner, scope)
         self.run.track(value, tag, context=context, **kwargs)
 
@@ -144,10 +144,10 @@ class AimLogger(ILogger):
         image,
         runner: "IRunner",
         scope: Optional[str] = None,
-        image_kwargs: Dict[str, Any] = {},
+        **kwargs,
     ) -> None:
         """Logs image to Aim for current scope on current step."""
-        value = aim.Image(image, **image_kwargs)
+        value = aim.Image(image, **kwargs)
         context, kwargs = _aim_context(runner, scope)
         self.run.track(value, tag, context=context, **kwargs)
 
@@ -193,7 +193,7 @@ class AimLogger(ILogger):
         fig: Any,
         runner: "IRunner",
         scope: Optional[str] = None,
-        kwargs: Dict[str, Any] = {},
+        **kwargs,
     ) -> None:
         """Logs figure to Aim for current scope on current step."""
         value = aim.Figure(fig, **kwargs)
