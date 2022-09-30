@@ -56,7 +56,7 @@ COMPRESSAI_CODECS = [
 ]
 
 REFERENCE_DF = pd.concat(
-    [compressai_dataframe(name, dataset="kodak") for name in COMPRESSAI_CODECS]
+    [compressai_dataframe(name, dataset="image/kodak") for name in COMPRESSAI_CODECS]
 )
 
 HOVER_HPARAMS = [

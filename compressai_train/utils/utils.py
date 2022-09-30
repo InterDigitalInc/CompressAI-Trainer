@@ -135,7 +135,7 @@ def compressai_dataframe(model_name: str, **kwargs):
 
 def compressai_result(
     model_name: str,
-    dataset: str = "kodak",
+    dataset: str = "image/kodak",
     opt_metric: str = "mse",
     device: str = "cuda",
 ) -> dict[str, Any]:
