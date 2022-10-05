@@ -68,8 +68,8 @@ def create_criterion(conf: DictConfig) -> TCriterion:
 
 def create_dataloaders(conf: DictConfig) -> dict[str, TDataLoader]:
     return {
-        key: create_dataset_tuple(conf.dataset[key], conf.misc.device).loader
-        for key in ["train", "valid", "infer"]
+        loader: create_dataset_tuple(conf.dataset[loader], conf.misc.device).loader
+        for loader in conf.dataset
     }
 
 
