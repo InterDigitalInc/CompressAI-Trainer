@@ -29,6 +29,7 @@
 
 from __future__ import annotations
 
+import math
 from typing import Any, Dict, cast
 
 from omegaconf import DictConfig, OmegaConf
@@ -43,6 +44,18 @@ from compressai_train.typing.torch import (
 )
 
 from .dataset import create_dataset_tuple
+from .env import get_env
+
+
+def configure_conf(conf: DictConfig):
+    conf.env = get_env(conf)
+    for loader in conf.dataset:
+        conf_loader = conf.dataset[loader]
+        drop_last = conf_loader.loader.get("drop_last", False)
+        to_int = math.floor if drop_last else math.ceil
+        conf_loader.meta.steps_per_epoch = to_int(
+            conf_loader.meta.num_samples / conf_loader.loader.batch_size
+        )
 
 
 def create_criterion(conf: DictConfig) -> TCriterion:

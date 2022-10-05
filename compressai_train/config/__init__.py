@@ -28,6 +28,7 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from .config import (
+    configure_conf,
     create_criterion,
     create_dataloaders,
     create_model,
@@ -45,6 +46,7 @@ from .load import (
 from .outputs import write_config, write_git_diff, write_outputs
 
 __all__ = [
+    "configure_conf",
     "configure_engine",
     "create_callback",
     "create_criterion",

@@ -38,6 +38,7 @@ import hydra
 from omegaconf import DictConfig
 
 from compressai_train.config import (
+    configure_conf,
     configure_engine,
     create_criterion,
     create_dataloaders,
@@ -45,7 +46,6 @@ from compressai_train.config import (
     create_optimizer,
     create_runner,
     create_scheduler,
-    get_env,
     write_outputs,
 )
 from compressai_train.typing import TRunner
@@ -55,7 +55,7 @@ def setup(conf: DictConfig) -> tuple[TRunner, dict[str, Any]]:
     catalyst.utils.set_global_seed(conf.misc.seed)
     catalyst.utils.prepare_cudnn(benchmark=True)
 
-    conf.env = get_env(conf)
+    configure_conf(conf)
     write_outputs(conf)
 
     model = create_model(conf)
