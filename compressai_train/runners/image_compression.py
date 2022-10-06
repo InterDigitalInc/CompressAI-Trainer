@@ -46,7 +46,6 @@ METERS = [
     "aux_loss",
     "bpp_loss",
     "mse_loss",
-    "lmbda",
 ]
 
 INFER_METERS = [
@@ -103,7 +102,6 @@ class ImageCompressionRunner(BaseRunner):
             "loss": loss["net"],
             "aux_loss": loss["aux"],
             **out_criterion,
-            "lmbda": self.criterion.lmbda,
         }
         self._update_batch_metrics(batch_metrics)
 
@@ -123,7 +121,6 @@ class ImageCompressionRunner(BaseRunner):
             "loss": loss["net"],
             "aux_loss": loss["aux"],
             **out_criterion,
-            "lmbda": self.criterion.lmbda,
             **out_metrics,
             "bpp": out_infer["bpp"],
         }
