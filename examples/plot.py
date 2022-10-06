@@ -36,7 +36,6 @@ from typing import Iterable
 
 import aim
 import pandas as pd
-from plotly.offline import plot
 
 from compressai_train.plot import plot_rd
 from compressai_train.utils.aim.query import (
@@ -145,6 +144,8 @@ def plot_dataframe(df: pd.DataFrame, args):
     fig = plot_rd(df, scatter_kwargs=scatter_kwargs, title=TITLE)
 
     if args.out_html:
+        from plotly.offline import plot
+
         plot(fig, auto_open=False, filename=args.out_html)
 
     if args.show:

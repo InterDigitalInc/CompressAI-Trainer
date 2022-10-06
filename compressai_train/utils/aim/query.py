@@ -32,7 +32,6 @@ from __future__ import annotations
 from typing import Any, Callable, Literal, Optional, Sequence, TypeVar
 
 import aim
-import numpy as np
 import pandas as pd
 from aim.storage.context import Context
 

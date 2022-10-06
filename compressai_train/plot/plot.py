@@ -30,11 +30,10 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-import pandas as pd
-import plotly.express as px
-from plotly.subplots import make_subplots
+if TYPE_CHECKING:
+    import pandas as pd
 
 PLOT_RD_SCATTER_SETTINGS = dict(
     x="bpp",
@@ -52,6 +51,9 @@ PLOT_RD_LAYOUT_SETTINGS = dict(
 
 
 def plot_rd(df: pd.DataFrame, scatter_kwargs: dict[str, Any] = {}, **layout_kwargs):
+    import plotly.express as px
+    from plotly.subplots import make_subplots
+
     scatter_kwargs = {**PLOT_RD_SCATTER_SETTINGS, **scatter_kwargs}
     layout_kwargs = {**PLOT_RD_LAYOUT_SETTINGS, **layout_kwargs}
     fig = make_subplots()
