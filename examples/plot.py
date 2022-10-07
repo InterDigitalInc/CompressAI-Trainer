@@ -181,7 +181,8 @@ def build_args(argv):
             wrap(
                 "For the current query, specify a grouping and format for the curves. "
                 "One may specify multiple such groupings for a given query within a list. "
-                'The curve name is constructed from "name" + "suffix".\n'
+                'The curve name is constructed from "name" + "suffix". '
+                'If a key (e.g. "name", "suffix", "x", "y") is not specified, its default value is used.\n'
                 "\n"
                 'For "name" and "suffix", one may specify a hparam as by key via "{hparam}". '
                 'There is also a "{name}" property that equals "{model.name}" by default, '
@@ -244,9 +245,10 @@ def build_args(argv):
     if len(args.query) == 0:
         args.query = [""]
     num_queries = len(args.query)
-    curves_default = [{"name": "{name}", "suffix": "", "x": args.x, "y": args.y}]
+    curves_default = {"name": "{name}", "suffix": "", "x": args.x, "y": args.y}
     args.curves = [eval(x) for x in args.curves]  # WARNING: unsafe!
-    args.curves += [curves_default] * (num_queries - len(args.curves))
+    args.curves = [[{**curves_default, **x} for x in xs] for xs in args.curves]
+    args.curves += [[curves_default]] * (num_queries - len(args.curves))
     args.name += [""] * (num_queries - len(args.name))
     args.pareto += [False] * (num_queries - len(args.pareto))
 
