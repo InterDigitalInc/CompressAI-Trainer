@@ -181,17 +181,17 @@ def build_args(argv):
             wrap(
                 "For the current query, specify a grouping and format for the curves. "
                 "One may specify multiple such groupings for a given query within a list. "
-                'The curve name is constructed from "name" + "suffix". '
-                'If a key (e.g. "name", "suffix", "x", "y") is not specified, its default value is used.\n'
+                'Each unique "name" produces a unique curve. '
+                'If a key (e.g. "name", "x", "y") is not specified, its default value is used.\n'
                 "\n"
-                'For "name" and "suffix", one may specify a hparam as by key via "{hparam}". '
+                'For "name", one may specify a hparam as by key via "{hparam}". '
                 'There is also a "{name}" property that equals "{model.name}" by default, '
                 "but this may be overridden via --name.\n"
             )
             + (
                 "\n"
                 "\n"
-                'Default: [{"name": "{name}", "suffix": "", "x": args.x, "y": args.y}].\n'
+                'Default: [{"name": "{name}", "x": args.x, "y": args.y}].\n'
                 "\n"
                 "Examples:\n"
                 "  - Show both model name and experiment name:\n"
@@ -200,12 +200,12 @@ def build_args(argv):
                 '    [{"name": "{name} (M={hp.M})"}]\n'
                 "  - Multiple metrics as separate curves:\n"
                 "    [\n"
-                '        {"suffix": " (full quality)", "y": "psnr_full"},\n'
-                '        {"suffix": " (low quality)", "y": "psnr_low"},\n'
+                '        {"name": "{name} (full quality)", "y": "psnr_full"},\n'
+                '        {"name": "{name} (low quality)", "y": "psnr_low"},\n'
                 "    ]\n"
                 "  - Multi-rate models (e.g. G-VAE):\n"
                 "    [{\n"
-                '        "suffix": " {run.hash}",\n'
+                '        "name": "{name} {run.hash}",\n'
                 '        "x": ["bpp_0", "bpp_1", "bpp_2", "bpp_3"],\n'
                 '        "y": ["psnr_0", "psnr_1", "psnr_2", "psnr_3"],\n'
                 "    }]\n"
@@ -245,7 +245,7 @@ def build_args(argv):
     if len(args.query) == 0:
         args.query = [""]
     num_queries = len(args.query)
-    curves_default = {"name": "{name}", "suffix": "", "x": args.x, "y": args.y}
+    curves_default = {"name": "{name}", "x": args.x, "y": args.y}
     args.curves = [eval(x) for x in args.curves]  # WARNING: unsafe!
     args.curves = [[{**curves_default, **x} for x in xs] for xs in args.curves]
     args.curves += [[curves_default]] * (num_queries - len(args.curves))

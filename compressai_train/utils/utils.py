@@ -197,18 +197,18 @@ def format_dataframe(
     .. code-block:: python
 
         # Basic, single curve.
-        [{"suffix": "", "y": "psnr"}]
+        [{"name": "{name}", "x": "bpp", "y": "psnr"}]
 
         # Multiple series with different suffixes.
         [
-            {"suffix": " (psnr_x)", "x": "bpp" "y": "psnr_x"},
-            {"suffix": " (psnr_s)", "x": "bpp" "y": "psnr_s"},
+            {"name": "{name} (psnr_x)", "x": "bpp" "y": "psnr_x"},
+            {"name": "{name} (psnr_s)", "x": "bpp" "y": "psnr_s"},
         ]
 
         # Flatten multiple bpps/psnrs onto a single curve.
         [
             {
-                "suffix": "",
+                "name": "{name}",
                 "x": ["bpp_0", "bpp_1", "bpp_2"],
                 "y": ["psnr_0", "psnr_1", "psnr_2"],
             }
@@ -222,7 +222,6 @@ def format_dataframe(
                 r = dict(record)
                 fmt = curve.get("name", "{name}")
                 r["name"] = formatter.vformat(fmt, [], record)
-                r["name"] += curve.get("suffix", "")
                 r[x] = record[x_src]
                 r[y] = record[y_src]
                 if skip_nan and (_is_nan(r[x]) or _is_nan(r[y])):
