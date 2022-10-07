@@ -190,7 +190,7 @@ def build_args(argv):
             + (
                 "\n"
                 "\n"
-                'Default: [{"name": "{name}", "suffix": "", "x": "bpp", "y": "psnr"}].\n'
+                'Default: [{"name": "{name}", "suffix": "", "x": args.x, "y": args.y}].\n'
                 "\n"
                 "Examples:\n"
                 "  - Show both model name and experiment name:\n"
@@ -244,7 +244,7 @@ def build_args(argv):
     if len(args.query) == 0:
         args.query = [""]
     num_queries = len(args.query)
-    curves_default = [{"name": "{name}", "suffix": "", "x": "bpp", "y": "psnr"}]
+    curves_default = [{"name": "{name}", "suffix": "", "x": args.x, "y": args.y}]
     args.curves = [eval(x) for x in args.curves]  # WARNING: unsafe!
     args.curves += [curves_default] * (num_queries - len(args.curves))
     args.name += [""] * (num_queries - len(args.name))
