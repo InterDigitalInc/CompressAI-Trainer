@@ -185,7 +185,7 @@ def build_args(argv):
                 'If a key (e.g. "name", "x", "y") is not specified, its default value is used.\n'
                 "\n"
                 'For "name", one may specify a hparam as by key via "{hparam}". '
-                'There is also a "{name}" property that equals "{model.name}" by default, '
+                'There is also a "{name}" property that equals "{experiment}" by default, '
                 "but this may be overridden via --name.\n"
             )
             + (

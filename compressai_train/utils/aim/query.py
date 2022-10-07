@@ -118,7 +118,7 @@ def metrics_at_index(
     context = Context({"loader": "_epoch_", "scope": "epoch"})
     epoch = _metric_at_index(run, "epoch", context, index)
     info = {
-        "name": run["model", "name"],
+        "name": run.experiment,
         "run_hash": run.hash,
         "experiment": run.experiment,
         "model.name": run["model", "name"],
