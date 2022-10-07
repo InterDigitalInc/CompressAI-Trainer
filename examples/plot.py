@@ -32,6 +32,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+import textwrap
 from typing import Iterable
 
 import aim
@@ -153,27 +154,91 @@ def plot_dataframe(df: pd.DataFrame, args):
 
 
 def build_args(argv):
+    wrap = lambda s: "\n".join("\n".join(textwrap.wrap(x)) for x in s.splitlines())
     help = {
+        "description": wrap(
+            "Plot.\n"
+            "\n"
+            "Queries experiment tracker (Aim) repository for relevant metrics and plots. "
+            "Users may specify what to plot using groups of --query, --curves, --name, and --pareto. "
+            "If desired, one may plot multiple query groups within the same plot.\n"
+        ),
         "show": "Show figure in browser.",
-        "query": 'Example: \'run.model.name == "bmshj2018-factorized" and run.exp.name == "example-experiment"\'',
-        "curves": 'Default: [{"name": "{name}", "suffix": "", "x": "bpp", "y": "psnr"}]',
+        "query": (
+            "Query selector for relevant runs to aggregate plotting data from.\n"
+            "\n"
+            "Default: '' (i.e. uses all runs).\n"
+            "\n"
+            "Examples:\n"
+            "  - 'run.model.name == \"bmshj2018-factorized\"'\n"
+            "  - 'run.experiment.startswith(\"hindsight2020-best_model-\")'\n"
+            "  - 'run.hash == \"e4e6d4d5e5c59c69f3bd7be2\"'\n"
+            "  - 'run.created_at >= datetime(1970, 1, 1)'\n"
+            "  - 'run.criterion.lmbda < 0.02 and run.hp.M == 3 * 2**6'\n"
+            "  - 'random.random() > 1/6 and \"Russian roulette! Removes random runs.\"'\n"
+        ),
+        "curves": (
+            wrap(
+                "For the current query, specify a grouping and format for the curves. "
+                "One may specify multiple such groupings for a given query within a list. "
+                'The curve name is constructed from "name" + "suffix".\n'
+                "\n"
+                'For "name" and "suffix", one may specify a hparam as by key via "{hparam}". '
+                'There is also a "{name}" property that equals "{model.name}" by default, '
+                "but this may be overridden via --name.\n"
+            )
+            + (
+                "\n"
+                "\n"
+                'Default: [{"name": "{name}", "suffix": "", "x": "bpp", "y": "psnr"}].\n'
+                "\n"
+                "Examples:\n"
+                "  - Show both model name and experiment name:\n"
+                '    [{"name": "{model.name} {experiment}"}]\n'
+                "  - Group by hp.M:\n"
+                '    [{"name": "{name} (M={hp.M})"}]\n'
+                "  - Multiple metrics as separate curves:\n"
+                "    [\n"
+                '        {"suffix": " (full quality)", "y": "psnr_full"},\n'
+                '        {"suffix": " (low quality)", "y": "psnr_low"},\n'
+                "    ]\n"
+                "  - Multi-rate models (e.g. G-VAE):\n"
+                "    [{\n"
+                '        "suffix": " {run.hash}",\n'
+                '        "x": ["bpp_0", "bpp_1", "bpp_2", "bpp_3"],\n'
+                '        "y": ["psnr_0", "psnr_1", "psnr_2", "psnr_3"],\n'
+                "    }]\n"
+            )
+        ),
+        "name": "Force override {name} property for respective query.",
+        "pareto": (
+            "Show only pareto-optimal points on curve for respective query.\n"
+            "Default: False.\n"
+        ),
     }
 
-    parser = argparse.ArgumentParser(description="Plot.")
+    parser = argparse.ArgumentParser(
+        description=help["description"],
+        formatter_class=argparse.RawTextHelpFormatter,
+    )
     parser.add_argument("--aim_repo", type=str, required=True)
     parser.add_argument("--out_html", type=str, default="plot_result.html")
     parser.add_argument("--out_csv", type=str, default="plot_result.csv")
     parser.add_argument("--show", action="store_true", help=help["show"])
     parser.add_argument("--x", "-x", type=str, default="bpp")
     parser.add_argument("--y", "-y", type=str, default="psnr")
-    parser.add_argument("--name", "-n", action="append", default=[])
     parser.add_argument(
         "--query", "-q", action="append", default=[], help=help["query"]
     )
     parser.add_argument(
-        "--curves", "-c", action="append", default=[], help=help["curves"]
+        "--curves",
+        "-c",
+        action="append",
+        default=[],
+        help=help["curves"],
     )
-    parser.add_argument("--pareto", action="append", default=[])
+    parser.add_argument("--name", "-n", action="append", default=[], help=help["name"])
+    parser.add_argument("--pareto", action="append", default=[], help=help["pareto"])
     args = parser.parse_args(argv)
 
     if len(args.query) == 0:
