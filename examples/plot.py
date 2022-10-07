@@ -64,7 +64,7 @@ HOVER_HPARAMS = [
 ]
 
 HOVER_METRICS = [
-    #
+    "loss",
 ]
 
 HOVER_DATA = [
