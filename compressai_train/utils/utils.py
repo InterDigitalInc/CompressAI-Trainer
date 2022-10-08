@@ -197,18 +197,18 @@ def format_dataframe(
     .. code-block:: python
 
         # Basic, single curve.
-        [{"name": "{name}", "x": "bpp", "y": "psnr"}]
+        [{"name": "{experiment}", "x": "bpp", "y": "psnr"}]
 
         # Multiple series with different suffixes.
         [
-            {"name": "{name} (psnr_x)", "x": "bpp" "y": "psnr_x"},
-            {"name": "{name} (psnr_s)", "x": "bpp" "y": "psnr_s"},
+            {"name": "{experiment} (psnr_x)", "x": "bpp" "y": "psnr_x"},
+            {"name": "{experiment} (psnr_s)", "x": "bpp" "y": "psnr_s"},
         ]
 
         # Flatten multiple bpps/psnrs onto a single curve.
         [
             {
-                "name": "{name}",
+                "name": "{experiment}",
                 "x": ["bpp_0", "bpp_1", "bpp_2"],
                 "y": ["psnr_0", "psnr_1", "psnr_2"],
             }

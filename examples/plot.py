@@ -180,27 +180,26 @@ def build_args(argv):
                 'Each unique "name" produces a unique curve. '
                 'If a key (e.g. "name", "x", "y") is not specified, its default value is used.\n'
                 "\n"
-                'For "name", one may specify a hparam as by key via "{hparam}". '
-                'There is also a "{name}" property that equals "{experiment}" by default.\n'
+                'For "name", one may specify a hparam as by key via "{hparam}".\n'
             )
             + (
                 "\n"
                 "\n"
-                'Default: [{"name": "{name}", "x": args.x, "y": args.y}].\n'
+                'Default: [{"name": "{experiment}", "x": args.x, "y": args.y}].\n'
                 "\n"
                 "Examples:\n"
                 "  - Show both model name and experiment name:\n"
                 '    [{"name": "{model.name} {experiment}"}]\n'
                 "  - Group by hp.M:\n"
-                '    [{"name": "{name} (M={hp.M})"}]\n'
+                '    [{"name": "{experiment} (M={hp.M})"}]\n'
                 "  - Multiple metrics as separate curves:\n"
                 "    [\n"
-                '        {"name": "{name} (full quality)", "y": "psnr_full"},\n'
-                '        {"name": "{name} (low quality)", "y": "psnr_low"},\n'
+                '        {"name": "{experiment} (full quality)", "y": "psnr_full"},\n'
+                '        {"name": "{experiment} (low quality)", "y": "psnr_low"},\n'
                 "    ]\n"
                 "  - Multi-rate models (e.g. G-VAE):\n"
                 "    [{\n"
-                '        "name": "{name} {run.hash}",\n'
+                '        "name": "{experiment} {run.hash}",\n'
                 '        "x": ["bpp_0", "bpp_1", "bpp_2", "bpp_3"],\n'
                 '        "y": ["psnr_0", "psnr_1", "psnr_2", "psnr_3"],\n'
                 "    }]\n"
@@ -238,7 +237,7 @@ def build_args(argv):
     if len(args.query) == 0:
         args.query = [""]
     num_queries = len(args.query)
-    curves_default = {"name": "{name}", "x": args.x, "y": args.y}
+    curves_default = {"name": "{experiment}", "x": args.x, "y": args.y}
     args.curves = [eval(x) for x in args.curves]  # WARNING: unsafe!
     args.curves = [[{**curves_default, **x} for x in xs] for xs in args.curves]
     args.curves += [[curves_default]] * (num_queries - len(args.curves))
