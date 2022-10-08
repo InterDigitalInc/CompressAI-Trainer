@@ -145,14 +145,15 @@ class ImageCompressionRunner(BaseRunner):
 
     @property
     def _current_dataframe(self):
+        r = lambda x: float(f"{x:.4g}")
         d = {
             "name": self.hparams["model"]["name"],
             "epoch": self.epoch_step,
             "criterion.lmbda": self.hparams["criterion"]["lmbda"],
-            "loss": self.loader_metrics["loss"],
-            "bpp": self.loader_metrics["bpp"],
-            "psnr": self.loader_metrics["psnr"],
-            "ms-ssim": self.loader_metrics["ms-ssim"],
+            "loss": r(self.loader_metrics["loss"]),
+            "bpp": r(self.loader_metrics["bpp"]),
+            "psnr": r(self.loader_metrics["psnr"]),
+            "ms-ssim": r(self.loader_metrics["ms-ssim"]),
         }
         return pd.DataFrame.from_dict([d])
 

@@ -97,12 +97,13 @@ class BaseRunner(dl.Runner):
 
     @property
     def _current_dataframe(self):
+        r = lambda x: float(f"{x:.4g}")
         d = dict(
             name=self.hparams["model"]["name"],
             epoch=self.epoch_step,
-            loss=self.loader_metrics["loss"],
-            bpp=self.loader_metrics["bpp"],
-            psnr=self.loader_metrics["psnr"],
+            loss=r(self.loader_metrics["loss"]),
+            bpp=r(self.loader_metrics["bpp"]),
+            psnr=r(self.loader_metrics["psnr"]),
         )
         return pd.DataFrame.from_dict([d])
 
