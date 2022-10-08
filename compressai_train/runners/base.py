@@ -99,9 +99,10 @@ class BaseRunner(dl.Runner):
     def _current_dataframe(self):
         d = dict(
             name=self.hparams["model"]["name"],
+            epoch=self.epoch_step,
+            loss=self.loader_metrics["loss"],
             bpp=self.loader_metrics["bpp"],
             psnr=self.loader_metrics["psnr"],
-            epoch=self.epoch_step,
         )
         return pd.DataFrame.from_dict([d])
 

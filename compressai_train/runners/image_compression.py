@@ -31,6 +31,7 @@ from __future__ import annotations
 
 from typing import Any
 
+import pandas as pd
 import torch
 from catalyst import metrics
 from compressai.models.google import CompressionModel
@@ -63,6 +64,17 @@ RD_PLOT_SETTINGS: dict[str, Any] = dict(
         "mbt2018",
         "cheng2020-anchor",
     ],
+    scatter_kwargs=dict(
+        hover_data=[
+            "name",
+            "bpp",
+            "psnr",
+            "ms-ssim",
+            "loss",
+            "epoch",
+            "criterion.lmbda",
+        ],
+    ),
 )
 
 
@@ -130,6 +142,19 @@ class ImageCompressionRunner(BaseRunner):
         super().on_loader_end(runner)
         if self.is_infer_loader:
             self._log_rd_figure(**RD_PLOT_SETTINGS)
+
+    @property
+    def _current_dataframe(self):
+        d = {
+            "name": self.hparams["model"]["name"],
+            "epoch": self.epoch_step,
+            "criterion.lmbda": self.hparams["criterion"]["lmbda"],
+            "loss": self.loader_metrics["loss"],
+            "bpp": self.loader_metrics["bpp"],
+            "psnr": self.loader_metrics["psnr"],
+            "ms-ssim": self.loader_metrics["ms-ssim"],
+        }
+        return pd.DataFrame.from_dict([d])
 
     def _grad_clip(self):
         grad_clip = self.hparams["optimizer"].get("grad_clip", None)
