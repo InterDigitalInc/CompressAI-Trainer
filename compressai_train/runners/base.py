@@ -120,10 +120,12 @@ class BaseRunner(dl.Runner):
         self.log_artifact(f"{package.__name__}_git_diff", path_to_artifact=diff_path)
 
     def _log_rd_figure(self, codecs: list[str], dataset: str, **kwargs):
+        hover_data = kwargs.get("scatter_kwargs", {}).get("hover_data", [])
         dfs = [compressai_dataframe(name, dataset=dataset) for name in codecs]
         dfs.append(self._current_dataframe)
-        dfs = pd.concat(dfs)
-        fig = plot_rd(dfs, **kwargs)
+        df = pd.concat(dfs)
+        df = _reorder_dataframe_columns(df, hover_data)
+        fig = plot_rd(df, **kwargs)
         self.log_figure(f"rd-curves-{dataset}-psnr", fig)
 
     def _log_stats(self):
@@ -135,3 +137,9 @@ class BaseRunner(dl.Runner):
 
 def _coerce_item(x):
     return x.item() if hasattr(x, "item") else x
+
+
+def _reorder_dataframe_columns(df: pd.DataFrame, head: list[str]) -> pd.DataFrame:
+    head_set = set(head)
+    columns = head + [x for x in df.columns if x not in head_set]
+    return cast(pd.DataFrame, df[columns])
