@@ -80,17 +80,15 @@ HOVER_DATA += HOVER_HPARAMS + HOVER_METRICS
 
 def create_dataframe(repo, args):
     dfs = [
-        _create_dataframe(repo, args.x, args.y, name, query, curves, pareto)
-        for name, query, curves, pareto in zip(
-            args.name, args.query, args.curves, args.pareto
-        )
+        _create_dataframe(repo, args.x, args.y, query, curves, pareto)
+        for query, curves, pareto in zip(args.query, args.curves, args.pareto)
     ]
     df = pd.concat([REFERENCE_DF, *dfs])
     df = _reorder_dataframe_columns(df)
     return df
 
 
-def _create_dataframe(repo, x, y, name, query, curves, pareto):
+def _create_dataframe(repo, x, y, query, curves, pareto):
     runs = runs_by_query(repo, query)
     metrics = sorted(
         {x, y, *HOVER_METRICS}
@@ -104,8 +102,6 @@ def _create_dataframe(repo, x, y, name, query, curves, pareto):
         hparams=hparams,
         epoch="best",
     )
-    if name:
-        df["name"] = name
     df = format_dataframe(df, x, y, curves, skip_nan=True)
     df.sort_values(["name", x, y], inplace=True)
     df.reset_index(drop=True, inplace=True)
@@ -160,7 +156,7 @@ def build_args(argv):
             "Plot.\n"
             "\n"
             "Queries experiment tracker (Aim) repository for relevant metrics and plots. "
-            "Users may specify what to plot using groups of --query, --curves, --name, and --pareto. "
+            "Users may specify what to plot using groups of --query, --curves, and --pareto. "
             "If desired, one may plot multiple query groups within the same plot.\n"
         ),
         "show": "Show figure in browser.",
@@ -185,8 +181,7 @@ def build_args(argv):
                 'If a key (e.g. "name", "x", "y") is not specified, its default value is used.\n'
                 "\n"
                 'For "name", one may specify a hparam as by key via "{hparam}". '
-                'There is also a "{name}" property that equals "{experiment}" by default, '
-                "but this may be overridden via --name.\n"
+                'There is also a "{name}" property that equals "{experiment}" by default.\n'
             )
             + (
                 "\n"
@@ -211,7 +206,6 @@ def build_args(argv):
                 "    }]\n"
             )
         ),
-        "name": "Force override {name} property for respective query.",
         "pareto": (
             "Show only pareto-optimal points on curve for respective query.\n"
             "Default: False.\n"
@@ -238,7 +232,6 @@ def build_args(argv):
         default=[],
         help=help["curves"],
     )
-    parser.add_argument("--name", "-n", action="append", default=[], help=help["name"])
     parser.add_argument("--pareto", action="append", default=[], help=help["pareto"])
     args = parser.parse_args(argv)
 
@@ -249,7 +242,6 @@ def build_args(argv):
     args.curves = [eval(x) for x in args.curves]  # WARNING: unsafe!
     args.curves = [[{**curves_default, **x} for x in xs] for xs in args.curves]
     args.curves += [[curves_default]] * (num_queries - len(args.curves))
-    args.name += [""] * (num_queries - len(args.name))
     args.pareto += [False] * (num_queries - len(args.pareto))
 
     return args
