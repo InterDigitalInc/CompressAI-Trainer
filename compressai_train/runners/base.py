@@ -109,7 +109,9 @@ class BaseRunner(dl.Runner):
 
     def _update_batch_metrics(self, batch_metrics):
         self.batch_metrics.update(batch_metrics)
-        for key in self.batch_meters.keys():
+        for key in batch_metrics.keys():
+            if key not in self.batch_meters:
+                continue
             self.batch_meters[key].update(
                 _coerce_item(self.batch_metrics[key]),
                 self.batch_size,
