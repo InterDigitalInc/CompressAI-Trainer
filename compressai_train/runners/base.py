@@ -58,6 +58,7 @@ class BaseRunner(dl.Runner):
         super().on_experiment_start(runner)
         self._log_git_diff(compressai)
         self._log_git_diff(compressai_train)
+        self._log_pip()
         self._log_stats()
 
     def on_epoch_start(self, runner):
@@ -121,6 +122,10 @@ class BaseRunner(dl.Runner):
         src_root = self.hparams["paths"]["src"]
         dest_path = os.path.join(src_root, filename)
         self.log_artifact(tag, path_to_artifact=dest_path)
+
+    def _log_pip(self):
+        self._log_src_artifact("pip_list.txt", "pip_list.txt")
+        self._log_src_artifact("requirements.txt", "requirements.txt")
 
     def _log_git_diff(self, package: ModuleType):
         self._log_src_artifact(

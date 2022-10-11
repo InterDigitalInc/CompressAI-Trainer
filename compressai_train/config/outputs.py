@@ -35,13 +35,15 @@ import compressai
 from omegaconf import DictConfig, OmegaConf
 
 import compressai_train
-from compressai_train.utils import git
+from compressai_train.utils import git, pip
 
 
 def write_outputs(conf: DictConfig):
     write_config(conf)
     write_git_diff(conf, compressai_train)
     write_git_diff(conf, compressai)
+    write_pip_list(conf)
+    write_pip_requirements(conf)
 
 
 def write_config(conf: DictConfig):
@@ -56,6 +58,14 @@ def write_config(conf: DictConfig):
 def write_git_diff(conf: Mapping[str, Any], package: ModuleType) -> str:
     data = git.diff(root=package.__path__[0])
     return _write_src(conf, f"{package.__name__}.patch", data)
+
+
+def write_pip_list(conf: Mapping[str, Any]) -> str:
+    return _write_src(conf, "pip_list.txt", pip.list())
+
+
+def write_pip_requirements(conf: Mapping[str, Any]) -> str:
+    return _write_src(conf, "requirements.txt", pip.freeze())
 
 
 def _write_src(conf: Mapping[str, Any], filename: str, data: str) -> str:

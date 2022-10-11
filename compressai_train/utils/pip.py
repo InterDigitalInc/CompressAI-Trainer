@@ -27,15 +27,19 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from . import aim, catalyst, compressai, git, metrics, pip, system, utils
+import subprocess
+import sys
 
-__all__ = [
-    "aim",
-    "catalyst",
-    "compressai",
-    "git",
-    "metrics",
-    "pip",
-    "system",
-    "utils",
-]
+
+def list():
+    return _run_pip_cmd("list")
+
+
+def freeze():
+    return _run_pip_cmd("freeze")
+
+
+def _run_pip_cmd(*cmd):
+    cmd = [sys.executable, "-m", "pip", *cmd]
+    p = subprocess.run(cmd, check=True, capture_output=True)
+    return p.stdout.decode()
