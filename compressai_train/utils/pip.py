@@ -31,8 +31,8 @@ import subprocess
 import sys
 
 
-def list():
-    return _run_pip_cmd("list")
+def list(format="columns"):
+    return _run_pip_cmd("list", f"--format={format}")
 
 
 def freeze():

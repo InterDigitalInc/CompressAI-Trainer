@@ -65,7 +65,7 @@ def write_pip_list(conf: Mapping[str, Any]) -> str:
 
 
 def write_pip_requirements(conf: Mapping[str, Any]) -> str:
-    return _write_src(conf, "requirements.txt", pip.freeze())
+    return _write_src(conf, "requirements.txt", pip.list(format="freeze"))
 
 
 def _write_src(conf: Mapping[str, Any], filename: str, data: str) -> str:
