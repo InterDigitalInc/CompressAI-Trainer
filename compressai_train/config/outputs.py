@@ -37,6 +37,9 @@ from omegaconf import DictConfig, OmegaConf
 import compressai_train
 from compressai_train.utils import git, pip
 
+CONFIG_DIR = "configs"
+CONFIG_NAME = "config.yaml"
+
 
 def write_outputs(conf: DictConfig):
     write_config(conf)
@@ -48,10 +51,9 @@ def write_outputs(conf: DictConfig):
 
 def write_config(conf: DictConfig):
     logdir = conf.misc.config_logdir
-    filename = "config.yaml"
     s = OmegaConf.to_yaml(conf, resolve=False)
     os.makedirs(logdir, exist_ok=True)
-    with open(os.path.join(logdir, filename), "w") as f:
+    with open(os.path.join(logdir, CONFIG_NAME), "w") as f:
         f.write(s)
 
 

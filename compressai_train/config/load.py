@@ -41,6 +41,7 @@ from omegaconf import DictConfig, OmegaConf
 from torch import Tensor
 
 import compressai_train
+from compressai_train.config import outputs
 from compressai_train.config.config import create_model
 from compressai_train.utils import git
 
@@ -53,7 +54,7 @@ def load_config(run_root: str) -> DictConfig:
 
     Example of run root path: `/path/to/runs/e4e6d4d5e5c59c69f3bd7be2`.
     """
-    config_path = os.path.join(run_root, "configs", "config.yaml")
+    config_path = os.path.join(run_root, outputs.CONFIG_DIR, outputs.CONFIG_NAME)
     conf = OmegaConf.load(config_path)
     return cast(DictConfig, conf)
 
