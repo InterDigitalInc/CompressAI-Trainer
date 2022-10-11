@@ -29,6 +29,7 @@
 
 from __future__ import annotations
 
+from collections import defaultdict
 from typing import Any
 
 import pandas as pd
@@ -82,6 +83,7 @@ RD_PLOT_SETTINGS: dict[str, Any] = dict(
 class ImageCompressionRunner(BaseRunner):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._loader_metrics = {}
 
     def on_loader_start(self, runner):
         super().on_loader_start(runner)
@@ -137,11 +139,13 @@ class ImageCompressionRunner(BaseRunner):
             "bpp": out_infer["bpp"],
         }
         self._update_batch_metrics(batch_metrics)
+        self._handle_custom_metrics(out_net)
 
     def on_loader_end(self, runner):
         super().on_loader_end(runner)
         if self.is_infer_loader:
             self._log_rd_figure(**RD_PLOT_SETTINGS)
+            self._log_chan_bpp()
 
     @property
     def _current_dataframe(self):
@@ -164,6 +168,33 @@ class ImageCompressionRunner(BaseRunner):
         max_norm = grad_clip.get("max_norm", None)
         if max_norm is not None:
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm)
+
+    def _handle_custom_metrics(self, out_net):
+        likelihoods = out_net["likelihoods"]
+        _, _, h, w = out_net["x_hat"].shape
+        chan_bpp = {
+            k: l.detach().log2().sum(axis=(-2, -1)) / -(h * w)
+            for k, l in likelihoods.items()
+        }
+        if "chan_bpp" not in self._loader_metrics:
+            self._loader_metrics["chan_bpp"] = defaultdict(list)
+        for k, ch_bpp in chan_bpp.items():
+            self._loader_metrics["chan_bpp"][k].extend(ch_bpp)
+
+    def _log_chan_bpp(self):
+        for k, ch_bpp in self._loader_metrics["chan_bpp"].items():
+            ch_bpp = torch.stack(ch_bpp).mean(dim=0).to(torch.float16).cpu()
+            c, *_ = ch_bpp.shape
+            ch_bpp_sorted, _ = torch.sort(ch_bpp, descending=True)
+            bin_edges = torch.arange(c + 1)
+            kwargs = dict(
+                unused=None,
+                scope="epoch",
+                context={"name": k},
+                bin_edges=bin_edges.numpy(),
+            )
+            self.log_distribution("chan_bpp_sorted", hist=ch_bpp_sorted, **kwargs)
+            self.log_distribution("chan_bpp_unsorted", hist=ch_bpp, **kwargs)
 
     def _setup_meters(self):
         keys = list(METERS)
