@@ -117,10 +117,15 @@ class BaseRunner(dl.Runner):
                 self.batch_size,
             )
 
-    def _log_git_diff(self, package: ModuleType):
+    def _log_src_artifact(self, tag: str, filename: str):
         src_root = self.hparams["paths"]["src"]
-        diff_path = os.path.join(src_root, f"{package.__name__}.patch")
-        self.log_artifact(f"{package.__name__}_git_diff", path_to_artifact=diff_path)
+        dest_path = os.path.join(src_root, filename)
+        self.log_artifact(tag, path_to_artifact=dest_path)
+
+    def _log_git_diff(self, package: ModuleType):
+        self._log_src_artifact(
+            f"{package.__name__}_git_diff", f"{package.__name__}.patch"
+        )
 
     def _log_rd_figure(self, codecs: list[str], dataset: str, **kwargs):
         hover_data = kwargs.get("scatter_kwargs", {}).get("hover_data", [])

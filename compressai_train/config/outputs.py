@@ -54,9 +54,14 @@ def write_config(conf: DictConfig):
 
 
 def write_git_diff(conf: Mapping[str, Any], package: ModuleType) -> str:
+    data = git.diff(root=package.__path__[0])
+    return _write_src(conf, f"{package.__name__}.patch", data)
+
+
+def _write_src(conf: Mapping[str, Any], filename: str, data: str) -> str:
     src_root = conf["paths"]["src"]
-    diff_path = os.path.join(src_root, f"{package.__name__}.patch")
+    dest_path = os.path.join(src_root, filename)
     os.makedirs(src_root, exist_ok=True)
-    with open(diff_path, "w") as f:
-        f.write(git.diff(root=package.__path__[0]))
-    return diff_path
+    with open(dest_path, "w") as f:
+        f.write(data)
+    return dest_path
