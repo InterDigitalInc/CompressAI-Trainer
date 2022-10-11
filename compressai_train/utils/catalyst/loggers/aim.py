@@ -53,6 +53,9 @@ class AimLogger(ILogger):
             (default: SETTINGS.log_batch_metrics or False).
         log_epoch_metrics: boolean flag to log epoch metrics
             (default: SETTINGS.log_epoch_metrics or True).
+        repo: Aim repo object.
+        run: Aim run object.
+            If specified, `experiment`, `run_hash`, and `repo` are ignored.
 
     Python API examples:
 
@@ -96,6 +99,7 @@ class AimLogger(ILogger):
         log_batch_metrics: bool = SETTINGS.log_batch_metrics,
         log_epoch_metrics: bool = SETTINGS.log_epoch_metrics,
         repo: Optional[Union[str, aim.Repo]] = None,
+        run: Optional[aim.Run] = None,
         **kwargs,
     ) -> None:
         super().__init__(
@@ -103,11 +107,15 @@ class AimLogger(ILogger):
             log_epoch_metrics=log_epoch_metrics,
         )
         self.exclude = [] if exclude is None else exclude
-        self.run = aim.Run(
-            run_hash=run_hash,
-            repo=repo,
-            experiment=experiment,
-            **kwargs,
+        self.run = (
+            run
+            if run is not None
+            else aim.Run(
+                run_hash=run_hash,
+                repo=repo,
+                experiment=experiment,
+                **kwargs,
+            )
         )
 
     @property
