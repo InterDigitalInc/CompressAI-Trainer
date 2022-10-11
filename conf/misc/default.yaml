@@ -1,3 +1,2 @@
-config_logdir: "${paths.configs}"
 device: "cuda"
 seed: 1234

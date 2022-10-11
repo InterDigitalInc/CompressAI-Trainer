@@ -50,7 +50,8 @@ def write_outputs(conf: DictConfig):
 
 
 def write_config(conf: DictConfig):
-    logdir = conf.misc.config_logdir
+    logdir = conf.paths.configs
+    assert logdir == os.path.join(conf.paths._run_root, CONFIG_DIR)
     s = OmegaConf.to_yaml(conf, resolve=False)
     os.makedirs(logdir, exist_ok=True)
     with open(os.path.join(logdir, CONFIG_NAME), "w") as f:
