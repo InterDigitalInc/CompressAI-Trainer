@@ -56,7 +56,6 @@ def setup(conf: DictConfig) -> tuple[TRunner, dict[str, Any]]:
     catalyst.utils.prepare_cudnn(benchmark=True)
 
     configure_conf(conf)
-    write_outputs(conf)
 
     model = create_model(conf)
     criterion = create_criterion(conf.criterion)
@@ -74,6 +73,8 @@ def setup(conf: DictConfig) -> tuple[TRunner, dict[str, Any]]:
     engine_kwargs = {**d, **configure_engine(conf)}
 
     runner = create_runner(conf.runner)
+
+    write_outputs(conf)
 
     return runner, engine_kwargs
 

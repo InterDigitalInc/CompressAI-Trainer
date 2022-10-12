@@ -34,7 +34,6 @@ from datetime import datetime, timezone
 from typing import Any
 
 import compressai
-from aim.sdk.utils import generate_run_hash
 from omegaconf import DictConfig
 
 import compressai_train
@@ -43,12 +42,7 @@ from compressai_train.utils import git, system
 
 def get_env(conf: DictConfig) -> dict[str, Any]:
     return {
-        "aim": {
-            "repo": conf.env.aim.repo,
-            "run_hash": (
-                conf.env.aim.run_hash if conf.env.aim.run_hash else generate_run_hash()
-            ),
-        },
+        "aim": conf.env.aim,
         "git": {
             package.__name__: _get_git_repo_info(
                 package.__path__[0],

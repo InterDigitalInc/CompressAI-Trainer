@@ -77,4 +77,5 @@ def configure_engine(conf: DictConfig) -> dict[str, Any]:
             **conf.engine.loggers.tensorboard,
         ),
     }
+    conf.env.aim.run_hash = engine_kwargs["loggers"]["aim"].run.hash
     return engine_kwargs
