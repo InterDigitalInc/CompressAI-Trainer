@@ -20,11 +20,11 @@ callbacks:
     resume_runner:  "${paths.checkpoint}"
     topk: 1     # number of top-k checkpoints to keep
   - type: "EarlyStoppingCallback"
-    patience: 20
+    patience: 15
     loader_key: "valid"
     metric_key: "loss"
     minimize: True
-    min_delta: 1e-3  # Recommendation: < 1e-4 * {.patience}
+    min_delta: 1e-4  # Recommendation: < 1e-4 * {.patience}
 loggers:
   aim: {}
   tensorboard:
