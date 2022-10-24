@@ -59,10 +59,6 @@ def create_runner(conf: DictConfig) -> TRunner:
 def configure_engine(conf: DictConfig) -> dict[str, Any]:
     engine_kwargs = OmegaConf.to_container(conf.engine, resolve=True)
     engine_kwargs = cast(Dict[str, Any], engine_kwargs)
-    engine_kwargs["callbacks"] = [
-        create_callback(cb_conf) for cb_conf in conf.engine.callbacks
-    ]
-    engine_kwargs["hparams"] = OmegaConf.to_container(conf, resolve=True)
     engine_kwargs["loggers"] = {
         "aim": AimLogger(
             experiment=conf.exp.name,
@@ -78,4 +74,8 @@ def configure_engine(conf: DictConfig) -> dict[str, Any]:
         ),
     }
     conf.env.aim.run_hash = engine_kwargs["loggers"]["aim"].run.hash
+    engine_kwargs["callbacks"] = [
+        create_callback(cb_conf) for cb_conf in conf.engine.callbacks
+    ]
+    engine_kwargs["hparams"] = OmegaConf.to_container(conf, resolve=True)
     return engine_kwargs
