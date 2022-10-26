@@ -8,7 +8,7 @@ check: False
 callbacks:
   - type: "SchedulerCallback"
     scheduler_key: "net"
-    mode: "epoch"
+    mode: null  # "epoch" or "batch"
     loader_key: "valid"
     metric_key: "loss"
   - type: "CheckpointCallback"
