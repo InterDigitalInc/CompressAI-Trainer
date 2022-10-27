@@ -27,6 +27,7 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import catalyst.contrib.schedulers
 from compressai.registry.torch import (
     CRITERIONS,
     DATASETS,
@@ -52,3 +53,8 @@ __all__ = [
     "register_optimizer",
     "register_scheduler",
 ]
+
+
+SCHEDULERS.update(
+    {k: v for k, v in catalyst.contrib.schedulers.__dict__.items() if k[0].isupper()}
+)
