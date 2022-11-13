@@ -26,18 +26,18 @@ dev = ["black (>=22.0,<23.0)", "datasets", "deepspeed", "evaluate", "flake8 (>=3
 quality = ["black (>=22.0,<23.0)", "flake8 (>=3.8.3)", "isort (>=5.5.4)"]
 sagemaker = ["sagemaker"]
 test = ["datasets", "deepspeed", "evaluate", "parameterized", "pytest", "pytest-subtests", "pytest-xdist", "scipy", "sklearn", "transformers"]
-test_trackers = ["comet-ml", "tensorboard", "wandb"]
+test-trackers = ["comet-ml", "tensorboard", "wandb"]
 
 [[package]]
 name = "aim"
-version = "3.14.1"
+version = "3.14.4"
 description = "A super-easy way to record, search and compare AI experiments."
 category = "main"
 optional = false
 python-versions = ">=3.6.0"
 
 [package.dependencies]
-aim-ui = "3.14.1"
+aim-ui = "3.14.4"
 aimrecords = "0.0.7"
 aimrocks = "0.2.1"
 aiofiles = ">=0.5.0"
@@ -61,7 +61,7 @@ uvicorn = ">=0.12.0"
 
 [[package]]
 name = "aim-ui"
-version = "3.14.1"
+version = "3.14.4"
 description = "Aim UI"
 category = "main"
 optional = false
@@ -139,7 +139,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 dev = ["cloudpickle", "coverage[toml] (>=5.0.2)", "furo", "hypothesis", "mypy", "pre-commit", "pympler", "pytest (>=4.3.0)", "pytest-mypy-plugins", "six", "sphinx", "sphinx-notfound-page", "zope.interface"]
 docs = ["furo", "sphinx", "sphinx-notfound-page", "zope.interface"]
 tests = ["cloudpickle", "coverage[toml] (>=5.0.2)", "hypothesis", "mypy", "pympler", "pytest (>=4.3.0)", "pytest-mypy-plugins", "six", "zope.interface"]
-tests_no_zope = ["cloudpickle", "coverage[toml] (>=5.0.2)", "hypothesis", "mypy", "pympler", "pytest (>=4.3.0)", "pytest-mypy-plugins", "six"]
+tests-no-zope = ["cloudpickle", "coverage[toml] (>=5.0.2)", "hypothesis", "mypy", "pympler", "pytest (>=4.3.0)", "pytest-mypy-plugins", "six"]
 
 [[package]]
 name = "base58"
@@ -238,7 +238,7 @@ optional = false
 python-versions = ">=3.5.0"
 
 [package.extras]
-unicode_backport = ["unicodedata2"]
+unicode-backport = ["unicodedata2"]
 
 [[package]]
 name = "click"
@@ -354,7 +354,7 @@ six = ">=1.9.0"
 
 [package.extras]
 aiohttp = ["aiohttp (>=3.6.2,<4.0.0dev)", "requests (>=2.20.0,<3.0.0dev)"]
-enterprise_cert = ["cryptography (==36.0.2)", "pyopenssl (==22.0.0)"]
+enterprise-cert = ["cryptography (==36.0.2)", "pyopenssl (==22.0.0)"]
 pyopenssl = ["pyopenssl (>=20.0.0)"]
 reauth = ["pyu2f (>=0.1.5)"]
 
@@ -485,9 +485,9 @@ python-versions = ">=3.6.1,<4.0"
 
 [package.extras]
 colors = ["colorama (>=0.4.3,<0.5.0)"]
-pipfile_deprecated_finder = ["pipreqs", "requirementslib"]
+pipfile-deprecated-finder = ["pipreqs", "requirementslib"]
 plugins = ["setuptools"]
-requirements_deprecated_finder = ["pip-api", "pipreqs"]
+requirements-deprecated-finder = ["pip-api", "pipreqs"]
 
 [[package]]
 name = "jinja2"
@@ -858,7 +858,7 @@ urllib3 = ">=1.21.1,<1.27"
 
 [package.extras]
 socks = ["PySocks (>=1.5.6,!=1.5.7)"]
-use_chardet_on_py3 = ["chardet (>=3.0.2,<5)"]
+use-chardet-on-py3 = ["chardet (>=3.0.2,<5)"]
 
 [[package]]
 name = "requests-oauthlib"
@@ -978,19 +978,19 @@ aiomysql = ["aiomysql", "greenlet (!=0.4.17)"]
 aiosqlite = ["aiosqlite", "greenlet (!=0.4.17)", "typing_extensions (!=3.10.0.1)"]
 asyncio = ["greenlet (!=0.4.17)"]
 asyncmy = ["asyncmy (>=0.2.3,!=0.2.4)", "greenlet (!=0.4.17)"]
-mariadb_connector = ["mariadb (>=1.0.1)"]
+mariadb-connector = ["mariadb (>=1.0.1)"]
 mssql = ["pyodbc"]
-mssql_pymssql = ["pymssql"]
-mssql_pyodbc = ["pyodbc"]
+mssql-pymssql = ["pymssql"]
+mssql-pyodbc = ["pyodbc"]
 mypy = ["mypy (>=0.910)", "sqlalchemy2-stubs"]
 mysql = ["mysqlclient (>=1.4.0)", "mysqlclient (>=1.4.0,<2)"]
-mysql_connector = ["mysql-connector-python"]
+mysql-connector = ["mysql-connector-python"]
 oracle = ["cx_oracle (>=7)", "cx_oracle (>=7,<8)"]
 postgresql = ["psycopg2 (>=2.7)"]
-postgresql_asyncpg = ["asyncpg", "greenlet (!=0.4.17)"]
-postgresql_pg8000 = ["pg8000 (>=1.16.6,!=1.29.0)"]
-postgresql_psycopg2binary = ["psycopg2-binary"]
-postgresql_psycopg2cffi = ["psycopg2cffi"]
+postgresql-asyncpg = ["asyncpg", "greenlet (!=0.4.17)"]
+postgresql-pg8000 = ["pg8000 (>=1.16.6,!=1.29.0)"]
+postgresql-psycopg2binary = ["psycopg2-binary"]
+postgresql-psycopg2cffi = ["psycopg2cffi"]
 pymysql = ["pymysql", "pymysql (<1)"]
 sqlcipher = ["sqlcipher3_binary"]
 
@@ -1222,28 +1222,28 @@ accelerate = [
     {file = "accelerate-0.10.0.tar.gz", hash = "sha256:e9eb1e2b8bccf03a821db49a8720f518289980dc2a1da9e5a8e633a8d9023a58"},
 ]
 aim = [
-    {file = "aim-3.14.1-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:832e006208b7d9cd440820e43bf7d6ec50826ac53896e323b9d3b5193abcf696"},
-    {file = "aim-3.14.1-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:d4a1543f6c1057823e1d158cd99754debfc7e0a8ba23ee8d428852e46d2ee14f"},
-    {file = "aim-3.14.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:67d9d3518dc2104c9ee4e01caff4605ba7ff2122588aeec0d049ee14cbb8c702"},
-    {file = "aim-3.14.1-cp310-cp310-manylinux_2_24_x86_64.whl", hash = "sha256:7d9dd482c65ffa787cfb1aa1089b9c9398480a0ad107e7927f16c914368fa073"},
-    {file = "aim-3.14.1-cp36-cp36m-macosx_10_14_x86_64.whl", hash = "sha256:07cf1a9dfb10c5d5f342a8fed6debce78a4dd6e3e17fa8aa6ce4dbd8bcc72f1a"},
-    {file = "aim-3.14.1-cp36-cp36m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:4e1c066b1634e04583cf93abe5a9cc9d4d40d003ce284acba36fbf0db1bf03dd"},
-    {file = "aim-3.14.1-cp36-cp36m-manylinux_2_24_x86_64.whl", hash = "sha256:cc5bc79e2150c2686ac6fc67b51c84960b43b3baf2a9b5f2ea7cf4ccd089ebac"},
-    {file = "aim-3.14.1-cp37-cp37m-macosx_10_14_x86_64.whl", hash = "sha256:607b3198ebbf0339f72d38c085fe3f5aaebd00025dfdbf6b29fe3131ef2ef130"},
-    {file = "aim-3.14.1-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:f5f103ce7fa43aeea83c9a4866c226e79cdebc44ddbcd64aaf96881122f2a16e"},
-    {file = "aim-3.14.1-cp37-cp37m-manylinux_2_24_x86_64.whl", hash = "sha256:448caea260770756d5c20fdcbdbcab42825329ad626f20f63506b0300955a315"},
-    {file = "aim-3.14.1-cp38-cp38-macosx_10_14_x86_64.whl", hash = "sha256:b0ee444085e24ed239680b43ddf722c80a83bd2da71fc3349eda21afe3264309"},
-    {file = "aim-3.14.1-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:b7ae508c9b6d05c74307abd4288e59c165e57e8296d9a437d50538448932843a"},
-    {file = "aim-3.14.1-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:37e11b594d09d1bf1b148c55a8ba2a64f7a35fa0656381ecd541e853e5235ba4"},
-    {file = "aim-3.14.1-cp38-cp38-manylinux_2_24_x86_64.whl", hash = "sha256:bfb97007d6104b30cb98ef20b0470ed666da2a04e68ad1ca9c782923b4dda8ac"},
-    {file = "aim-3.14.1-cp39-cp39-macosx_10_14_x86_64.whl", hash = "sha256:267ee540fe82226316a773df9c8a52427fa8886b2faebc0f211e9258a51bfef0"},
-    {file = "aim-3.14.1-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:197ade9a380a33427be5f4ac108155b099711b1c73e8614eeefd9f6b13b0fb83"},
-    {file = "aim-3.14.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:2d4de07ca8eb20bbb5414fa17085a166e8d83b3e11033d8700a703c8684e1dee"},
-    {file = "aim-3.14.1-cp39-cp39-manylinux_2_24_x86_64.whl", hash = "sha256:24d02d08dc569bf346ecbeedb05222d9f5b8927927c258387fa33a8d7139054c"},
-    {file = "aim-3.14.1.tar.gz", hash = "sha256:ff229918260dbf2b6ffa9917f3d95be3ae07286bcd2f861ae145937d7d05822f"},
+    {file = "aim-3.14.4-cp310-cp310-macosx_10_14_x86_64.whl", hash = "sha256:840dbe86fe2a9e76d6301c5df6e8813f573977867b403750f10124a37ad8887d"},
+    {file = "aim-3.14.4-cp310-cp310-macosx_11_0_arm64.whl", hash = "sha256:89197fdf88ad38abda25894e4e017aea0f7958e49795a469d7327b7a5c55a32a"},
+    {file = "aim-3.14.4-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:5edce1390b943bdcaec55ce78c21344325027c6c8ffa42f34502618423d83159"},
+    {file = "aim-3.14.4-cp310-cp310-manylinux_2_24_x86_64.whl", hash = "sha256:e711777109278ef9d2a6ae0ee49fb9267602ca74e69a4e1738d4e05b9913b9b0"},
+    {file = "aim-3.14.4-cp36-cp36m-macosx_10_14_x86_64.whl", hash = "sha256:4d29db6a017f46c9efb6ad106df61e344d24f34d9d11e16794d7eefc64e48bcf"},
+    {file = "aim-3.14.4-cp36-cp36m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:4bb774b9a446da4e357eaa72cb5f03ff1ae9c7f5dd22327e46c79633a87337dd"},
+    {file = "aim-3.14.4-cp36-cp36m-manylinux_2_24_x86_64.whl", hash = "sha256:e44e0f700843838b795fa640d4e9f6420fb3fcccc96a52b7b04b392c32111bc2"},
+    {file = "aim-3.14.4-cp37-cp37m-macosx_10_14_x86_64.whl", hash = "sha256:68f4944408ef4ec773e56c6ad4de59a65c44db559f0b1dda42b9fb1970deddf7"},
+    {file = "aim-3.14.4-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:e01a91e220f8fca9f16720e05b2b5a738ad8585c21d37defae5cb4834be41e7a"},
+    {file = "aim-3.14.4-cp37-cp37m-manylinux_2_24_x86_64.whl", hash = "sha256:71bee31b441eaa4f34aad74cf90593fdd2721c58f64cde9809718eb3420e27c6"},
+    {file = "aim-3.14.4-cp38-cp38-macosx_10_14_x86_64.whl", hash = "sha256:8d6c9e69b0ab730b1e2973e2f492cd994a1fa68a60867d8ab072e701eff8d9ff"},
+    {file = "aim-3.14.4-cp38-cp38-macosx_11_0_arm64.whl", hash = "sha256:c34db88467bf32a5d1a752d86bba53360029a21b3cdf06c3e78bdac2f45d0a64"},
+    {file = "aim-3.14.4-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:f95b30eab5331b0dfbea45e668dd09321f4904a6d12aba62198a5e2952e134d8"},
+    {file = "aim-3.14.4-cp38-cp38-manylinux_2_24_x86_64.whl", hash = "sha256:fd309b1ef1005a23cff0bdc4aa92fd084b2c914d9371c77e1459e6e4eddf1640"},
+    {file = "aim-3.14.4-cp39-cp39-macosx_10_14_x86_64.whl", hash = "sha256:827a6a79496eb6bc0444cfad6ce28d90155816813bb314cb0cf20342467a7096"},
+    {file = "aim-3.14.4-cp39-cp39-macosx_11_0_arm64.whl", hash = "sha256:f726686f2db65de27bf09c63f1a2a45c076855e9abfd974b56766026105d443f"},
+    {file = "aim-3.14.4-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:6502efb7a2cfa88841318ac9e222373af5074540e8579278c00f02caf95e85ea"},
+    {file = "aim-3.14.4-cp39-cp39-manylinux_2_24_x86_64.whl", hash = "sha256:34c9640aa98a80c9d6e97516b8bb7fdaba2026b3da227d6ddd7f0cc130ba3cc5"},
+    {file = "aim-3.14.4.tar.gz", hash = "sha256:d0a3a9eb939532d0572e41216cc4627f171ba6cb48f6da62fe96f3dbb0250d3a"},
 ]
 aim-ui = [
-    {file = "aim-ui-3.14.1.tar.gz", hash = "sha256:201e2c6f3d9bf1547e066ade44aae1e018ead4ab894cb227ea53c6d3ddf7f9ae"},
+    {file = "aim-ui-3.14.4.tar.gz", hash = "sha256:059dfc580ce2e3df8f339b43d64c4644739334cc95f9777bdb43d66b4a27f4da"},
 ]
 aimrecords = [
     {file = "aimrecords-0.0.7-py2.py3-none-any.whl", hash = "sha256:b9276890891c5fd68f817e20fc5d466a80c01e22fa468eaa979331448a75d601"},
