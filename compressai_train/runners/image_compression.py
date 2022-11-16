@@ -83,10 +83,10 @@ RD_PLOT_SETTINGS: dict[str, Any] = dict(
 class ImageCompressionRunner(BaseRunner):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._loader_metrics = {}
 
     def on_loader_start(self, runner):
         super().on_loader_start(runner)
+        self._loader_metrics = {}
         self._setup_meters()
 
     def handle_batch(self, batch):
