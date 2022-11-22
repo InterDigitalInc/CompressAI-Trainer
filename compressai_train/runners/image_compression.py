@@ -33,13 +33,16 @@ from collections import defaultdict
 from typing import Any
 
 import pandas as pd
+import plotly.graph_objects as go
 import torch
 from catalyst import metrics
 from compressai.models.google import CompressionModel
 
+from compressai_train.plot import plot_rd
 from compressai_train.registry import register_runner
+from compressai_train.runners.base import _reorder_dataframe_columns
 from compressai_train.utils.metrics import compute_metrics
-from compressai_train.utils.utils import inference
+from compressai_train.utils.utils import compressai_dataframe, inference
 
 from .base import BaseRunner
 
@@ -126,6 +129,7 @@ class ImageCompressionRunner(BaseRunner):
         out_net = out_infer["out_net"]
         out_criterion = self.criterion(out_net, x)
         out_metrics = compute_metrics(x, out_net["x_hat"], ["psnr", "ms-ssim"])
+        out_metrics["bpp"] = out_infer["bpp"]
 
         loss = {}
         loss["net"] = out_criterion["loss"]
@@ -139,7 +143,7 @@ class ImageCompressionRunner(BaseRunner):
             "bpp": out_infer["bpp"],
         }
         self._update_batch_metrics(batch_metrics)
-        self._handle_custom_metrics(out_net)
+        self._handle_custom_metrics(out_net, out_metrics)
 
     def on_loader_end(self, runner):
         super().on_loader_end(runner)
@@ -169,7 +173,7 @@ class ImageCompressionRunner(BaseRunner):
         if max_norm is not None:
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm)
 
-    def _handle_custom_metrics(self, out_net):
+    def _handle_custom_metrics(self, out_net, out_metrics):
         likelihoods = out_net["likelihoods"]
         _, _, h, w = out_net["x_hat"].shape
         chan_bpp = {
@@ -178,8 +182,12 @@ class ImageCompressionRunner(BaseRunner):
         }
         if "chan_bpp" not in self._loader_metrics:
             self._loader_metrics["chan_bpp"] = defaultdict(list)
+            self._loader_metrics["bpp"] = []
+            self._loader_metrics["psnr"] = []
         for k, ch_bpp in chan_bpp.items():
             self._loader_metrics["chan_bpp"][k].extend(ch_bpp)
+        self._loader_metrics["bpp"].append(out_metrics["bpp"])
+        self._loader_metrics["psnr"].append(out_metrics["psnr"])
 
     def _log_chan_bpp(self):
         for k, ch_bpp in self._loader_metrics["chan_bpp"].items():
@@ -195,6 +203,27 @@ class ImageCompressionRunner(BaseRunner):
             )
             self.log_distribution("chan_bpp_sorted", hist=ch_bpp_sorted, **kwargs)
             self.log_distribution("chan_bpp_unsorted", hist=ch_bpp, **kwargs)
+
+    def _log_rd_figure(self, codecs: list[str], dataset: str, **kwargs):
+        hover_data = kwargs.get("scatter_kwargs", {}).get("hover_data", [])
+        dfs = [compressai_dataframe(name, dataset=dataset) for name in codecs]
+        dfs.append(self._current_dataframe)
+        df = pd.concat(dfs)
+        df = _reorder_dataframe_columns(df, hover_data)
+        fig = plot_rd(df, **kwargs)
+        lmbda = self.hparams["criterion"]["lmbda"]
+        num_points = len(self._loader_metrics["bpp"])
+        fig.add_trace(
+            go.Scatter(
+                x=self._loader_metrics["bpp"],
+                y=self._loader_metrics["psnr"],
+                mode="markers",
+                name=f'{self.hparams["model"]["name"]} {lmbda:.4f}',
+                text=[f"lmbda={lmbda:.4f}\nimg_idx={i}" for i in range(num_points)],
+                visible="legendonly",
+            )
+        )
+        self.log_figure(f"rd-curves-{dataset}-psnr", fig)
 
     def _setup_meters(self):
         keys = list(METERS)
