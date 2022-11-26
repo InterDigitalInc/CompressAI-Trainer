@@ -11,3 +11,4 @@ engine:         "${._run_root}/engine"
 src:            "${._run_root}/src"
 tensorboard:    "${._run_root}/tensorboard"
 checkpoint:     null  # to resume from checkpoint, override with e.g. "${.checkpoints}/runner.last.pth"
+model_checkpoint: null  # checkpoint to load only model weights from

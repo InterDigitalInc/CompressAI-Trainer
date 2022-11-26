@@ -32,6 +32,7 @@ from __future__ import annotations
 import math
 from typing import Any, Dict, cast
 
+from catalyst.utils.torch import load_checkpoint
 from omegaconf import DictConfig, OmegaConf
 
 from compressai_train.registry.torch import CRITERIONS, MODELS, OPTIMIZERS, SCHEDULERS
@@ -76,6 +77,15 @@ def create_dataloaders(conf: DictConfig) -> dict[str, TDataLoader]:
 def create_model(conf: DictConfig) -> TModel:
     model = MODELS[conf.model.name](**conf.hp)
     model = model.to(conf.misc.device)
+
+    if conf.paths.model_checkpoint:
+        from compressai_train.config.load import state_dict_from_checkpoint
+
+        checkpoint = load_checkpoint(conf.paths.model_checkpoint)
+        state_dict = state_dict_from_checkpoint(checkpoint)
+        missing_keys, unexpected_keys = model.load_state_dict(state_dict, strict=False)
+        print(f"Missing keys: {missing_keys}\nUnexpected keys: {unexpected_keys}")
+
     return model
 
 
