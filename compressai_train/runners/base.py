@@ -115,6 +115,9 @@ class BaseRunner(dl.Runner):
         )
         return pd.DataFrame.from_dict([d])
 
+    def _current_rd_traces(self):
+        return []
+
     def _update_batch_metrics(self, batch_metrics):
         self.batch_metrics.update(batch_metrics)
         for key in batch_metrics.keys():
@@ -146,6 +149,8 @@ class BaseRunner(dl.Runner):
         df = pd.concat(dfs)
         df = _reorder_dataframe_columns(df, hover_data)
         fig = plot_rd(df, **kwargs)
+        for trace in self._current_rd_traces():
+            fig.add_trace(trace)
         self.log_figure(f"rd-curves-{dataset}-psnr", fig)
 
     def _log_stats(self):
