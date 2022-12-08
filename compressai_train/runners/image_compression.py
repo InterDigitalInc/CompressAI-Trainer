@@ -201,12 +201,11 @@ class ImageCompressionRunner(BaseRunner):
             ch_bpp = torch.stack(ch_bpp).mean(dim=0).to(torch.float16).cpu()
             c, *_ = ch_bpp.shape
             ch_bpp_sorted, _ = torch.sort(ch_bpp, descending=True)
-            bin_edges = torch.arange(c + 1)
             kwargs = dict(
                 unused=None,
                 scope="epoch",
                 context={"name": name},
-                bin_edges=bin_edges.numpy(),
+                bin_range=(0, c),
             )
             self.log_distribution("chan_bpp_sorted", hist=ch_bpp_sorted, **kwargs)
             self.log_distribution("chan_bpp_unsorted", hist=ch_bpp, **kwargs)
