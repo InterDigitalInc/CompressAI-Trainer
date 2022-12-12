@@ -75,6 +75,8 @@ def create_dataloaders(conf: DictConfig) -> dict[str, TDataLoader]:
 
 
 def create_model(conf: DictConfig) -> TModel:
+    import compressai.models as _
+
     model = MODELS[conf.model.name](**conf.hp)
     model = model.to(conf.misc.device)
 
