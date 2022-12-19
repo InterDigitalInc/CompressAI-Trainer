@@ -6,7 +6,7 @@ valid:
     image_size: [ 256, 256, ]
   loader:
     shuffle: True
-    batch_size: 16
+    batch_size: 64
     num_workers: 2
   settings:
     patch_size: [ 256, 256, ]
