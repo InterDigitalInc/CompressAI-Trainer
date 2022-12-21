@@ -27,18 +27,19 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Wrapper around CompressAI scripts to work more easily with CompressAI Train.
+r"""Wrapper around CompressAI scripts to work more easily with CompressAI Train.
 
 Example usage:
 
-```bash
-python -m compressai_train.utils.compressai \
-    update_and_eval_model \
-    checkpoint \
-    --architecture="bmshj2018-factorized" \
-    --path="$HOME/data/runs/e4e6d4d5e5c59c69f3bd7be2/checkpoints/runner.best.pth" \
-    "$HOME/data/datasets/kodak/test"
-```
+.. code-block:: bash
+
+    python -m compressai_train.utils.compressai \
+        update_and_eval_model \
+        checkpoint \
+        --architecture="bmshj2018-factorized" \
+        --path="$HOME/data/runs/e4e6d4d5e5c59c69f3bd7be2/checkpoints/runner.best.pth" \
+        "$HOME/data/datasets/kodak/test"
+
 """
 
 import importlib
