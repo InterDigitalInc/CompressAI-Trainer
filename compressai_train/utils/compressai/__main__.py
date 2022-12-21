@@ -44,11 +44,9 @@ python -m compressai_train.utils.compressai \
 import importlib
 import sys
 
-from compressai_train.zoo import setup_models
-
-setup_models()
-
 if __name__ == "__main__":
+    import compressai.models as _
+
     _, util_name, *argv = sys.argv
     if util_name == "update_and_eval_model":
         from . import update_and_eval_model
