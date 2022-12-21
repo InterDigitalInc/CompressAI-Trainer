@@ -28,7 +28,15 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from .catalyst import TCallback, TRunner
-from .torch import TCriterion, TDataLoader, TDataset, TModel, TOptimizer, TScheduler
+from .torch import (
+    TCriterion,
+    TDataLoader,
+    TDataset,
+    TModel,
+    TModule,
+    TOptimizer,
+    TScheduler,
+)
 
 __all__ = [
     "TCallback",
@@ -37,6 +45,7 @@ __all__ = [
     "TDataLoader",
     "TDataset",
     "TModel",
+    "TModule",
     "TOptimizer",
     "TRunner",
     "TScheduler",

@@ -32,6 +32,7 @@ from compressai.typing.torch import (
     TDataLoader,
     TDataset,
     TModel,
+    TModule,
     TOptimizer,
     TScheduler,
 )
@@ -41,6 +42,7 @@ __all__ = [
     "TDataLoader",
     "TDataset",
     "TModel",
+    "TModule",
     "TOptimizer",
     "TScheduler",
 ]
