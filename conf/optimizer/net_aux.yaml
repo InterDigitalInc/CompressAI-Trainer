@@ -1,7 +1,9 @@
 type: "net_aux"
 net:
+  type: "Adam"
   lr: 0.0001
 aux:
+  type: "Adam"
   lr: 0.001
 grad_clip:
   max_norm: 1.0
