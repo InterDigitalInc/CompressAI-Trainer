@@ -36,7 +36,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import torch
 from catalyst import metrics
-from compressai.models.google import CompressionModel
+from compressai.models.base import CompressionModel
 
 from compressai_train.registry import register_runner
 from compressai_train.utils.metrics import compute_metrics

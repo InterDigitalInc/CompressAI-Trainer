@@ -37,7 +37,7 @@ import compressai
 import pandas as pd
 from catalyst import dl, metrics
 from catalyst.typing import TorchCriterion, TorchOptimizer
-from compressai.models.google import CompressionModel
+from compressai.models.base import CompressionModel
 from torch.nn.parallel import DataParallel, DistributedDataParallel
 
 import compressai_train
