@@ -107,7 +107,7 @@ class BaseRunner(dl.Runner):
     def _current_dataframe(self):
         r = lambda x: float(f"{x:.4g}")
         d = dict(
-            name=self.hparams["model"]["name"],
+            name=self.hparams["model"]["name"] + "*",
             epoch=self.epoch_step,
             loss=r(self.loader_metrics["loss"]),
             bpp=r(self.loader_metrics["bpp"]),

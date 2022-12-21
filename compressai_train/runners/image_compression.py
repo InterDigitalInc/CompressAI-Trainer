@@ -153,7 +153,7 @@ class ImageCompressionRunner(BaseRunner):
     def _current_dataframe(self):
         r = lambda x: float(f"{x:.4g}")
         d = {
-            "name": self.hparams["model"]["name"],
+            "name": self.hparams["model"]["name"] + "*",
             "epoch": self.epoch_step,
             "criterion.lmbda": self.hparams["criterion"]["lmbda"],
             "loss": r(self.loader_metrics["loss"]),
