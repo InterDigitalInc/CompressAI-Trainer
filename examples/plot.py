@@ -166,12 +166,11 @@ def build_args(argv):
             "Default: '' (i.e. uses all runs).\n"
             "\n"
             "Examples:\n"
-            "  - 'run.model.name == \"bmshj2018-factorized\"'\n"
-            "  - 'run.experiment.startswith(\"hindsight2020-best_model-\")'\n"
             "  - 'run.hash == \"e4e6d4d5e5c59c69f3bd7be2\"'\n"
+            "  - 'run.model.name == \"bmshj2018-factorized\"'\n"
+            "  - 'run.experiment.startswith(\"some-prefix-\")'\n"
             "  - 'run.created_at >= datetime(1970, 1, 1)'\n"
             "  - 'run.criterion.lmbda < 0.02 and run.hp.M == 3 * 2**6'\n"
-            "  - 'random.random() > 1/6 and \"Russian roulette! Removes random runs.\"'\n"
         ),
         "curves": (
             wrap(
@@ -194,8 +193,8 @@ def build_args(argv):
                 '    [{"name": "{experiment} (M={hp.M})"}]\n'
                 "  - Multiple metrics as separate curves:\n"
                 "    [\n"
-                '        {"name": "{experiment} (full quality)", "y": "psnr_full"},\n'
-                '        {"name": "{experiment} (low quality)", "y": "psnr_low"},\n'
+                '        {"name": "{experiment} (RGB-PSNR)", "y": "psnr_rgb"},\n'
+                '        {"name": "{experiment} (YUV-PSNR)", "y": "psnr_yuv"},\n'
                 "    ]\n"
                 "  - Multi-rate models (e.g. G-VAE):\n"
                 "    [{\n"

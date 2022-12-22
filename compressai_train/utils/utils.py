@@ -201,8 +201,8 @@ def format_dataframe(
 
         # Multiple series with different suffixes.
         [
-            {"name": "{experiment} (psnr_x)", "x": "bpp" "y": "psnr_x"},
-            {"name": "{experiment} (psnr_s)", "x": "bpp" "y": "psnr_s"},
+            {"name": "{experiment} (RGB-PSNR)", "x": "bpp", "y": "psnr_rgb"},
+            {"name": "{experiment} (YUV-PSNR)", "x": "bpp", "y": "psnr_yuv"},
         ]
 
         # Flatten multiple bpps/psnrs onto a single curve.
