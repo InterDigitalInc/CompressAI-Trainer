@@ -1,0 +1,41 @@
+name: publish documentation
+
+on:
+  push:
+    branches:
+      - master
+jobs:
+  docs-to-gh-pages:
+    runs-on: ubuntu-latest
+    name: Publish documentation
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install poetry
+        run: pipx install poetry
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          poetry install --with=docs
+
+      - name: Install dependencies (compressai)
+        run: |
+          cd ..
+          git clone "https://github.com/InterDigitalInc/CompressAI.git" compressai
+          cd -
+          poetry run pip install -e ../compressai
+
+      - name: Build documentation
+        run: |
+          poetry run make docs
+
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/master'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/_build/html
+          enable_jekyll: false
