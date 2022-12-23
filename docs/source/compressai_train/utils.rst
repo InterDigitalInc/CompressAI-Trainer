@@ -1,69 +1,69 @@
-compressai_train.utils
-======================
+compressai_trainer.utils
+========================
 
 Miscellaneous.
 
 
-.. automodule:: compressai_train.utils
+.. automodule:: compressai_trainer.utils
    :members:
    :undoc-members:
 
 Aim
 ~~~
 
-.. automodule:: compressai_train.utils.aim.query
+.. automodule:: compressai_trainer.utils.aim.query
    :members:
    :undoc-members:
 
 Catalyst
 ~~~~~~~~
 
-.. automodule:: compressai_train.utils.catalyst.loggers
+.. automodule:: compressai_trainer.utils.catalyst.loggers
    :members:
    :undoc-members:
 
 CompressAI
 ~~~~~~~~~~
 
-.. automodule:: compressai_train.utils.compressai.__main__
+.. automodule:: compressai_trainer.utils.compressai.__main__
    :members:
    :undoc-members:
 
-.. automodule:: compressai_train.utils.compressai.update_and_eval_model
+.. automodule:: compressai_trainer.utils.compressai.update_and_eval_model
    :members:
    :undoc-members:
 
 Git
 ~~~
 
-.. automodule:: compressai_train.utils.git
+.. automodule:: compressai_trainer.utils.git
    :members:
    :undoc-members:
 
 Metrics
 ~~~~~~~
 
-.. automodule:: compressai_train.utils.metrics
+.. automodule:: compressai_trainer.utils.metrics
    :members:
    :undoc-members:
 
 Pip
 ~~~
 
-.. automodule:: compressai_train.utils.pip
+.. automodule:: compressai_trainer.utils.pip
    :members:
    :undoc-members:
 
 System
 ~~~~~~
 
-.. automodule:: compressai_train.utils.system
+.. automodule:: compressai_trainer.utils.system
    :members:
    :undoc-members:
 
 Utils
 ~~~~~
 
-.. automodule:: compressai_train.utils.utils
+.. automodule:: compressai_trainer.utils.utils
    :members:
    :undoc-members:

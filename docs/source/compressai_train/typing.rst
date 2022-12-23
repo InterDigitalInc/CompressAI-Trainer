@@ -1,9 +1,9 @@
-compressai_train.typing
-=======================
+compressai_trainer.typing
+=========================
 
 Types for type annotations.
 
 
-.. automodule:: compressai_train.typing
+.. automodule:: compressai_trainer.typing
    :members:
    :undoc-members:

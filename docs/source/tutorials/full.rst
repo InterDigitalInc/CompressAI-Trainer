@@ -117,7 +117,7 @@ By default, this has the following directory structure:
           engine/
           src/
             compressai.patch        # Auto generated git diff patch for reproducibility.
-            compressai_train.patch  # Auto generated git diff patch for reproducibility.
+            compressai_trainer.patch  # Auto generated git diff patch for reproducibility.
           tensorboard/
 
 Each experiment run is saved in a directory named by its run hash inside the ``runs/`` directory. This directory includes the respective model checkpoints/weights, and various configurations and diffs for better reproducibility.
@@ -237,14 +237,14 @@ Defining a custom Runner training loop
 
 We provide the following pre-made runners:
 
-- :py:class:`~compressai_train.runners.BaseRunner` (base compression class)
-- :py:class:`~compressai_train.runners.ImageCompressionRunner`
-- :py:class:`~compressai_train.runners.VideoCompressionRunner` (future release)
+- :py:class:`~compressai_trainer.runners.BaseRunner` (base compression class)
+- :py:class:`~compressai_trainer.runners.ImageCompressionRunner`
+- :py:class:`~compressai_trainer.runners.VideoCompressionRunner` (future release)
 
-Begin by creating a file at ``compressai_train/runners/custom.py`` and then add the following line to ``compressai_train/runners/__init__.py``:
+Begin by creating a file at ``compressai_trainer/runners/custom.py`` and then add the following line to ``compressai_trainer/runners/__init__.py``:
 
 .. code-block:: python
-    :caption: compressai_train/runners/__init__.py
+    :caption: compressai_trainer/runners/__init__.py
 
     from .custom import CustomImageCompressionRunner
 
@@ -258,10 +258,10 @@ Create ``conf/runners/CustomImageCompressionRunner.yaml`` with:
     # Additional arguments for CustomImageCompressionRunner.__init__ here:
     # some_custom_argument: "value"
 
-Then, in ``compressai_train/runners/custom.py``, create a :py:class:`~catalyst.runners.runner.Runner` by inheriting from :py:class:`~compressai_train.runners.BaseRunner` or :py:class:`~catalyst.runners.runner.Runner`:
+Then, in ``compressai_trainer/runners/custom.py``, create a :py:class:`~catalyst.runners.runner.Runner` by inheriting from :py:class:`~compressai_trainer.runners.BaseRunner` or :py:class:`~catalyst.runners.runner.Runner`:
 
 .. code-block:: python
-    :caption: compressai_train/runners/custom.py
+    :caption: compressai_trainer/runners/custom.py
 
     from compressai.registry import register_runner
     from .base import BaseRunner

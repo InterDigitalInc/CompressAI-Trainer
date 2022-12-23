@@ -46,7 +46,7 @@ sys.path.insert(0, os.path.abspath("../compressai-trainer/"))
 
 # -- Project information -----------------------------------------------------
 
-project = "compressai_train"
+project = "compressai_trainer"
 copyright = "2022, InterDigital Communications, Inc"
 author = "InterDigital Communications, Inc."
 

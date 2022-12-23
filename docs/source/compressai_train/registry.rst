@@ -1,5 +1,5 @@
-compressai_train.registry
-=========================
+compressai_trainer.registry
+===========================
 
 Register models, runners, etc, to make them accessible via dynamic YAML configuration.
 
@@ -20,7 +20,7 @@ All models and runners should be registered and imported, as described in :ref:`
             ...
 
 .. code-block:: python
-    :caption: compressai_train/runners/custom.py
+    :caption: compressai_trainer/runners/custom.py
 
     from compressai.registry import register_runner
     from .base import BaseRunner
@@ -30,13 +30,13 @@ All models and runners should be registered and imported, as described in :ref:`
         ...
 
 
-.. automodule:: compressai_train.registry
+.. automodule:: compressai_trainer.registry
 
 
 torch
 -----
 
-.. automodule:: compressai_train.registry.torch
+.. automodule:: compressai_trainer.registry.torch
    :members:
    :undoc-members:
 
@@ -44,6 +44,6 @@ torch
 catalyst
 --------
 
-.. automodule:: compressai_train.registry.catalyst
+.. automodule:: compressai_trainer.registry.catalyst
    :members:
    :undoc-members:

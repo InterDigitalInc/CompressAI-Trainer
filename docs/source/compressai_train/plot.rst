@@ -1,10 +1,10 @@
-compressai_train.plot
-=====================
+compressai_trainer.plot
+=======================
 
 For plotting.
 
 
-.. automodule:: compressai_train.plot
+.. automodule:: compressai_trainer.plot
    :members:
    :undoc-members:
 

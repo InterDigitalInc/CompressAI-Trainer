@@ -53,12 +53,12 @@ These tools give researchers more flexibility, experiment reproducibility, exper
    :caption: CompressAI Trainer API
    :hidden:
 
-   compressai_train/config
-   compressai_train/plot
-   compressai_train/registry
-   compressai_train/runners
-   compressai_train/typing
-   compressai_train/utils
+   compressai_trainer/config
+   compressai_trainer/plot
+   compressai_trainer/registry
+   compressai_trainer/runners
+   compressai_trainer/typing
+   compressai_trainer/utils
 
 .. toctree::
    :maxdepth: 1

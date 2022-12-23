@@ -1,16 +1,16 @@
-compressai_train.config
-=======================
+compressai_trainer.config
+=========================
 
 Configuration system with dynamic object creation.
 
 
-.. automodule:: compressai_train.config
+.. automodule:: compressai_trainer.config
 
 
 config
 ------
 
-.. automodule:: compressai_train.config.config
+.. automodule:: compressai_trainer.config.config
    :members:
    :undoc-members:
 
@@ -18,7 +18,7 @@ config
 dataset
 -------
 
-.. automodule:: compressai_train.config.dataset
+.. automodule:: compressai_trainer.config.dataset
    :members:
    :undoc-members:
 
@@ -26,7 +26,7 @@ dataset
 engine
 ------
 
-.. automodule:: compressai_train.config.engine
+.. automodule:: compressai_trainer.config.engine
    :members:
    :undoc-members:
 
@@ -34,7 +34,7 @@ engine
 env
 ---
 
-.. automodule:: compressai_train.config.env
+.. automodule:: compressai_trainer.config.env
    :members:
    :undoc-members:
 
@@ -42,7 +42,7 @@ env
 load
 ----
 
-.. automodule:: compressai_train.config.load
+.. automodule:: compressai_trainer.config.load
    :members:
    :undoc-members:
 
@@ -50,7 +50,7 @@ load
 outputs
 -------
 
-.. automodule:: compressai_train.config.outputs
+.. automodule:: compressai_trainer.config.outputs
    :members:
    :undoc-members:
 
