@@ -36,9 +36,9 @@ from omegaconf import DictConfig
 from torch.utils.data import DataLoader
 from torchvision import transforms
 
-from compressai_train.registry.torch import DATASETS
-from compressai_train.registry.torchvision import TRANSFORMS
-from compressai_train.typing.torch import TDataLoader, TDataset
+from compressai_trainer.registry.torch import DATASETS
+from compressai_trainer.registry.torchvision import TRANSFORMS
+from compressai_trainer.typing.torch import TDataLoader, TDataset
 
 
 @dataclass

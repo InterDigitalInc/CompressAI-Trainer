@@ -40,10 +40,10 @@ import torch
 from omegaconf import DictConfig, OmegaConf
 from torch import Tensor
 
-import compressai_train
-from compressai_train.config import outputs
-from compressai_train.config.config import create_model
-from compressai_train.utils import git
+import compressai_trainer
+from compressai_trainer.config import outputs
+from compressai_trainer.config.config import create_model
+from compressai_trainer.utils import git
 
 if TYPE_CHECKING:
     import torch.nn as nn
@@ -74,7 +74,7 @@ def load_checkpoint(
     """
     # If git hashes are different, raise error/warning.
     _check_git_hash(conf, compressai, warn_only=warn_only)
-    _check_git_hash(conf, compressai_train, warn_only=warn_only)
+    _check_git_hash(conf, compressai_trainer, warn_only=warn_only)
 
     device = torch.device(conf.misc.device)
     model = create_model(conf)

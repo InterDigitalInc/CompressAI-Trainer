@@ -35,9 +35,9 @@ import aim
 from catalyst import dl
 from omegaconf import DictConfig, OmegaConf
 
-from compressai_train.registry.catalyst import CALLBACKS, RUNNERS
-from compressai_train.typing.catalyst import TCallback, TRunner
-from compressai_train.utils.catalyst.loggers import AimLogger
+from compressai_trainer.registry.catalyst import CALLBACKS, RUNNERS
+from compressai_trainer.typing.catalyst import TCallback, TRunner
+from compressai_trainer.utils.catalyst.loggers import AimLogger
 
 
 def create_callback(conf: DictConfig) -> TCallback:

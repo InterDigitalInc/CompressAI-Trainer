@@ -36,8 +36,8 @@ from typing import Any
 import compressai
 from omegaconf import DictConfig
 
-import compressai_train
-from compressai_train.utils import git, system
+import compressai_trainer
+from compressai_trainer.utils import git, system
 
 
 def get_env(conf: DictConfig) -> dict[str, Any]:
@@ -48,7 +48,7 @@ def get_env(conf: DictConfig) -> dict[str, Any]:
                 package.__path__[0],
                 conf.env.git[package.__name__].main_branch,
             )
-            for package in [compressai, compressai_train]
+            for package in [compressai, compressai_trainer]
         },
         "slurm": {
             "account": os.environ.get("SLURM_JOB_ACCOUNT"),

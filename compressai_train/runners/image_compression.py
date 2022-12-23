@@ -38,9 +38,9 @@ import torch
 from catalyst import metrics
 from compressai.models.base import CompressionModel
 
-from compressai_train.registry import register_runner
-from compressai_train.utils.metrics import compute_metrics
-from compressai_train.utils.utils import inference
+from compressai_trainer.registry import register_runner
+from compressai_trainer.utils.metrics import compute_metrics
+from compressai_trainer.utils.utils import inference
 
 from .base import BaseRunner
 

@@ -7,7 +7,7 @@ git:
     hash:
     main_branch: "master"
     main_hash:
-  compressai_train:
+  compressai_trainer:
     branch:
     hash:
     main_branch: "master"

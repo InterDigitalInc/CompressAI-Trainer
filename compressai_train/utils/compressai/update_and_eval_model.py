@@ -35,8 +35,8 @@ import torch.nn as nn
 from compressai.registry import MODELS
 from compressai.zoo import load_state_dict
 
-from compressai_train.config import load_checkpoint as load_checkpoint_from_config
-from compressai_train.config import load_config, state_dict_from_checkpoint
+from compressai_trainer.config import load_checkpoint as load_checkpoint_from_config
+from compressai_trainer.config import load_config, state_dict_from_checkpoint
 
 
 def load_checkpoint(arch: str, checkpoint_path: str) -> nn.Module:

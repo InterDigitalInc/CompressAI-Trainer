@@ -33,7 +33,7 @@ from typing import TypeVar
 
 import catalyst.callbacks
 
-from compressai_train.typing import TCallback, TRunner
+from compressai_trainer.typing import TCallback, TRunner
 
 CALLBACKS: dict[str, type[TCallback]] = {
     k: v for k, v in catalyst.callbacks.__dict__.items() if k[0].isupper()

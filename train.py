@@ -37,7 +37,7 @@ import catalyst.utils
 import hydra
 from omegaconf import DictConfig
 
-from compressai_train.config import (
+from compressai_trainer.config import (
     configure_conf,
     configure_engine,
     create_criterion,
@@ -48,7 +48,7 @@ from compressai_train.config import (
     create_scheduler,
     write_outputs,
 )
-from compressai_train.typing import TRunner
+from compressai_trainer.typing import TRunner
 
 
 def setup(conf: DictConfig) -> tuple[TRunner, dict[str, Any]]:

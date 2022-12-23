@@ -35,8 +35,8 @@ from typing import Any, Dict, cast
 from catalyst.utils.torch import load_checkpoint
 from omegaconf import DictConfig, OmegaConf
 
-from compressai_train.registry.torch import CRITERIONS, MODELS, OPTIMIZERS, SCHEDULERS
-from compressai_train.typing.torch import (
+from compressai_trainer.registry.torch import CRITERIONS, MODELS, OPTIMIZERS, SCHEDULERS
+from compressai_trainer.typing.torch import (
     TCriterion,
     TDataLoader,
     TModel,
@@ -81,7 +81,7 @@ def create_model(conf: DictConfig) -> TModel:
     model = model.to(conf.misc.device)
 
     if conf.paths.model_checkpoint:
-        from compressai_train.config.load import state_dict_from_checkpoint
+        from compressai_trainer.config.load import state_dict_from_checkpoint
 
         checkpoint = load_checkpoint(conf.paths.model_checkpoint)
         state_dict = state_dict_from_checkpoint(checkpoint)

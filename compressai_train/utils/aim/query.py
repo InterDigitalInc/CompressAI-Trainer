@@ -35,7 +35,7 @@ import aim
 import pandas as pd
 from aim.storage.context import Context
 
-from compressai_train.utils.utils import arg_pareto_optimal_set
+from compressai_trainer.utils.utils import arg_pareto_optimal_set
 
 T = TypeVar("T")
 

@@ -38,13 +38,13 @@ from typing import Iterable
 import aim
 import pandas as pd
 
-from compressai_train.plot import plot_rd
-from compressai_train.utils.aim.query import (
+from compressai_trainer.plot import plot_rd
+from compressai_trainer.utils.aim.query import (
     get_runs_dataframe,
     pareto_optimal_dataframe,
     runs_by_query,
 )
-from compressai_train.utils.utils import compressai_dataframe, format_dataframe
+from compressai_trainer.utils.utils import compressai_dataframe, format_dataframe
 
 TITLE = "Performance evaluation on Kodak - PSNR (RGB)"
 

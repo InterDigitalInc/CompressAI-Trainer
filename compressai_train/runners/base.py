@@ -40,9 +40,9 @@ from catalyst.typing import TorchCriterion, TorchOptimizer
 from compressai.models.base import CompressionModel
 from torch.nn.parallel import DataParallel, DistributedDataParallel
 
-import compressai_train
-from compressai_train.plot import plot_rd
-from compressai_train.utils.utils import compressai_dataframe, num_parameters
+import compressai_trainer
+from compressai_trainer.plot import plot_rd
+from compressai_trainer.utils.utils import compressai_dataframe, num_parameters
 
 
 class BaseRunner(dl.Runner):
@@ -57,7 +57,7 @@ class BaseRunner(dl.Runner):
     def on_experiment_start(self, runner):
         super().on_experiment_start(runner)
         self._log_git_diff(compressai)
-        self._log_git_diff(compressai_train)
+        self._log_git_diff(compressai_trainer)
         self._log_pip()
         self._log_stats()
 

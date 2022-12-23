@@ -33,7 +33,7 @@ Example usage:
 
 .. code-block:: bash
 
-    python -m compressai_train.utils.compressai \
+    python -m compressai_trainer.utils.compressai \
         update_and_eval_model \
         checkpoint \
         --architecture="bmshj2018-factorized" \
