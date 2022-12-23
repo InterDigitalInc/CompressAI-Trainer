@@ -12,7 +12,7 @@ CompressAI Trainer integrates with [CompressAI] (library), [Aim] (experiment tra
 [Hydra]: https://hydra.cc/
 
 
-| ![](assets/aim-run-figure-rd-curves.png) |
+| ![](docs/source/media/images/aim-run-figure-rd-curves.png) |
 |:--:|
 | *CompressAI Trainer integrates with the Aim experiment tracker to display live visualizations of RD curves during training.* |
 
