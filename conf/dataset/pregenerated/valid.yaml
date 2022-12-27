@@ -1,18 +1,17 @@
-valid:
-  type: "PreGeneratedMemmapDataset"
-  config:
-    root: "${paths.datasets}/vimeo90k/vimeo_triplet_npy"
-    split: "valid"
-    image_size: [ 256, 256, ]
-  loader:
-    shuffle: True
-    batch_size: 64
-    num_workers: 2
-  settings:
-    patch_size: [ 256, 256, ]
-  transforms:
-    - "CenterCrop": {size: "${....settings.patch_size}"}
-    - "ToTensor": {}
-  meta:
-    num_samples: 43917
-    steps_per_epoch:
+type: "PreGeneratedMemmapDataset"
+config:
+  root: "${paths.datasets}/vimeo90k/vimeo_triplet_npy"
+  split: "valid"
+  image_size: [ 256, 256, ]
+loader:
+  shuffle: True
+  batch_size: 64
+  num_workers: 2
+settings:
+  patch_size: [ 256, 256, ]
+transforms:
+  - "CenterCrop": {size: "${....settings.patch_size}"}
+  - "ToTensor": {}
+meta:
+  num_samples: 43917
+  steps_per_epoch:

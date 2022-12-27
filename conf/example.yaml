@@ -6,10 +6,10 @@ defaults:
   - criterion: RateDistortionLoss
   - optimizer: net_aux
   - scheduler: ReduceLROnPlateau
-  - dataset/vimeo90k/train@dataset
-  - dataset/vimeo90k/valid@dataset
-  - dataset/kodak/infer@dataset
   - misc: default
+  - dataset@dataset.train: vimeo90k/train
+  - dataset@dataset.valid: vimeo90k/valid
+  - dataset@dataset.infer: kodak/infer
   - _self_
 
 exp:

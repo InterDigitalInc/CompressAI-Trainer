@@ -349,10 +349,10 @@ In the ``defaults`` list, one may import configurations from other YAML files:
       - scheduler: ReduceLROnPlateau
       - misc: default
 
-      # Imports dataset/vimeo90k/train, etc into "dataset:" dict.
-      - dataset/vimeo90k/train@dataset
-      - dataset/vimeo90k/valid@dataset
-      - dataset/kodak/infer@dataset
+      # Imports vimeo90k/train into "dataset.train:" dict, etc.
+      - dataset@dataset.train: vimeo90k/train
+      - dataset@dataset.valid: vimeo90k/valid
+      - dataset@dataset.infer: kodak/infer
 
       # Imports current YAML's configuration, defined below.
       - _self_

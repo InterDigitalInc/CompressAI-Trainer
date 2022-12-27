@@ -1,15 +1,14 @@
-infer:
-  type: "ImageFolder"
-  config:
-    root: "${paths.datasets}/kodak"
-    split: "test"
-  loader:
-    shuffle: False
-    batch_size: 1
-    num_workers: 2
-  settings:
-  transforms:
-    - "ToTensor": {}
-  meta:
-    num_samples: 24
-    steps_per_epoch:
+type: "ImageFolder"
+config:
+  root: "${paths.datasets}/kodak"
+  split: "test"
+loader:
+  shuffle: False
+  batch_size: 1
+  num_workers: 2
+settings:
+transforms:
+  - "ToTensor": {}
+meta:
+  num_samples: 24
+  steps_per_epoch:

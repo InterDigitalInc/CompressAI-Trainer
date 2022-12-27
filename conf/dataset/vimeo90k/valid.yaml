@@ -1,17 +1,16 @@
-valid:
-  type: "Vimeo90kDataset"
-  config:
-    root: "${paths.datasets}/vimeo90k/vimeo_triplet"
-    split: "valid"
-  loader:
-    shuffle: False
-    batch_size: 64
-    num_workers: 2
-  settings:
-    patch_size: [ 256, 256, ]
-  transforms:
-    - "CenterCrop": {size: "${....settings.patch_size}"}
-    - "ToTensor": {}
-  meta:
-    num_samples: 11346  # = 3782 * 3
-    steps_per_epoch:
+type: "Vimeo90kDataset"
+config:
+  root: "${paths.datasets}/vimeo90k/vimeo_triplet"
+  split: "valid"
+loader:
+  shuffle: False
+  batch_size: 64
+  num_workers: 2
+settings:
+  patch_size: [ 256, 256, ]
+transforms:
+  - "CenterCrop": {size: "${....settings.patch_size}"}
+  - "ToTensor": {}
+meta:
+  num_samples: 11346  # = 3782 * 3
+  steps_per_epoch:
