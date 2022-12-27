@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/source/_static/logo-big.png" alt="ID-CompressAI-Trainer-logo">
+</p>
+
 # CompressAI Trainer
 
 [![License](https://img.shields.io/github/license/InterDigitalInc/CompressAI-Trainer?color=blue)](https://github.com/InterDigitalInc/CompressAI-Trainer/blob/master/LICENSE)
