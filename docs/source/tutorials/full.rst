@@ -19,7 +19,7 @@ Override the following paths specified in ``conf/paths/default.yaml``:
       _common_root: "./logs"
       datasets: "./datasets"
 
-It is recommend to use paths that somewhere outside the source code directory.
+It is recommend to use paths that are somewhere outside the source code directory.
 
 For image compression datasets, the default configuration expects the directory structure to be organized in the following way:
 
