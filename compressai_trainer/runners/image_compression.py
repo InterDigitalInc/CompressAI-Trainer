@@ -63,8 +63,10 @@ RD_PLOT_SETTINGS: dict[str, Any] = dict(
     codecs=[
         "bmshj2018-factorized",
         "bmshj2018-hyperprior",
+        "mbt2018-mean",
         "mbt2018",
         "cheng2020-anchor",
+        "vtm",
     ],
     scatter_kwargs=dict(
         hover_data=[
