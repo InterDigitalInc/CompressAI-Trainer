@@ -125,7 +125,13 @@ def num_parameters(net: nn.Module, predicate=lambda x: x.requires_grad) -> int:
 
 
 def compressai_dataframe(model_name: str, **kwargs):
-    d = compressai_result(model_name, **kwargs)
+    generic_codecs = ["av1", "hm", "jpeg", "jpeg2000", "vtm", "webp"]
+
+    if model_name in generic_codecs:
+        d = generic_codec_result(model_name, **kwargs)
+    else:
+        d = compressai_result(model_name, **kwargs)
+
     df = pd.DataFrame.from_dict(d["results"])
     df["name"] = d["name"]
     df["model.name"] = d["name"]
@@ -143,6 +149,16 @@ def compressai_result(
         f"{compressai.__path__[0]}/../results/{dataset}/"
         f"compressai-{model_name}_{opt_metric}_{device}.json"
     )
+
+    with open(path) as f:
+        return json.load(f)
+
+
+def generic_codec_result(
+    codec_name: str,
+    dataset: str = "kodak",
+) -> dict[str, Any]:
+    path = f"{compressai.__path__[0]}/../results/{dataset}/" f"{codec_name}.json"
 
     with open(path) as f:
         return json.load(f)
