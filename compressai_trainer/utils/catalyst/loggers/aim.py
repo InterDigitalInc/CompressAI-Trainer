@@ -146,8 +146,7 @@ class AimLogger(ILogger):
             "text": aim.Text,
         }
         value = kind_dict[kind](artifact, **kwargs)
-        context_default, track_kwargs = _aim_context(runner, scope)
-        context = context_default if context is None else context
+        context, track_kwargs = _aim_context(runner, scope, context)
         self.run.track(value, tag, context=context, **track_kwargs)
 
     def log_image(
@@ -161,8 +160,7 @@ class AimLogger(ILogger):
     ) -> None:
         """Logs image to Aim for current scope on current step."""
         value = aim.Image(image, **kwargs)
-        context_default, track_kwargs = _aim_context(runner, scope)
-        context = context_default if context is None else context
+        context, track_kwargs = _aim_context(runner, scope, context)
         self.run.track(value, tag, context=context, **track_kwargs)
 
     def log_hparams(self, hparams: Dict, runner: "Optional[IRunner]" = None) -> None:
@@ -216,8 +214,7 @@ class AimLogger(ILogger):
         """Logs distribution to Aim for current scope on current step."""
         assert unused is None
         value = aim.Distribution(**kwargs)
-        context_default, track_kwargs = _aim_context(runner, scope)
-        context = context_default if context is None else context
+        context, track_kwargs = _aim_context(runner, scope, context)
         self.run.track(value, tag, context=context, **track_kwargs)
 
     def log_figure(
@@ -231,8 +228,7 @@ class AimLogger(ILogger):
     ) -> None:
         """Logs figure to Aim for current scope on current step."""
         value = aim.Figure(fig, **kwargs)
-        context_default, track_kwargs = _aim_context(runner, scope)
-        context = context_default if context is None else context
+        context, track_kwargs = _aim_context(runner, scope, context)
         self.run.track(value, tag, context=context, **track_kwargs)
 
     def close_log(self) -> None:
@@ -247,8 +243,7 @@ class AimLogger(ILogger):
         scope: str = "",
         context: Optional[Dict] = None,
     ):
-        context_default, track_kwargs = _aim_context(runner, scope)
-        context = context_default if context is None else context
+        context, track_kwargs = _aim_context(runner, scope, context)
         for key, value in metrics.items():
             self.run.track(value, key, context=context, **track_kwargs)
 
@@ -256,16 +251,19 @@ class AimLogger(ILogger):
 def _aim_context(
     runner: "IRunner",
     scope: Optional[str],
+    context: Optional[Dict] = None,
+    *,
     loader_key: Optional[str] = None,
     all_scope_steps: bool = False,
 ):
     if loader_key is None:
         loader_key = runner.loader_key
-    context = {}
-    if loader_key is not None:
-        context["loader"] = loader_key
-    if scope is not None:
-        context["scope"] = scope
+    if context is None:
+        context = {}
+        if loader_key is not None:
+            context["loader"] = loader_key
+        if scope is not None:
+            context["scope"] = scope
     track_kwargs = {}
     if all_scope_steps or scope == "batch":
         track_kwargs["step"] = runner.batch_step
