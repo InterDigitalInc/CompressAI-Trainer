@@ -35,6 +35,7 @@ from typing import cast
 
 import compressai
 import pandas as pd
+import yaml
 from catalyst import dl, metrics
 from catalyst.typing import TorchCriterion, TorchOptimizer
 from compressai.models.base import CompressionModel
@@ -53,6 +54,7 @@ class BaseRunner(dl.Runner):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._has_started = False
 
     def on_experiment_start(self, runner):
         super().on_experiment_start(runner)
@@ -63,6 +65,9 @@ class BaseRunner(dl.Runner):
         self._log_stats()
 
     def on_epoch_start(self, runner):
+        if not self._has_started:
+            self._has_started = True
+            self._log_state()
         super().on_epoch_start(runner)
 
     def on_loader_start(self, runner):
@@ -156,6 +161,17 @@ class BaseRunner(dl.Runner):
         for trace in self._current_rd_traces():
             fig.add_trace(trace)
         self.log_figure(f"rd-curves-{dataset}-psnr", fig)
+
+    def _log_state(self):
+        state = {
+            "epoch_step": self.epoch_step,
+        }
+        self.loggers["aim"].log_artifact(
+            "state",
+            artifact=yaml.safe_dump(state),
+            kind="text",  # type: ignore
+            runner=self,
+        )
 
     def _log_stats(self):
         stats = {
