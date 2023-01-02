@@ -1,4 +1,4 @@
-# Copyright (c) 2021-2022, InterDigital Communications, Inc
+# Copyright (c) 2021-2023, InterDigital Communications, Inc
 # All rights reserved.
 
 # Redistribution and use in source and binary forms, with or without
@@ -47,7 +47,7 @@ sys.path.insert(0, os.path.abspath("../compressai-trainer/"))
 # -- Project information -----------------------------------------------------
 
 project = "compressai_trainer"
-copyright = "2022, InterDigital Communications, Inc"
+copyright = "2023, InterDigital Communications, Inc"
 author = "InterDigital Communications, Inc."
 
 # -- General configuration ---------------------------------------------------
