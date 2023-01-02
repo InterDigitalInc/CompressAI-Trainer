@@ -243,7 +243,9 @@ class AimLogger(ILogger):
         scope: str = "",
         context: Optional[Dict] = None,
     ):
-        context, track_kwargs = _aim_context(runner, scope, context)
+        context, track_kwargs = _aim_context(
+            runner, scope, context, loader_key=loader_key
+        )
         for key, value in metrics.items():
             self.run.track(value, key, context=context, **track_kwargs)
 
