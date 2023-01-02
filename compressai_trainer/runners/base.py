@@ -160,7 +160,13 @@ class BaseRunner(dl.Runner):
         fig = plot_rd(df, **kwargs)
         for trace in self._current_rd_traces():
             fig.add_trace(trace)
-        self.log_figure(f"rd-curves-{dataset}-psnr", fig)
+        context = {
+            "dataset": dataset,
+            "loader": "infer",
+            "metric": "psnr",
+            "opt_metric": "mse",
+        }
+        self.log_figure(f"rd-curves", fig, context=context)
 
     def _log_state(self):
         state = {
