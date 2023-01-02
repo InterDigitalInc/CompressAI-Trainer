@@ -145,8 +145,8 @@ class AimLogger(ILogger):
             "text": aim.Text,
         }
         value = kind_dict[kind](artifact, **kwargs)
-        context, kwargs = _aim_context(runner, scope)
-        self.run.track(value, tag, context=context, **kwargs)
+        context, track_kwargs = _aim_context(runner, scope)
+        self.run.track(value, tag, context=context, **track_kwargs)
 
     def log_image(
         self,
@@ -158,8 +158,8 @@ class AimLogger(ILogger):
     ) -> None:
         """Logs image to Aim for current scope on current step."""
         value = aim.Image(image, **kwargs)
-        context, kwargs = _aim_context(runner, scope)
-        self.run.track(value, tag, context=context, **kwargs)
+        context, track_kwargs = _aim_context(runner, scope)
+        self.run.track(value, tag, context=context, **track_kwargs)
 
     def log_hparams(self, hparams: Dict, runner: "Optional[IRunner]" = None) -> None:
         """Logs parameters for current scope.
@@ -209,9 +209,9 @@ class AimLogger(ILogger):
         """Logs distribution to Aim for current scope on current step."""
         assert unused is None
         value = aim.Distribution(**kwargs)
-        context_default, kwargs = _aim_context(runner, scope)
+        context_default, track_kwargs = _aim_context(runner, scope)
         context = context_default if context is None else context
-        self.run.track(value, tag, context=context, **kwargs)
+        self.run.track(value, tag, context=context, **track_kwargs)
 
     def log_figure(
         self,
@@ -223,8 +223,8 @@ class AimLogger(ILogger):
     ) -> None:
         """Logs figure to Aim for current scope on current step."""
         value = aim.Figure(fig, **kwargs)
-        context, kwargs = _aim_context(runner, scope)
-        self.run.track(value, tag, context=context, **kwargs)
+        context, track_kwargs = _aim_context(runner, scope)
+        self.run.track(value, tag, context=context, **track_kwargs)
 
     def close_log(self) -> None:
         """End an active Aim run."""
@@ -237,9 +237,9 @@ class AimLogger(ILogger):
         loader_key: str,
         scope: str = "",
     ):
-        context, kwargs = _aim_context(runner, scope, loader_key)
+        context, track_kwargs = _aim_context(runner, scope, loader_key)
         for key, value in metrics.items():
-            self.run.track(value, key, context=context, **kwargs)
+            self.run.track(value, key, context=context, **track_kwargs)
 
 
 def _aim_context(
@@ -255,12 +255,12 @@ def _aim_context(
         context["loader"] = loader_key
     if scope is not None:
         context["scope"] = scope
-    kwargs = {}
+    track_kwargs = {}
     if all_scope_steps or scope == "batch":
-        kwargs["step"] = runner.batch_step
+        track_kwargs["step"] = runner.batch_step
     if all_scope_steps or scope == "epoch" or scope == "loader":
-        kwargs["epoch"] = runner.epoch_step
-    return context, kwargs
+        track_kwargs["epoch"] = runner.epoch_step
+    return context, track_kwargs
 
 
 def _build_params_dict(
