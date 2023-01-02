@@ -56,6 +56,7 @@ class BaseRunner(dl.Runner):
 
     def on_experiment_start(self, runner):
         super().on_experiment_start(runner)
+        self._log_config()
         self._log_git_diff(compressai)
         self._log_git_diff(compressai_trainer)
         self._log_pip()
@@ -128,18 +129,21 @@ class BaseRunner(dl.Runner):
                 self.batch_size,
             )
 
-    def _log_src_artifact(self, tag: str, filename: str):
-        src_root = self.hparams["paths"]["src"]
-        dest_path = os.path.join(src_root, filename)
+    def _log_artifact(self, tag: str, filename: str, dir_key: str):
+        root = self.hparams["paths"][dir_key]
+        dest_path = os.path.join(root, filename)
         self.log_artifact(tag, path_to_artifact=dest_path)
 
+    def _log_config(self):
+        self._log_artifact("config.yaml", "config.yaml", "configs")
+
     def _log_pip(self):
-        self._log_src_artifact("pip_list.txt", "pip_list.txt")
-        self._log_src_artifact("requirements.txt", "requirements.txt")
+        self._log_artifact("pip_list.txt", "pip_list.txt", "src")
+        self._log_artifact("requirements.txt", "requirements.txt", "src")
 
     def _log_git_diff(self, package: ModuleType):
-        self._log_src_artifact(
-            f"{package.__name__}_git_diff", f"{package.__name__}.patch"
+        self._log_artifact(
+            f"{package.__name__}_git_diff", f"{package.__name__}.patch", "src"
         )
 
     def _log_rd_figure(self, codecs: list[str], dataset: str, **kwargs):
