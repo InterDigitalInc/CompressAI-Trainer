@@ -1,0 +1,14 @@
+net:
+  # https://catalyst-team.github.io/catalyst/v20.04.2/_modules/torch/optim/lr_scheduler.html
+  type: "OneCycleLR"
+  max_lr: "${optimizer.net.lr}"
+  steps_per_epoch: 1
+  epochs: "${engine.num_epochs}"
+  pct_start: 0.0
+# pct_start (float): The percentage of the cycle (in number of steps) spent
+#     increasing the learning rate.
+#     Default: 0.3
+
+# For batch-wise granularity, set:
+# scheduler.net.steps_per_epoch = "${dataset.train.meta.steps_per_epoch}" and
+# engine.callbacks[type="SchedulerCallback"].mode = "batch"

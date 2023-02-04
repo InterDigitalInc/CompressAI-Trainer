@@ -1,0 +1,36 @@
+defaults:
+  - paths: default
+  - env: default
+  - engine: default
+  - runner: ImageCompressionRunner
+  - criterion: RateDistortionLoss
+  - optimizer: net_aux
+  - scheduler: ReduceLROnPlateau
+  - misc: default
+  - dataset@dataset.train: pregenerated/train
+  - dataset@dataset.valid: pregenerated/valid
+  - dataset@dataset.infer: kodak/infer
+  - _self_
+
+exp:
+  name: "example_experiment"
+
+model:
+  name: "bmshj2018-factorized"
+
+hp:
+  # Qualities 1-5
+  N: 128
+  M: 192
+  # Qualities 6-8
+  # N: 192
+  # M: 320
+
+# To resume from checkpoint, override paths.checkpoint:
+# paths:
+#   checkpoint: "${.checkpoints}/runner.last.pth"
+#
+# To continue as part of a previous run, also override env.aim.run_hash:
+# env:
+#   aim:
+#     run_hash: "e4e6d4d5e5c59c69f3bd7be2"  # replace this with your run hash
