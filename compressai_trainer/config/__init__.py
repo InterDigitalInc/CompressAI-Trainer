@@ -52,6 +52,7 @@ __all__ = [
     "create_criterion",
     "create_dataloaders",
     "create_model",
+    "create_module",
     "create_optimizer",
     "create_runner",
     "create_scheduler",

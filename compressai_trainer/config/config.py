@@ -35,11 +35,18 @@ from typing import Any, Dict, cast
 from catalyst.utils.torch import load_checkpoint
 from omegaconf import DictConfig, OmegaConf
 
-from compressai_trainer.registry.torch import CRITERIONS, MODELS, OPTIMIZERS, SCHEDULERS
+from compressai_trainer.registry.torch import (
+    CRITERIONS,
+    MODELS,
+    MODULES,
+    OPTIMIZERS,
+    SCHEDULERS,
+)
 from compressai_trainer.typing.torch import (
     TCriterion,
     TDataLoader,
     TModel,
+    TModule,
     TOptimizer,
     TScheduler,
 )
@@ -89,6 +96,14 @@ def create_model(conf: DictConfig) -> TModel:
         print(f"Missing keys: {missing_keys}\nUnexpected keys: {unexpected_keys}")
 
     return model
+
+
+def create_module(conf: DictConfig) -> TModule:
+    kwargs = OmegaConf.to_container(conf, resolve=True)
+    kwargs = cast(Dict[str, Any], kwargs)
+    del kwargs["type"]
+    module = MODULES[conf["type"]](**kwargs)
+    return module
 
 
 def create_optimizer(conf: DictConfig, net: TModel) -> TOptimizer:
