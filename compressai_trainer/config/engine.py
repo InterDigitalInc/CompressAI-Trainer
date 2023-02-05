@@ -39,6 +39,8 @@ from compressai_trainer.registry.catalyst import CALLBACKS, RUNNERS
 from compressai_trainer.typing.catalyst import TCallback, TRunner
 from compressai_trainer.utils.catalyst.loggers import AimLogger
 
+PRIMARY_LOGGER = "aim"
+
 
 def create_callback(conf: DictConfig) -> TCallback:
     kwargs = OmegaConf.to_container(conf, resolve=True)
@@ -46,6 +48,27 @@ def create_callback(conf: DictConfig) -> TCallback:
     del kwargs["type"]
     callback = CALLBACKS[conf.type](**kwargs)
     return callback
+
+
+def create_logger(conf: DictConfig, logger_type: str) -> dl.ILogger:
+    if logger_type == "aim":
+        logger = AimLogger(
+            experiment=conf.exp.name,
+            run_hash=conf.env.aim.run_hash,
+            repo=aim.Repo(
+                conf.env.aim.repo,
+                init=not aim.Repo.exists(conf.env.aim.repo),
+            ),
+            **conf.engine.loggers.aim,
+        )
+        conf.env.aim.run_hash = logger.run.hash
+        return logger
+    if logger_type == "tensorboard":
+        assert conf.env[PRIMARY_LOGGER].run_hash is not None
+        return dl.TensorboardLogger(
+            **conf.engine.loggers.tensorboard,
+        )
+    raise ValueError(f"Unknown logger type: {logger_type}")
 
 
 def create_runner(conf: DictConfig) -> TRunner:
@@ -59,20 +82,13 @@ def create_runner(conf: DictConfig) -> TRunner:
 def configure_engine(conf: DictConfig) -> dict[str, Any]:
     engine_kwargs = OmegaConf.to_container(conf.engine, resolve=True)
     engine_kwargs = cast(Dict[str, Any], engine_kwargs)
-    engine_kwargs["loggers"] = {}
-    engine_kwargs["loggers"]["aim"] = AimLogger(
-        experiment=conf.exp.name,
-        run_hash=conf.env.aim.run_hash,
-        repo=aim.Repo(
-            conf.env.aim.repo,
-            init=not aim.Repo.exists(conf.env.aim.repo),
-        ),
-        **conf.engine.loggers.aim,
-    )
-    conf.env.aim.run_hash = engine_kwargs["loggers"]["aim"].run.hash
-    engine_kwargs["loggers"]["tensorboard"] = dl.TensorboardLogger(
-        **conf.engine.loggers.tensorboard,
-    )
+    logger_types = [
+        PRIMARY_LOGGER,
+        *[k for k in conf.engine.loggers.keys() if k != PRIMARY_LOGGER],
+    ]
+    engine_kwargs["loggers"] = {
+        logger_type: create_logger(conf, logger_type) for logger_type in logger_types
+    }
     engine_kwargs["callbacks"] = [
         create_callback(cb_conf) for cb_conf in conf.engine.callbacks
     ]
