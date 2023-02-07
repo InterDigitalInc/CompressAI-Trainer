@@ -62,7 +62,7 @@ class BaseRunner(dl.Runner):
         self._log_git_diff(compressai)
         self._log_git_diff(compressai_trainer)
         self._log_pip()
-        self._log_stats()
+        self._log_model_info()
 
     def on_epoch_start(self, runner):
         if not self._has_started:
@@ -179,11 +179,17 @@ class BaseRunner(dl.Runner):
             runner=self,
         )
 
-    def _log_stats(self):
+    def _log_model_info(self):
         stats = {
             "num_params": num_parameters(self.model),
         }
         self.log_hparams({"stats": stats})
+        print("\nModel:")
+        print(self.model_module)
+        print("\nModel state dict:")
+        for k, v in self.model_module.state_dict().items():
+            print(f"{str(list(v.shape)): <24} {k}")
+        print("")
 
 
 def _coerce_item(x):
