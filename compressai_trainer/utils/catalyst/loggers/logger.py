@@ -27,11 +27,28 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from .aim import AimLogger
-from .logger import DistributionSuperlogger, FigureSuperlogger
+from __future__ import annotations
 
-__all__ = [
-    "AimLogger",
-    "DistributionSuperlogger",
-    "FigureSuperlogger",
-]
+from catalyst.core.logger import ILogger
+
+
+class DistributionSuperlogger:
+    loggers: dict[str, ILogger]
+
+    def log_distribution(self, *args, **kwargs) -> None:
+        """Logs distribution to available loggers."""
+        for logger in self.loggers.values():
+            if not hasattr(logger, "log_distribution"):
+                continue
+            logger.log_distribution(*args, **kwargs, runner=self)  # type: ignore
+
+
+class FigureSuperlogger:
+    loggers: dict[str, ILogger]
+
+    def log_figure(self, *args, **kwargs) -> None:
+        """Logs figure to available loggers."""
+        for logger in self.loggers.values():
+            if not hasattr(logger, "log_figure"):
+                continue
+            logger.log_figure(*args, **kwargs, runner=self)  # type: ignore

@@ -43,10 +43,14 @@ from torch.nn.parallel import DataParallel, DistributedDataParallel
 
 import compressai_trainer
 from compressai_trainer.plot import plot_rd
+from compressai_trainer.utils.catalyst.loggers import (
+    DistributionSuperlogger,
+    FigureSuperlogger,
+)
 from compressai_trainer.utils.utils import compressai_dataframe, num_parameters
 
 
-class BaseRunner(dl.Runner):
+class BaseRunner(dl.Runner, DistributionSuperlogger, FigureSuperlogger):
     criterion: TorchCriterion
     model: CompressionModel | DataParallel | DistributedDataParallel
     optimizer: dict[str, TorchOptimizer]
@@ -87,20 +91,6 @@ class BaseRunner(dl.Runner):
 
     def on_experiment_end(self, runner):
         super().on_experiment_end(runner)
-
-    def log_distribution(self, *args, **kwargs) -> None:
-        """Logs distribution to available loggers."""
-        for logger in self.loggers.values():
-            if not hasattr(logger, "log_distribution"):
-                continue
-            logger.log_distribution(*args, **kwargs, runner=self)  # type: ignore
-
-    def log_figure(self, *args, **kwargs) -> None:
-        """Logs figure to available loggers."""
-        for logger in self.loggers.values():
-            if not hasattr(logger, "log_figure"):
-                continue
-            logger.log_figure(*args, **kwargs, runner=self)  # type: ignore
 
     @property
     def model_module(self) -> CompressionModel:
