@@ -40,9 +40,14 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
+import subprocess
 import sys
 
-sys.path.insert(0, os.path.abspath("../compressai-trainer/"))
+result = subprocess.run(
+    "git rev-parse --show-toplevel".split(), check=True, capture_output=True
+)
+root_dir = os.path.abspath(result.stdout.decode().strip())
+sys.path.insert(0, root_dir)
 
 # -- Project information -----------------------------------------------------
 
