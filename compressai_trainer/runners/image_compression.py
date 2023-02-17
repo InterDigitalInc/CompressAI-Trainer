@@ -30,7 +30,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import Any
+from typing import Any, cast
 
 import pandas as pd
 import plotly.graph_objects as go
@@ -38,9 +38,10 @@ import torch
 from catalyst import metrics
 from compressai.models.base import CompressionModel
 
+from compressai_trainer.plot import plot_rd
 from compressai_trainer.registry import register_runner
 from compressai_trainer.utils.metrics import compute_metrics
-from compressai_trainer.utils.utils import inference
+from compressai_trainer.utils.utils import compressai_dataframe, inference
 
 from .base import BaseRunner
 
@@ -212,6 +213,23 @@ class ImageCompressionRunner(BaseRunner):
             self.log_distribution("chan_bpp_sorted", hist=ch_bpp_sorted, **kwargs)
             self.log_distribution("chan_bpp_unsorted", hist=ch_bpp, **kwargs)
 
+    def _log_rd_figure(self, codecs: list[str], dataset: str, **kwargs):
+        hover_data = kwargs.get("scatter_kwargs", {}).get("hover_data", [])
+        dfs = [compressai_dataframe(name, dataset=dataset) for name in codecs]
+        dfs.append(self._current_dataframe)
+        df = pd.concat(dfs)
+        df = _reorder_dataframe_columns(df, hover_data)
+        fig = plot_rd(df, **kwargs)
+        for trace in self._current_rd_traces():
+            fig.add_trace(trace)
+        context = {
+            "dataset": dataset,
+            "loader": "infer",
+            "metric": "psnr",
+            "opt_metric": "mse",
+        }
+        self.log_figure(f"rd-curves", fig, context=context)
+
     def _setup_loader_metrics(self):
         self._loader_metrics = {
             "chan_bpp": defaultdict(list),
@@ -226,3 +244,9 @@ class ImageCompressionRunner(BaseRunner):
         self.batch_meters = {
             key: metrics.AdditiveMetric(compute_on_call=False) for key in keys
         }
+
+
+def _reorder_dataframe_columns(df: pd.DataFrame, head: list[str]) -> pd.DataFrame:
+    head_set = set(head)
+    columns = head + [x for x in df.columns if x not in head_set]
+    return cast(pd.DataFrame, df[columns])

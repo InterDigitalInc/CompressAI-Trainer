@@ -34,7 +34,6 @@ from types import ModuleType
 from typing import cast
 
 import compressai
-import pandas as pd
 import yaml
 from catalyst import dl, metrics
 from catalyst.typing import TorchCriterion, TorchOptimizer
@@ -42,12 +41,11 @@ from compressai.models.base import CompressionModel
 from torch.nn.parallel import DataParallel, DistributedDataParallel
 
 import compressai_trainer
-from compressai_trainer.plot import plot_rd
 from compressai_trainer.utils.catalyst.loggers import (
     DistributionSuperlogger,
     FigureSuperlogger,
 )
-from compressai_trainer.utils.utils import compressai_dataframe, num_parameters
+from compressai_trainer.utils.utils import num_parameters
 
 
 class BaseRunner(dl.Runner, DistributionSuperlogger, FigureSuperlogger):
@@ -99,21 +97,6 @@ class BaseRunner(dl.Runner, DistributionSuperlogger, FigureSuperlogger):
             return cast(CompressionModel, self.model.module)
         return self.model
 
-    @property
-    def _current_dataframe(self):
-        r = lambda x: float(f"{x:.4g}")
-        d = dict(
-            name=self.hparams["model"]["name"] + "*",
-            epoch=self.epoch_step,
-            loss=r(self.loader_metrics["loss"]),
-            bpp=r(self.loader_metrics["bpp"]),
-            psnr=r(self.loader_metrics["psnr"]),
-        )
-        return pd.DataFrame.from_dict([d])
-
-    def _current_rd_traces(self):
-        return []
-
     def _update_batch_metrics(self, batch_metrics):
         self.batch_metrics.update(batch_metrics)
         for key in batch_metrics.keys():
@@ -141,23 +124,6 @@ class BaseRunner(dl.Runner, DistributionSuperlogger, FigureSuperlogger):
             f"{package.__name__}_git_diff", f"{package.__name__}.patch", "src"
         )
 
-    def _log_rd_figure(self, codecs: list[str], dataset: str, **kwargs):
-        hover_data = kwargs.get("scatter_kwargs", {}).get("hover_data", [])
-        dfs = [compressai_dataframe(name, dataset=dataset) for name in codecs]
-        dfs.append(self._current_dataframe)
-        df = pd.concat(dfs)
-        df = _reorder_dataframe_columns(df, hover_data)
-        fig = plot_rd(df, **kwargs)
-        for trace in self._current_rd_traces():
-            fig.add_trace(trace)
-        context = {
-            "dataset": dataset,
-            "loader": "infer",
-            "metric": "psnr",
-            "opt_metric": "mse",
-        }
-        self.log_figure(f"rd-curves", fig, context=context)
-
     def _log_state(self):
         state = {
             "epoch_step": self.epoch_step,
@@ -184,9 +150,3 @@ class BaseRunner(dl.Runner, DistributionSuperlogger, FigureSuperlogger):
 
 def _coerce_item(x):
     return x.item() if hasattr(x, "item") else x
-
-
-def _reorder_dataframe_columns(df: pd.DataFrame, head: list[str]) -> pd.DataFrame:
-    head_set = set(head)
-    columns = head + [x for x in df.columns if x not in head_set]
-    return cast(pd.DataFrame, df[columns])
