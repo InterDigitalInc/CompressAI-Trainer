@@ -9,6 +9,7 @@ _run_root:      "${.runs_root}/${env.aim.run_hash}"
 checkpoints:    "${._run_root}/checkpoints"
 configs:        "${._run_root}/configs"
 engine:         "${._run_root}/engine"
+images:         "${._run_root}/images"
 src:            "${._run_root}/src"
 tensorboard:    "${._run_root}/tensorboard"
 

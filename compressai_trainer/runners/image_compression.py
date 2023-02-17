@@ -37,11 +37,16 @@ import plotly.graph_objects as go
 import torch
 from catalyst import metrics
 from compressai.models.base import CompressionModel
+from PIL import Image
 
 from compressai_trainer.plot import plot_rd
 from compressai_trainer.registry import register_runner
 from compressai_trainer.utils.metrics import compute_metrics
-from compressai_trainer.utils.utils import compressai_dataframe, inference
+from compressai_trainer.utils.utils import (
+    compressai_dataframe,
+    inference,
+    tensor_to_np_img,
+)
 
 from .base import BaseRunner
 
@@ -146,6 +151,8 @@ class ImageCompressionRunner(BaseRunner):
         self._update_batch_metrics(batch_metrics)
         self._handle_custom_metrics(out_net, out_metrics)
 
+        self._log_outputs(x, out_infer)
+
     def on_loader_end(self, runner):
         super().on_loader_end(runner)
         if self.is_infer_loader:
@@ -212,6 +219,14 @@ class ImageCompressionRunner(BaseRunner):
             )
             self.log_distribution("chan_bpp_sorted", hist=ch_bpp_sorted, **kwargs)
             self.log_distribution("chan_bpp_unsorted", hist=ch_bpp, **kwargs)
+
+    def _log_outputs(self, x, out_infer):
+        for i in range(len(x)):
+            sample_idx = (self.loader_batch_step - 1) * self.loader_batch_size + i + 1
+            img_path_prefix = f"{self.hparams['paths']['images']}/{sample_idx:06}"
+            Image.fromarray(
+                tensor_to_np_img(out_infer["out_dec"]["x_hat"][i].cpu())
+            ).save(f"{img_path_prefix}_x_hat.png")
 
     def _log_rd_figure(self, codecs: list[str], dataset: str, **kwargs):
         hover_data = kwargs.get("scatter_kwargs", {}).get("hover_data", [])

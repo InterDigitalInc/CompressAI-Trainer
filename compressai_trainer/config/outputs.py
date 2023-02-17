@@ -47,6 +47,7 @@ def write_outputs(conf: DictConfig):
     write_git_diff(conf, compressai)
     write_pip_list(conf)
     write_pip_requirements(conf)
+    os.makedirs(conf["paths"]["images"], exist_ok=True)
 
 
 def write_config(conf: DictConfig):
