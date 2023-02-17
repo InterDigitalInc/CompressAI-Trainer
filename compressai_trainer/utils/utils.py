@@ -47,16 +47,12 @@ class ConfigStringFormatter(string.Formatter):
         return self.get_value(field_name, args, kwargs), field_name
 
 
-def preprocess_img(img: np.ndarray) -> torch.Tensor:
-    x = (img.transpose(2, 0, 1) / 255).astype(np.float32)
-    x = torch.from_numpy(x).unsqueeze(0)
-    return x
+def np_img_to_tensor(x: np.ndarray) -> torch.Tensor:
+    return torch.from_numpy(x).moveaxis(-1, -3).to(torch.float32) / 255
 
 
-def postprocess_img(x_hat: torch.Tensor) -> np.ndarray:
-    x = x_hat.squeeze(0).numpy()
-    x = (x.transpose(1, 2, 0) * 255).clip(0, 255).astype(np.uint8)
-    return x
+def tensor_to_np_img(x: torch.Tensor) -> np.ndarray:
+    return (x * 255).clip(0, 255).to(torch.uint8).moveaxis(-3, -1).cpu().numpy()
 
 
 @torch.no_grad()
@@ -64,11 +60,11 @@ def inference_single_image_uint8(
     model, img: np.ndarray, device=None
 ) -> tuple[np.ndarray, list[bytes]]:
     """Run inference on a single HWC uint8 RGB image."""
-    x = preprocess_img(img)
+    x = np_img_to_tensor(img[None, ...])
     x = x.to(device=device)
     result = inference(model, x, skip_decompress=False)
     x_hat = result["out_dec"]["x_hat"].cpu()
-    img_rec = postprocess_img(x_hat)
+    img_rec = tensor_to_np_img(x_hat).squeeze(0)
     encoded = [s[0] for s in result["out_enc"]["strings"]]
     return img_rec, encoded
 
