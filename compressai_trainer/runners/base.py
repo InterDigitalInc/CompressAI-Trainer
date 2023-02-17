@@ -49,6 +49,19 @@ from compressai_trainer.utils.utils import num_parameters
 
 
 class BaseRunner(dl.Runner, DistributionSuperlogger, FigureSuperlogger):
+    """Generic runner for all CompressAI Trainer experiments.
+
+    See the ``catalyst.dl.Runner`` documentation for info on runners.
+
+    ``BaseRunner`` provides functionality for common tasks such as:
+
+    - Logging environment: git hashes/diff, pip list, YAML config.
+    - Logging model basic info: num params, weight shapes, etc.
+    - Batch meters that aggregate (e.g. average) per-loader metrics
+      (e.g. loss) which are collected per-batch.
+    - Calls ``model.update()`` before inference (i.e. test).
+    """
+
     criterion: TorchCriterion
     model: CompressionModel | DataParallel | DistributedDataParallel
     optimizer: dict[str, TorchOptimizer]
