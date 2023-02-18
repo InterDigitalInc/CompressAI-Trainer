@@ -27,8 +27,16 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+from .featuremap import (
+    featuremap_image,
+    featuremap_matplotlib,
+    featuremap_matplotlib_looptiled,
+)
 from .plot import plot_rd
 
 __all__ = [
+    "featuremap_image",
+    "featuremap_matplotlib",
+    "featuremap_matplotlib_looptiled",
     "plot_rd",
 ]
