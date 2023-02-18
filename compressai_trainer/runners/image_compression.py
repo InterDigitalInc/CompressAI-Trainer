@@ -92,6 +92,19 @@ RD_PLOT_SETTINGS: dict[str, Any] = dict(
 
 @register_runner("ImageCompressionRunner")
 class ImageCompressionRunner(BaseRunner):
+    """Runner for image compression experiments.
+
+    Reimplementation of CompressAI's `examples/train.py
+    <https://github.com/InterDigitalInc/CompressAI/blob/master/examples/train.py>`_,
+    with additional functionality such as:
+
+    - Plots RD curves.
+    - Saves inference outputs including images (``_log_outputs``) and
+      featuremaps (``_log_debug_outputs``).
+    - Metrics (e.g. ``loss``). See: ``METERS`` and ``INFER_METERS``.
+    - Histograms for latent channel-wise rate distributions.
+    """
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
