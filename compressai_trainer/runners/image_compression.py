@@ -39,7 +39,9 @@ from catalyst import metrics
 from compressai.models.base import CompressionModel
 from PIL import Image
 
+from compressai_trainer import plot
 from compressai_trainer.plot import plot_rd
+from compressai_trainer.plot.featuremap import DEFAULT_COLORMAP
 from compressai_trainer.registry import register_runner
 from compressai_trainer.utils.metrics import compute_metrics
 from compressai_trainer.utils.utils import (
@@ -227,6 +229,36 @@ class ImageCompressionRunner(BaseRunner):
             Image.fromarray(
                 tensor_to_np_img(out_infer["out_dec"]["x_hat"][i].cpu())
             ).save(f"{img_path_prefix}_x_hat.png")
+            self._log_debug_outputs(out_infer, i, img_path_prefix)
+
+    def _log_debug_outputs(self, out_infer, i, img_path_prefix):
+        """Log ``debug_outputs`` from out_net/out_enc/out_dec,
+        such as featuremaps of tensors.
+
+        Add desired outputs to the ``debug_outputs`` key returned by
+        ``forward``/``compress``/``decompress``. For example:
+
+        .. code-block:: python
+
+            class MyModel(compressai.models.google.FactorizedPrior):
+                def compress(self, x):
+                    y = self.g_a(x)
+                    ...
+                    return {..., "debug_outputs": {"y": y}}
+        """
+        debug_outputs = {
+            f"debug_{mode}_{k}": v
+            for mode in ["net", "enc", "dec"]
+            for k, v in out_infer[f"out_{mode}"].get("debug_outputs", {}).items()
+        }
+
+        for name, output in debug_outputs.items():
+            if isinstance(output, torch.Tensor):
+                Image.fromarray(
+                    plot.featuremap_image(
+                        output[i].cpu().numpy(), cmap=DEFAULT_COLORMAP
+                    )
+                ).save(f"{img_path_prefix}_{name}.png")
 
     def _log_rd_figure(self, codecs: list[str], dataset: str, **kwargs):
         hover_data = kwargs.get("scatter_kwargs", {}).get("hover_data", [])
