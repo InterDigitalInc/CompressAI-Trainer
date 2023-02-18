@@ -28,3 +28,7 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from .plot import plot_rd
+
+__all__ = [
+    "plot_rd",
+]

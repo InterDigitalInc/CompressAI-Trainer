@@ -51,6 +51,7 @@ PLOT_RD_LAYOUT_SETTINGS = dict(
 
 
 def plot_rd(df: pd.DataFrame, scatter_kwargs: dict[str, Any] = {}, **layout_kwargs):
+    """Plots RD curve."""
     import plotly.express as px
     from plotly.subplots import make_subplots
 
