@@ -84,9 +84,9 @@ def configure_engine(conf: DictConfig) -> dict[str, Any]:
         PRIMARY_LOGGER,
         *[k for k in conf.engine.loggers.keys() if k != PRIMARY_LOGGER],
     ]
-    return {
-        **OmegaConf.to_container(conf.engine, resolve=True),
+    d = {
         "loggers": {t: create_logger(conf, t) for t in logger_types},
         "callbacks": [create_callback(cb_conf) for cb_conf in conf.engine.callbacks],
         "hparams": OmegaConf.to_container(conf, resolve=True),
     }
+    return {**d["hparams"]["engine"], **d}
