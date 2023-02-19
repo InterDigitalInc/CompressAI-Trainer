@@ -80,17 +80,13 @@ def create_runner(conf: DictConfig) -> TRunner:
 
 
 def configure_engine(conf: DictConfig) -> dict[str, Any]:
-    engine_kwargs = OmegaConf.to_container(conf.engine, resolve=True)
-    engine_kwargs = cast(Dict[str, Any], engine_kwargs)
     logger_types = [
         PRIMARY_LOGGER,
         *[k for k in conf.engine.loggers.keys() if k != PRIMARY_LOGGER],
     ]
-    engine_kwargs["loggers"] = {
-        logger_type: create_logger(conf, logger_type) for logger_type in logger_types
+    return {
+        **OmegaConf.to_container(conf.engine, resolve=True),
+        "loggers": {t: create_logger(conf, t) for t in logger_types},
+        "callbacks": [create_callback(cb_conf) for cb_conf in conf.engine.callbacks],
+        "hparams": OmegaConf.to_container(conf, resolve=True),
     }
-    engine_kwargs["callbacks"] = [
-        create_callback(cb_conf) for cb_conf in conf.engine.callbacks
-    ]
-    engine_kwargs["hparams"] = OmegaConf.to_container(conf, resolve=True)
-    return engine_kwargs
