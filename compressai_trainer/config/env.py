@@ -69,6 +69,7 @@ def _get_git_repo_info(root: str, main_branch: str) -> dict[str, str]:
         "hash": git.commit_hash(root=root)[:7],
         "main_hash": git.common_ancestor_hash(root=root, rev2=main_branch)[:7],
         "branch": git.branch_name(root=root),
+        "main_branch": main_branch,
     }
 
 
