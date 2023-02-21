@@ -29,6 +29,7 @@
 
 from __future__ import annotations
 
+import math
 from collections import defaultdict
 from typing import Any, cast
 
@@ -69,8 +70,21 @@ INFER_METERS = [
     "ms-ssim",
 ]
 
-RD_PLOT_SETTINGS: dict[str, Any] = dict(
-    title="Performance evaluation on Kodak - PSNR (RGB)",
+RD_PLOT_METRICS = [
+    "psnr",
+    "ms-ssim",
+    "ms-ssim-db",
+]
+
+RD_PLOT_DESCRIPTIONS = [
+    "PSNR (RGB)",
+    "MS-SSIM (RGB)",
+    "MS-SSIM (RGB)",
+]
+
+RD_PLOT_TITLE = "Performance evaluation on Kodak - {metric}"
+
+RD_PLOT_SETTINGS_COMMON: dict[str, Any] = dict(
     dataset="image/kodak",
     codecs=[
         "bmshj2018-factorized",
@@ -177,13 +191,7 @@ class ImageCompressionRunner(BaseRunner):
     def on_loader_end(self, runner):
         super().on_loader_end(runner)
         if self.is_infer_loader:
-            self._rd_figure_logger.log(
-                runner=self,
-                df=self._current_dataframe,
-                traces=self._current_rd_traces(),
-                metric="psnr",
-                **RD_PLOT_SETTINGS,
-            )
+            self._log_rd_curves()
             self._loader_metrics["chan_bpp"].log(self)
 
     @property
@@ -197,6 +205,7 @@ class ImageCompressionRunner(BaseRunner):
             "bpp": r(self.loader_metrics["bpp"]),
             "psnr": r(self.loader_metrics["psnr"]),
             "ms-ssim": r(self.loader_metrics["ms-ssim"]),
+            "ms-ssim-db": r(-10 * math.log10(1 - self.loader_metrics["ms-ssim"])),
         }
         return pd.DataFrame.from_dict([d])
 
@@ -234,6 +243,17 @@ class ImageCompressionRunner(BaseRunner):
                 tensor_to_np_img(out_infer["out_dec"]["x_hat"][i].cpu())
             ).save(f"{img_path_prefix}_x_hat.png")
             self._debug_outputs_logger.log(out_infer, i, img_path_prefix)
+
+    def _log_rd_curves(self):
+        for metric, description in zip(RD_PLOT_METRICS, RD_PLOT_DESCRIPTIONS):
+            self._rd_figure_logger.log(
+                runner=self,
+                df=self._current_dataframe,
+                traces=self._current_rd_traces(),
+                metric=metric,
+                **RD_PLOT_SETTINGS_COMMON,
+                layout_kwargs=dict(title=RD_PLOT_TITLE.format(metric=description)),
+            )
 
     def _setup_loader_metrics(self):
         self._loader_metrics = {
@@ -329,14 +349,19 @@ class RdFigureLogger:
         **kwargs,
     ):
         hover_data = kwargs.get("scatter_kwargs", {}).get("hover_data", [])
-        dfs = [compressai_dataframe(name, dataset=dataset) for name in codecs]
+        dfs = [
+            compressai_dataframe(name, dataset=dataset, opt_metric=opt_metric)
+            for name in codecs
+        ]
         dfs.append(df)
         df = pd.concat(dfs)
         df = _reorder_dataframe_columns(df, hover_data)
-        fig = plot_rd(df, **kwargs)
+        fig = plot_rd(df, metric=metric, **kwargs)
         for trace in traces:
             fig.add_trace(trace)
         context = {
+            # "_" is used to order the figures in the experiment tracker.
+            "_": int(metric != (opt_metric if opt_metric != "mse" else "psnr")),
             "dataset": dataset,
             "loader": loader,
             "metric": metric,

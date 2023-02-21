@@ -138,7 +138,7 @@ def plot_dataframe(df: pd.DataFrame, args):
     if args.out_csv:
         df.to_csv(args.out_csv, index=False)
 
-    fig = plot_rd(df, scatter_kwargs=scatter_kwargs, title=TITLE)
+    fig = plot_rd(df, scatter_kwargs=scatter_kwargs, layout_kwargs=dict(title=TITLE))
 
     if args.out_html:
         from plotly.offline import plot

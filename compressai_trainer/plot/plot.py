@@ -27,7 +27,6 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
@@ -35,28 +34,67 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     import pandas as pd
 
-PLOT_RD_SCATTER_SETTINGS = dict(
+
+_PLOT_RD_SCATTER_SETTINGS_COMMON = dict(
     x="bpp",
-    y="psnr",
     color="name",
     hover_data=["psnr", "ms-ssim", "epoch"],
 )
 
-PLOT_RD_LAYOUT_SETTINGS = dict(
+_PLOT_RD_LAYOUT_SETTINGS_COMMON = dict(
     xaxis_title="Bit-rate [bpp]",
-    yaxis_title="PSNR [dB]",
     xaxis=dict(range=[0.0, 2.25], tick0=0.0, dtick=0.25),
-    yaxis=dict(range=[26, 41], tick0=26, dtick=1),
 )
 
+PLOT_RD_SETTINGS = {
+    "psnr": {
+        "scatter_kwargs": dict(
+            **_PLOT_RD_SCATTER_SETTINGS_COMMON,
+            y="psnr",
+        ),
+        "layout_kwargs": dict(
+            **_PLOT_RD_LAYOUT_SETTINGS_COMMON,
+            yaxis_title="PSNR [dB]",
+            yaxis=dict(range=[26, 41], tick0=26, dtick=1),
+        ),
+    },
+    "ms-ssim": {
+        "scatter_kwargs": dict(
+            **_PLOT_RD_SCATTER_SETTINGS_COMMON,
+            y="ms-ssim",
+        ),
+        "layout_kwargs": dict(
+            **_PLOT_RD_LAYOUT_SETTINGS_COMMON,
+            yaxis_title="MS-SSIM",
+            yaxis=dict(range=[0.9, 1.0], tick0=0.9, dtick=0.01),
+        ),
+    },
+    "ms-ssim-db": {
+        "scatter_kwargs": dict(
+            **_PLOT_RD_SCATTER_SETTINGS_COMMON,
+            y="ms-ssim-db",
+        ),
+        "layout_kwargs": dict(
+            **_PLOT_RD_LAYOUT_SETTINGS_COMMON,
+            yaxis_title="MS-SSIM [dB]",
+            yaxis=dict(range=[10, 24], tick0=10, dtick=1),
+        ),
+    },
+}
 
-def plot_rd(df: pd.DataFrame, scatter_kwargs: dict[str, Any] = {}, **layout_kwargs):
+
+def plot_rd(
+    df: pd.DataFrame,
+    metric: str = "psnr",
+    scatter_kwargs: dict[str, Any] = {},
+    layout_kwargs: dict[str, Any] = {},
+):
     """Plots RD curve."""
     import plotly.express as px
     from plotly.subplots import make_subplots
 
-    scatter_kwargs = {**PLOT_RD_SCATTER_SETTINGS, **scatter_kwargs}
-    layout_kwargs = {**PLOT_RD_LAYOUT_SETTINGS, **layout_kwargs}
+    scatter_kwargs = {**PLOT_RD_SETTINGS[metric]["scatter_kwargs"], **scatter_kwargs}
+    layout_kwargs = {**PLOT_RD_SETTINGS[metric]["layout_kwargs"], **layout_kwargs}
     fig = make_subplots()
     fig = px.line(df, **scatter_kwargs, markers=True)
     fig.update_layout(**layout_kwargs)

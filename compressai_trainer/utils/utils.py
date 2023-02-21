@@ -135,7 +135,7 @@ def compressai_dataframe(
             codec_name, dataset=dataset, opt_metric=opt_metric, device=device
         )
 
-    d["results"] = _rename_results(d["results"])
+    d["results"] = _process_results(_rename_results(d["results"]))
     df = pd.DataFrame.from_dict(d["results"])
     df["name"] = d["name"]
     df["model.name"] = d["name"]
@@ -180,6 +180,11 @@ def _rename_results(results):
             continue
         results[f"{metric}"] = results[f"{metric}-rgb"]
         del results[f"{metric}-rgb"]
+    return results
+
+
+def _process_results(results):
+    results["ms-ssim-db"] = (-10 * np.log10(1 - np.array(results["ms-ssim"]))).tolist()
     return results
 
 
