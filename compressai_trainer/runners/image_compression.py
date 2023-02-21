@@ -43,6 +43,7 @@ from compressai_trainer import plot
 from compressai_trainer.plot import plot_rd
 from compressai_trainer.plot.featuremap import DEFAULT_COLORMAP
 from compressai_trainer.registry import register_runner
+from compressai_trainer.utils.catalyst.loggers import DistributionSuperlogger
 from compressai_trainer.utils.metrics import compute_metrics
 from compressai_trainer.utils.utils import (
     compressai_dataframe,
@@ -172,7 +173,7 @@ class ImageCompressionRunner(BaseRunner):
         super().on_loader_end(runner)
         if self.is_infer_loader:
             self._log_rd_figure(**RD_PLOT_SETTINGS)
-            self._log_chan_bpp()
+            self._loader_metrics["chan_bpp"].log(self)
 
     @property
     def _current_dataframe(self):
@@ -210,30 +211,9 @@ class ImageCompressionRunner(BaseRunner):
             torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm)
 
     def _handle_custom_metrics(self, out_net, out_metrics):
-        likelihoods = out_net["likelihoods"]
-        _, _, h, w = out_net["x_hat"].shape
-        chan_bpp = {
-            k: l.detach().log2().sum(axis=(-2, -1)) / -(h * w)
-            for k, l in likelihoods.items()
-        }
-        for name, ch_bpp in chan_bpp.items():
-            self._loader_metrics["chan_bpp"][name].extend(ch_bpp)
+        self._loader_metrics["chan_bpp"].update(out_net)
         self._loader_metrics["bpp"].append(out_metrics["bpp"])
         self._loader_metrics["psnr"].append(out_metrics["psnr"])
-
-    def _log_chan_bpp(self):
-        for name, ch_bpp in self._loader_metrics["chan_bpp"].items():
-            ch_bpp = torch.stack(ch_bpp).mean(dim=0).to(torch.float16).cpu()
-            c, *_ = ch_bpp.shape
-            ch_bpp_sorted, _ = torch.sort(ch_bpp, descending=True)
-            kwargs = dict(
-                unused=None,
-                scope="epoch",
-                context={"name": name},
-                bin_range=(0, c),
-            )
-            self.log_distribution("chan_bpp_sorted", hist=ch_bpp_sorted, **kwargs)
-            self.log_distribution("chan_bpp_unsorted", hist=ch_bpp, **kwargs)
 
     def _log_outputs(self, x, out_infer):
         for i in range(len(x)):
@@ -292,7 +272,7 @@ class ImageCompressionRunner(BaseRunner):
 
     def _setup_loader_metrics(self):
         self._loader_metrics = {
-            "chan_bpp": defaultdict(list),
+            "chan_bpp": ChannelwiseBppMeter(),
             "bpp": [],
             "psnr": [],
         }
@@ -304,6 +284,36 @@ class ImageCompressionRunner(BaseRunner):
         self.batch_meters = {
             key: metrics.AdditiveMetric(compute_on_call=False) for key in keys
         }
+
+
+class ChannelwiseBppMeter:
+    """Log channel-wise rates (bpp)."""
+
+    def __init__(self):
+        self._chan_bpp = defaultdict(list)
+
+    def update(self, out_net):
+        _, _, h, w = out_net["x_hat"].shape
+        chan_bpp = {
+            k: l.detach().log2().sum(axis=(-2, -1)) / -(h * w)
+            for k, l in out_net["likelihoods"].items()
+        }
+        for name, ch_bpp in chan_bpp.items():
+            self._chan_bpp[name].extend(ch_bpp)
+
+    def log(self, runner: DistributionSuperlogger):
+        for name, ch_bpp_samples in self._chan_bpp.items():
+            ch_bpp = torch.stack(ch_bpp_samples).mean(dim=0).to(torch.float16).cpu()
+            c, *_ = ch_bpp.shape
+            ch_bpp_sorted, _ = torch.sort(ch_bpp, descending=True)
+            kwargs = dict(
+                unused=None,
+                scope="epoch",
+                context={"name": name},
+                bin_range=(0, c),
+            )
+            runner.log_distribution("chan_bpp_sorted", hist=ch_bpp_sorted, **kwargs)
+            runner.log_distribution("chan_bpp_unsorted", hist=ch_bpp, **kwargs)
 
 
 def _reorder_dataframe_columns(df: pd.DataFrame, head: list[str]) -> pd.DataFrame:
