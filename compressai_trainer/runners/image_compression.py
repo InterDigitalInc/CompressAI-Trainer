@@ -43,7 +43,10 @@ from compressai_trainer import plot
 from compressai_trainer.plot import plot_rd
 from compressai_trainer.plot.featuremap import DEFAULT_COLORMAP
 from compressai_trainer.registry import register_runner
-from compressai_trainer.utils.catalyst.loggers import DistributionSuperlogger
+from compressai_trainer.utils.catalyst.loggers import (
+    DistributionSuperlogger,
+    FigureSuperlogger,
+)
 from compressai_trainer.utils.metrics import compute_metrics
 from compressai_trainer.utils.utils import (
     compressai_dataframe,
@@ -108,6 +111,7 @@ class ImageCompressionRunner(BaseRunner):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._rd_figure_logger = RdFigureLogger()
 
     def on_loader_start(self, runner):
         super().on_loader_start(runner)
@@ -172,7 +176,13 @@ class ImageCompressionRunner(BaseRunner):
     def on_loader_end(self, runner):
         super().on_loader_end(runner)
         if self.is_infer_loader:
-            self._log_rd_figure(**RD_PLOT_SETTINGS)
+            self._rd_figure_logger.log(
+                runner=self,
+                df=self._current_dataframe,
+                traces=self._current_rd_traces(),
+                metric="psnr",
+                **RD_PLOT_SETTINGS,
+            )
             self._loader_metrics["chan_bpp"].log(self)
 
     @property
@@ -253,23 +263,6 @@ class ImageCompressionRunner(BaseRunner):
                     )
                 ).save(f"{img_path_prefix}_{name}.png")
 
-    def _log_rd_figure(self, codecs: list[str], dataset: str, **kwargs):
-        hover_data = kwargs.get("scatter_kwargs", {}).get("hover_data", [])
-        dfs = [compressai_dataframe(name, dataset=dataset) for name in codecs]
-        dfs.append(self._current_dataframe)
-        df = pd.concat(dfs)
-        df = _reorder_dataframe_columns(df, hover_data)
-        fig = plot_rd(df, **kwargs)
-        for trace in self._current_rd_traces():
-            fig.add_trace(trace)
-        context = {
-            "dataset": dataset,
-            "loader": "infer",
-            "metric": "psnr",
-            "opt_metric": "mse",
-        }
-        self.log_figure(f"rd-curves", fig, context=context)
-
     def _setup_loader_metrics(self):
         self._loader_metrics = {
             "chan_bpp": ChannelwiseBppMeter(),
@@ -314,6 +307,38 @@ class ChannelwiseBppMeter:
             )
             runner.log_distribution("chan_bpp_sorted", hist=ch_bpp_sorted, **kwargs)
             runner.log_distribution("chan_bpp_unsorted", hist=ch_bpp, **kwargs)
+
+
+class RdFigureLogger:
+    """Log RD figure."""
+
+    def log(
+        self,
+        runner: FigureSuperlogger,
+        df: pd.DataFrame,
+        traces,
+        codecs: list[str],
+        dataset: str = "image/kodak",
+        loader: str = "infer",
+        metric: str = "psnr",
+        opt_metric: str = "mse",
+        **kwargs,
+    ):
+        hover_data = kwargs.get("scatter_kwargs", {}).get("hover_data", [])
+        dfs = [compressai_dataframe(name, dataset=dataset) for name in codecs]
+        dfs.append(df)
+        df = pd.concat(dfs)
+        df = _reorder_dataframe_columns(df, hover_data)
+        fig = plot_rd(df, **kwargs)
+        for trace in traces:
+            fig.add_trace(trace)
+        context = {
+            "dataset": dataset,
+            "loader": loader,
+            "metric": metric,
+            "opt_metric": opt_metric,
+        }
+        runner.log_figure(f"rd-curves", fig, context=context)
 
 
 def _reorder_dataframe_columns(df: pd.DataFrame, head: list[str]) -> pd.DataFrame:
