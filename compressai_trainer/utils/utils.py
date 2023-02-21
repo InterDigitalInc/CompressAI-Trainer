@@ -153,7 +153,7 @@ def compressai_result(
 
 def generic_codec_result(
     codec_name: str,
-    dataset: str = "kodak",
+    dataset: str = "image/kodak",
 ) -> dict[str, Any]:
     path = f"{compressai.__path__[0]}/../results/{dataset}/" f"{codec_name}.json"
 
