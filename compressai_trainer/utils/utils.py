@@ -29,12 +29,10 @@
 
 from __future__ import annotations
 
-import json
 import math
 import string
 from typing import Any
 
-import compressai
 import numpy as np
 import pandas as pd
 import torch
@@ -118,74 +116,6 @@ def _get_pad(h, w):
 def num_parameters(net: nn.Module, predicate=lambda x: x.requires_grad) -> int:
     unique = {x.data_ptr(): x for x in net.parameters() if predicate(x)}.values()
     return sum(x.numel() for x in unique)
-
-
-def compressai_dataframe(
-    codec_name: str,
-    dataset: str = "image/kodak",
-    opt_metric: str = "mse",
-    device: str = "cuda",
-):
-    generic_codecs = ["av1", "hm", "jpeg", "jpeg2000", "vtm", "webp"]
-
-    if codec_name in generic_codecs:
-        d = generic_codec_result(codec_name, dataset=dataset)
-    else:
-        d = compressai_result(
-            codec_name, dataset=dataset, opt_metric=opt_metric, device=device
-        )
-
-    d["results"] = _process_results(_rename_results(d["results"]))
-    df = pd.DataFrame.from_dict(d["results"])
-    df["name"] = d["name"]
-    df["model.name"] = d["name"]
-    df["description"] = d["description"]
-    return df
-
-
-def compressai_result(
-    model_name: str,
-    dataset: str = "image/kodak",
-    opt_metric: str = "mse",
-    device: str = "cuda",
-) -> dict[str, Any]:
-    path = (
-        f"{compressai.__path__[0]}/../results/{dataset}/"
-        f"compressai-{model_name}_{opt_metric}_{device}.json"
-    )
-
-    with open(path) as f:
-        return json.load(f)
-
-
-def generic_codec_result(
-    codec_name: str,
-    dataset: str = "image/kodak",
-) -> dict[str, Any]:
-    path = f"{compressai.__path__[0]}/../results/{dataset}/" f"{codec_name}.json"
-
-    with open(path) as f:
-        return json.load(f)
-
-
-def _rename_results(results):
-    """Adapter for different versions of CompressAI.
-
-    Renames METRIC-rgb -> METRIC.
-
-    https://github.com/InterDigitalInc/CompressAI/commit/3d3c9bbd92989b1cf19e122281161f7aac8ee769
-    """
-    for metric in ["psnr", "ms-ssim"]:
-        if f"{metric}-rgb" not in results:
-            continue
-        results[f"{metric}"] = results[f"{metric}-rgb"]
-        del results[f"{metric}-rgb"]
-    return results
-
-
-def _process_results(results):
-    results["ms-ssim-db"] = (-10 * np.log10(1 - np.array(results["ms-ssim"]))).tolist()
-    return results
 
 
 def arg_pareto_optimal_set(xs, objectives):

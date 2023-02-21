@@ -44,7 +44,8 @@ from compressai_trainer.utils.aim.query import (
     pareto_optimal_dataframe,
     runs_by_query,
 )
-from compressai_trainer.utils.utils import compressai_dataframe, format_dataframe
+from compressai_trainer.utils.compressai.results import compressai_dataframe
+from compressai_trainer.utils.utils import format_dataframe
 
 TITLE = "Performance evaluation on Kodak - PSNR (RGB)"
 

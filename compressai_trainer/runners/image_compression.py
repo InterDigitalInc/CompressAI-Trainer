@@ -48,12 +48,9 @@ from compressai_trainer.utils.catalyst.loggers import (
     DistributionSuperlogger,
     FigureSuperlogger,
 )
+from compressai_trainer.utils.compressai.results import compressai_dataframe
 from compressai_trainer.utils.metrics import compute_metrics
-from compressai_trainer.utils.utils import (
-    compressai_dataframe,
-    inference,
-    tensor_to_np_img,
-)
+from compressai_trainer.utils.utils import inference, tensor_to_np_img
 
 from .base import BaseRunner
 

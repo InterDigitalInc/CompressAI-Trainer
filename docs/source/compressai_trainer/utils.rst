@@ -33,6 +33,10 @@ CompressAI
    :members:
    :undoc-members:
 
+.. automodule:: compressai_trainer.utils.compressai.results
+   :members:
+   :undoc-members:
+
 Git
 ~~~
 
