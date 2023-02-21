@@ -120,13 +120,20 @@ def num_parameters(net: nn.Module, predicate=lambda x: x.requires_grad) -> int:
     return sum(x.numel() for x in unique)
 
 
-def compressai_dataframe(model_name: str, **kwargs):
+def compressai_dataframe(
+    codec_name: str,
+    dataset: str = "image/kodak",
+    opt_metric: str = "mse",
+    device: str = "cuda",
+):
     generic_codecs = ["av1", "hm", "jpeg", "jpeg2000", "vtm", "webp"]
 
-    if model_name in generic_codecs:
-        d = generic_codec_result(model_name, **kwargs)
+    if codec_name in generic_codecs:
+        d = generic_codec_result(codec_name, dataset=dataset)
     else:
-        d = compressai_result(model_name, **kwargs)
+        d = compressai_result(
+            codec_name, dataset=dataset, opt_metric=opt_metric, device=device
+        )
 
     d["results"] = _rename_results(d["results"])
     df = pd.DataFrame.from_dict(d["results"])
