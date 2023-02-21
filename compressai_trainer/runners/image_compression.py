@@ -104,13 +104,14 @@ class ImageCompressionRunner(BaseRunner):
 
     - Plots RD curves.
     - Saves inference outputs including images (``_log_outputs``) and
-      featuremaps (``_log_debug_outputs``).
+      featuremaps (``_debug_outputs_logger``).
     - Metrics (e.g. ``loss``). See: ``METERS`` and ``INFER_METERS``.
     - Histograms for latent channel-wise rate distributions.
     """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._debug_outputs_logger = DebugOutputsLogger()
         self._rd_figure_logger = RdFigureLogger()
 
     def on_loader_start(self, runner):
@@ -232,36 +233,7 @@ class ImageCompressionRunner(BaseRunner):
             Image.fromarray(
                 tensor_to_np_img(out_infer["out_dec"]["x_hat"][i].cpu())
             ).save(f"{img_path_prefix}_x_hat.png")
-            self._log_debug_outputs(out_infer, i, img_path_prefix)
-
-    def _log_debug_outputs(self, out_infer, i, img_path_prefix):
-        """Log ``debug_outputs`` from out_net/out_enc/out_dec,
-        such as featuremaps of tensors.
-
-        Add desired outputs to the ``debug_outputs`` key returned by
-        ``forward``/``compress``/``decompress``. For example:
-
-        .. code-block:: python
-
-            class MyModel(compressai.models.google.FactorizedPrior):
-                def compress(self, x):
-                    y = self.g_a(x)
-                    ...
-                    return {..., "debug_outputs": {"y": y}}
-        """
-        debug_outputs = {
-            f"debug_{mode}_{k}": v
-            for mode in ["net", "enc", "dec"]
-            for k, v in out_infer[f"out_{mode}"].get("debug_outputs", {}).items()
-        }
-
-        for name, output in debug_outputs.items():
-            if isinstance(output, torch.Tensor):
-                Image.fromarray(
-                    plot.featuremap_image(
-                        output[i].cpu().numpy(), cmap=DEFAULT_COLORMAP
-                    )
-                ).save(f"{img_path_prefix}_{name}.png")
+            self._debug_outputs_logger.log(out_infer, i, img_path_prefix)
 
     def _setup_loader_metrics(self):
         self._loader_metrics = {
@@ -307,6 +279,38 @@ class ChannelwiseBppMeter:
             )
             runner.log_distribution("chan_bpp_sorted", hist=ch_bpp_sorted, **kwargs)
             runner.log_distribution("chan_bpp_unsorted", hist=ch_bpp, **kwargs)
+
+
+class DebugOutputsLogger:
+    """Log ``debug_outputs`` from out_net/out_enc/out_dec,
+    such as featuremaps of tensors.
+
+    To use, add desired outputs to the ``debug_outputs`` key returned by
+    ``forward``/``compress``/``decompress``. For example:
+
+    .. code-block:: python
+
+        class MyModel(compressai.models.google.FactorizedPrior):
+            def compress(self, x):
+                y = self.g_a(x)
+                ...
+                return {..., "debug_outputs": {"y": y}}
+    """
+
+    def log(self, out_infer, i, img_path_prefix):
+        debug_outputs = {
+            f"debug_{mode}_{k}": v
+            for mode in ["net", "enc", "dec"]
+            for k, v in out_infer[f"out_{mode}"].get("debug_outputs", {}).items()
+        }
+
+        for name, output in debug_outputs.items():
+            if isinstance(output, torch.Tensor):
+                Image.fromarray(
+                    plot.featuremap_image(
+                        output[i].cpu().numpy(), cmap=DEFAULT_COLORMAP
+                    )
+                ).save(f"{img_path_prefix}_{name}.png")
 
 
 class RdFigureLogger:
