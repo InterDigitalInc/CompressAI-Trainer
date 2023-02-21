@@ -128,6 +128,7 @@ def compressai_dataframe(model_name: str, **kwargs):
     else:
         d = compressai_result(model_name, **kwargs)
 
+    d["results"] = _rename_results(d["results"])
     df = pd.DataFrame.from_dict(d["results"])
     df["name"] = d["name"]
     df["model.name"] = d["name"]
@@ -158,6 +159,21 @@ def generic_codec_result(
 
     with open(path) as f:
         return json.load(f)
+
+
+def _rename_results(results):
+    """Adapter for different versions of CompressAI.
+
+    Renames METRIC-rgb -> METRIC.
+
+    https://github.com/InterDigitalInc/CompressAI/commit/3d3c9bbd92989b1cf19e122281161f7aac8ee769
+    """
+    for metric in ["psnr", "ms-ssim"]:
+        if f"{metric}-rgb" not in results:
+            continue
+        results[f"{metric}"] = results[f"{metric}-rgb"]
+        del results[f"{metric}-rgb"]
+    return results
 
 
 def arg_pareto_optimal_set(xs, objectives):
