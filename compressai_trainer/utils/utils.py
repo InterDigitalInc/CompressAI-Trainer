@@ -37,7 +37,6 @@ import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 
 
 class ConfigStringFormatter(string.Formatter):
@@ -51,35 +50,6 @@ def np_img_to_tensor(x: np.ndarray) -> torch.Tensor:
 
 def tensor_to_np_img(x: torch.Tensor) -> np.ndarray:
     return (x * 255).clip(0, 255).to(torch.uint8).moveaxis(-3, -1).cpu().numpy()
-
-
-@torch.no_grad()
-def inference(model, x: torch.Tensor, skip_decompress: bool = False) -> dict[str, Any]:
-    """Run compression model on image batch."""
-    n, _, h, w = x.shape
-    pad, unpad = compute_padding(h, w)
-
-    x_padded = F.pad(x, pad, mode="constant", value=0)
-    out_net = model(x_padded)
-    out_net["x_hat"] = F.pad(out_net["x_hat"], unpad)
-    out_enc = model.compress(x_padded)
-    if skip_decompress:
-        out_dec = dict(out_net)
-        del out_dec["likelihoods"]
-    else:
-        out_dec = model.decompress(out_enc["strings"], out_enc["shape"])
-    out_dec["x_hat"] = F.pad(out_dec["x_hat"], unpad)
-
-    num_pixels = n * h * w
-    num_bits = sum(sum(map(len, s)) for s in out_enc["strings"]) * 8.0
-    bpp = num_bits / num_pixels
-
-    return {
-        "out_net": out_net,
-        "out_enc": out_enc,
-        "out_dec": out_dec,
-        "bpp": bpp,
-    }
 
 
 def compute_padding(in_h: int, in_w: int, *, out_h=None, out_w=None, min_div=1):

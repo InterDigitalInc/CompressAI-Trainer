@@ -36,6 +36,7 @@ from typing import Any, cast
 import pandas as pd
 import plotly.graph_objects as go
 import torch
+import torch.nn.functional as F
 from catalyst import metrics
 from compressai.models.base import CompressionModel
 from PIL import Image
@@ -50,7 +51,7 @@ from compressai_trainer.utils.catalyst.loggers import (
 )
 from compressai_trainer.utils.compressai.results import compressai_dataframe
 from compressai_trainer.utils.metrics import compute_metrics
-from compressai_trainer.utils.utils import inference, tensor_to_np_img
+from compressai_trainer.utils.utils import compute_padding, tensor_to_np_img
 
 from .base import BaseRunner
 
@@ -266,6 +267,35 @@ class ImageCompressionRunner(BaseRunner):
         self.batch_meters = {
             key: metrics.AdditiveMetric(compute_on_call=False) for key in keys
         }
+
+
+@torch.no_grad()
+def inference(model, x: torch.Tensor, skip_decompress: bool = False) -> dict[str, Any]:
+    """Run compression model on image batch."""
+    n, _, h, w = x.shape
+    pad, unpad = compute_padding(h, w)
+
+    x_padded = F.pad(x, pad, mode="constant", value=0)
+    out_net = model(x_padded)
+    out_net["x_hat"] = F.pad(out_net["x_hat"], unpad)
+    out_enc = model.compress(x_padded)
+    if skip_decompress:
+        out_dec = dict(out_net)
+        del out_dec["likelihoods"]
+    else:
+        out_dec = model.decompress(out_enc["strings"], out_enc["shape"])
+    out_dec["x_hat"] = F.pad(out_dec["x_hat"], unpad)
+
+    num_pixels = n * h * w
+    num_bits = sum(sum(map(len, s)) for s in out_enc["strings"]) * 8.0
+    bpp = num_bits / num_pixels
+
+    return {
+        "out_net": out_net,
+        "out_enc": out_enc,
+        "out_dec": out_dec,
+        "bpp": bpp,
+    }
 
 
 class ChannelwiseBppMeter:
