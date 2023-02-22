@@ -57,7 +57,7 @@ def tensor_to_np_img(x: torch.Tensor) -> np.ndarray:
 def inference(model, x: torch.Tensor, skip_decompress: bool = False) -> dict[str, Any]:
     """Run compression model on image batch."""
     n, _, h, w = x.shape
-    pad, unpad = _get_pad(h, w)
+    pad, unpad = compute_padding(h, w)
 
     x_padded = F.pad(x, pad, mode="constant", value=0)
     out_net = model(x_padded)
@@ -82,16 +82,32 @@ def inference(model, x: torch.Tensor, skip_decompress: bool = False) -> dict[str
     }
 
 
-def _get_pad(h, w):
-    p = 64  # maximum 6 strides of 2
+def compute_padding(in_h: int, in_w: int, *, out_h=None, out_w=None, min_div=1):
+    """Returns tuples for padding and unpadding.
 
-    new_h = (h + p - 1) // p * p
-    new_w = (w + p - 1) // p * p
+    NOTE: This is also available in ``compressai.ops`` as of v1.2.4.
 
-    left = (new_w - w) // 2
-    right = new_w - w - left
-    top = (new_h - h) // 2
-    bottom = new_h - h - top
+    Args:
+        in_h: Input height.
+        in_w: Input width.
+        out_h: Output height.
+        out_w: Output width.
+        min_div: Length that output dimensions should be divisible by.
+    """
+    if out_h is None:
+        out_h = (in_h + min_div - 1) // min_div * min_div
+    if out_w is None:
+        out_w = (in_w + min_div - 1) // min_div * min_div
+
+    if out_h % min_div != 0 or out_w % min_div != 0:
+        raise ValueError(
+            f"Padded output height and width are not divisible by min_div={min_div}."
+        )
+
+    left = (out_w - in_w) // 2
+    right = out_w - in_w - left
+    top = (out_h - in_h) // 2
+    bottom = out_h - in_h - top
 
     pad = (left, right, top, bottom)
     unpad = (-left, -right, -top, -bottom)
