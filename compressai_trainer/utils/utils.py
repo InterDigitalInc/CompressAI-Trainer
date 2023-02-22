@@ -54,20 +54,6 @@ def tensor_to_np_img(x: torch.Tensor) -> np.ndarray:
 
 
 @torch.no_grad()
-def inference_single_image_uint8(
-    model, img: np.ndarray, device=None
-) -> tuple[np.ndarray, list[bytes]]:
-    """Run inference on a single HWC uint8 RGB image."""
-    x = np_img_to_tensor(img[None, ...])
-    x = x.to(device=device)
-    result = inference(model, x, skip_decompress=False)
-    x_hat = result["out_dec"]["x_hat"].cpu()
-    img_rec = tensor_to_np_img(x_hat).squeeze(0)
-    encoded = [s[0] for s in result["out_enc"]["strings"]]
-    return img_rec, encoded
-
-
-@torch.no_grad()
 def inference(model, x: torch.Tensor, skip_decompress: bool = False) -> dict[str, Any]:
     """Run compression model on image batch."""
     n, _, h, w = x.shape
