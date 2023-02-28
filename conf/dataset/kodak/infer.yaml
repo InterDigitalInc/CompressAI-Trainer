@@ -10,5 +10,7 @@ settings:
 transforms:
   - "ToTensor": {}
 meta:
+  name: "Kodak"
+  identifier: "image/kodak"
   num_samples: 24
   steps_per_epoch:

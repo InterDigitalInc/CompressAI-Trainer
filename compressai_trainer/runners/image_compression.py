@@ -80,10 +80,9 @@ RD_PLOT_DESCRIPTIONS = [
     "MS-SSIM (RGB)",
 ]
 
-RD_PLOT_TITLE = "Performance evaluation on Kodak - {metric}"
+RD_PLOT_TITLE = "Performance evaluation on {dataset} - {metric}"
 
 RD_PLOT_SETTINGS_COMMON: dict[str, Any] = dict(
-    dataset="image/kodak",
     codecs=[
         "bmshj2018-factorized",
         "bmshj2018-hyperprior",
@@ -243,14 +242,21 @@ class ImageCompressionRunner(BaseRunner):
             self._debug_outputs_logger.log(out_infer, i, img_path_prefix)
 
     def _log_rd_curves(self):
+        meta = self.hparams["dataset"]["infer"]["meta"]
         for metric, description in zip(RD_PLOT_METRICS, RD_PLOT_DESCRIPTIONS):
             self._rd_figure_logger.log(
                 runner=self,
                 df=self._current_dataframe,
                 traces=self._current_rd_traces(),
                 metric=metric,
+                dataset=meta["identifier"],
                 **RD_PLOT_SETTINGS_COMMON,
-                layout_kwargs=dict(title=RD_PLOT_TITLE.format(metric=description)),
+                layout_kwargs=dict(
+                    title=RD_PLOT_TITLE.format(
+                        dataset=meta["name"],
+                        metric=description,
+                    )
+                ),
             )
 
     def _setup_loader_metrics(self):
