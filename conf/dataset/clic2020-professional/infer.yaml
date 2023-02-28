@@ -1,0 +1,16 @@
+type: "ImageFolder"
+config:
+  root: "${paths.datasets}/clic2020-professional"
+  split: "test"
+loader:
+  shuffle: False
+  batch_size: 1
+  num_workers: 2
+settings:
+transforms:
+  - "ToTensor": {}
+meta:
+  name: "CLIC 2020 Professional"
+  identifier: "image/clic2020-professional"
+  num_samples: 250
+  steps_per_epoch:

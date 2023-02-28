@@ -1,0 +1,18 @@
+type: "ImageFolder"
+config:
+  root: "${paths.datasets}/clic2020-mobile"
+  split: "valid"
+loader:
+  shuffle: False
+  batch_size: 64
+  num_workers: 2
+settings:
+  patch_size: [ 256, 256, ]
+transforms:
+  - "CenterCrop": {size: "${....settings.patch_size}"}
+  - "ToTensor": {}
+meta:
+  name: "CLIC 2020 Mobile"
+  identifier: "image/clic2020-mobile"
+  num_samples: 61
+  steps_per_epoch:
