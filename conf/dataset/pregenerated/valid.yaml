@@ -13,5 +13,7 @@ transforms:
   - "CenterCrop": {size: "${....settings.patch_size}"}
   - "ToTensor": {}
 meta:
+  name: "Vimeo-90K"
+  identifier:
   num_samples: 43917
   steps_per_epoch:
