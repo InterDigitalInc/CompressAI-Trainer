@@ -29,7 +29,6 @@
 
 from __future__ import annotations
 
-import math
 from collections import defaultdict
 from typing import Any, cast
 
@@ -50,7 +49,7 @@ from compressai_trainer.utils.catalyst.loggers import (
     FigureSuperlogger,
 )
 from compressai_trainer.utils.compressai.results import compressai_dataframe
-from compressai_trainer.utils.metrics import compute_metrics
+from compressai_trainer.utils.metrics import compute_metrics, db
 from compressai_trainer.utils.utils import compute_padding, tensor_to_np_img
 
 from .base import BaseRunner
@@ -168,6 +167,7 @@ class ImageCompressionRunner(BaseRunner):
         out_criterion = self.criterion(out_net, x)
         out_metrics = compute_metrics(x, out_net["x_hat"], ["psnr", "ms-ssim"])
         out_metrics["bpp"] = out_infer["bpp"]
+        out_metrics["ms-ssim-db"] = db(1 - out_metrics["ms-ssim"])
 
         loss = {}
         loss["net"] = out_criterion["loss"]
@@ -202,16 +202,18 @@ class ImageCompressionRunner(BaseRunner):
             "bpp": r(self.loader_metrics["bpp"]),
             "psnr": r(self.loader_metrics["psnr"]),
             "ms-ssim": r(self.loader_metrics["ms-ssim"]),
-            "ms-ssim-db": r(-10 * math.log10(1 - self.loader_metrics["ms-ssim"])),
+            # NOTE: The dB of the mean of MS-SSIM samples
+            # is not the same as the mean of MS-SSIM dB samples.
+            "ms-ssim-db": r(db(1 - self.loader_metrics["ms-ssim"])),
         }
         return pd.DataFrame.from_dict([d])
 
-    def _current_rd_traces(self):
+    def _current_rd_traces(self, metric):
         lmbda = self.hparams["criterion"]["lmbda"]
         num_points = len(self._loader_metrics["bpp"])
         samples_scatter = go.Scatter(
             x=self._loader_metrics["bpp"],
-            y=self._loader_metrics["psnr"],
+            y=self._loader_metrics[metric],
             mode="markers",
             name=f'{self.hparams["model"]["name"]} {lmbda:.4f}',
             text=[f"lmbda={lmbda:.4f}\nsample_idx={i}" for i in range(num_points)],
@@ -229,8 +231,8 @@ class ImageCompressionRunner(BaseRunner):
 
     def _handle_custom_metrics(self, out_net, out_metrics):
         self._loader_metrics["chan_bpp"].update(out_net)
-        self._loader_metrics["bpp"].append(out_metrics["bpp"])
-        self._loader_metrics["psnr"].append(out_metrics["psnr"])
+        for metric in ["bpp", *RD_PLOT_METRICS]:
+            self._loader_metrics[metric].append(out_metrics[metric])
 
     def _log_outputs(self, x, out_infer):
         for i in range(len(x)):
@@ -247,7 +249,7 @@ class ImageCompressionRunner(BaseRunner):
             self._rd_figure_logger.log(
                 runner=self,
                 df=self._current_dataframe,
-                traces=self._current_rd_traces(),
+                traces=self._current_rd_traces(metric),
                 metric=metric,
                 dataset=meta["identifier"],
                 **RD_PLOT_SETTINGS_COMMON,
@@ -262,8 +264,7 @@ class ImageCompressionRunner(BaseRunner):
     def _setup_loader_metrics(self):
         self._loader_metrics = {
             "chan_bpp": ChannelwiseBppMeter(),
-            "bpp": [],
-            "psnr": [],
+            **{k: [] for k in ["bpp", *RD_PLOT_METRICS]},
         }
 
     def _setup_meters(self):
