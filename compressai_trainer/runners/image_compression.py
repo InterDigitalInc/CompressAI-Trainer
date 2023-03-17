@@ -291,10 +291,10 @@ def inference(model, x: torch.Tensor, skip_decompress: bool = False) -> dict[str
     out_enc = model.compress(x_padded)
     if not skip_decompress:
         out_dec = model.decompress(out_enc["strings"], out_enc["shape"])
+        out_dec["x_hat"] = F.pad(out_dec["x_hat"], unpad)
     else:
         out_dec = dict(out_net)
         del out_dec["likelihoods"]
-    out_dec["x_hat"] = F.pad(out_dec["x_hat"], unpad)
 
     # Compute bpp.
     num_bits = sum(sum(map(len, s)) for s in out_enc["strings"]) * 8.0
