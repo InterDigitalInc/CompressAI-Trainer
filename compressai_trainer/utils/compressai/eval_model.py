@@ -49,10 +49,12 @@ def load_checkpoint(arch: str, no_update: bool, checkpoint_path: str) -> nn.Modu
     else:
         run_root = m.group("run_root")
         conf = load_config(run_root)
-        model = load_checkpoint_from_config(conf).eval()
+        model = load_checkpoint_from_config(conf)
 
     if not no_update:
         model.update(force=True)
+
+    model = model.eval()
 
     return model
 
@@ -60,8 +62,8 @@ def load_checkpoint(arch: str, no_update: bool, checkpoint_path: str) -> nn.Modu
 def load_checkpoint_from_state_dict(arch: str, checkpoint_path: str):
     ckpt = torch.load(checkpoint_path)
     state_dict = state_dict_from_checkpoint(ckpt)
-    state_dict = load_state_dict(state_dict)  # for pre-trained models
-    model = MODELS[arch].from_state_dict(state_dict).eval()
+    state_dict = load_state_dict(state_dict)  # for zoo models
+    model = MODELS[arch].from_state_dict(state_dict)
     return model
 
 
