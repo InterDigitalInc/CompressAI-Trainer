@@ -131,7 +131,7 @@ class ImageCompressionRunner(BaseRunner):
 
     def handle_batch(self, batch):
         if self.is_infer_loader:
-            return self.predict_batch(batch)
+            return self._handle_batch_infer(batch)
 
         x = batch
         out_net = self.model(x)
@@ -159,11 +159,11 @@ class ImageCompressionRunner(BaseRunner):
         }
         self._update_batch_metrics(batch_metrics)
 
-    def predict_batch(self, batch):
+    def _handle_batch_infer(self, batch):
         x = batch.to(self.engine.device)
-
-        out_infer = inference(self.model_module, x)
+        out_infer = self.predict_batch(x)
         out_net = out_infer["out_net"]
+
         out_criterion = self.criterion(out_net, x)
         out_metrics = compute_metrics(x, out_net["x_hat"], ["psnr", "ms-ssim"])
         out_metrics["bpp"] = out_infer["bpp"]
@@ -184,6 +184,11 @@ class ImageCompressionRunner(BaseRunner):
         self._handle_custom_metrics(out_net, out_metrics)
 
         self._log_outputs(x, out_infer)
+
+    def predict_batch(self, batch):
+        x = batch.to(self.engine.device)
+        out_infer = inference(self.model_module, x)
+        return out_infer
 
     def on_loader_end(self, runner):
         super().on_loader_end(runner)
