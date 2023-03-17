@@ -29,7 +29,7 @@ CompressAI
    :members:
    :undoc-members:
 
-.. automodule:: compressai_trainer.utils.compressai.update_and_eval_model
+.. automodule:: compressai_trainer.utils.compressai.eval_model
    :members:
    :undoc-members:
 

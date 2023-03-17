@@ -34,7 +34,7 @@ Example usage:
 .. code-block:: bash
 
     python -m compressai_trainer.utils.compressai \
-        update_and_eval_model \
+        eval_model \
         checkpoint \
         --architecture="bmshj2018-factorized" \
         --path="$HOME/data/runs/e4e6d4d5e5c59c69f3bd7be2/checkpoints/runner.best.pth" \
@@ -45,18 +45,26 @@ Example usage:
 import importlib
 import sys
 
-if __name__ == "__main__":
+
+def _get_module_main(util_name: str):
+    if util_name == "eval_model":
+        from . import eval_model
+
+        return eval_model.main
+
+    module = importlib.import_module(
+        f"compressai.utils.{util_name}.__main__",
+    )
+    return module.main
+
+
+def main():
     import compressai.models as _
 
     _, util_name, *argv = sys.argv
-    if util_name == "update_and_eval_model":
-        from . import update_and_eval_model
+    module_main = _get_module_main(util_name)
+    module_main(argv)
 
-        main = update_and_eval_model.main
-    else:
-        module = importlib.import_module(
-            f"compressai.utils.{util_name}.__main__",
-        )
-        main = module.main
 
-    main(argv)
+if __name__ == "__main__":
+    main()
