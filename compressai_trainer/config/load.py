@@ -52,7 +52,7 @@ if TYPE_CHECKING:
 def load_config(run_root: str) -> DictConfig:
     """Returns config file given run root path.
 
-    Example of run root path: `/path/to/runs/e4e6d4d5e5c59c69f3bd7be2`.
+    Example of run root path: ``/path/to/runs/e4e6d4d5e5c59c69f3bd7be2``.
     """
     config_path = os.path.join(run_root, outputs.CONFIG_DIR, outputs.CONFIG_NAME)
     conf = OmegaConf.load(config_path)

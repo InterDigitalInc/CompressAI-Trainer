@@ -39,21 +39,29 @@ from compressai_trainer.config import load_checkpoint as load_checkpoint_from_co
 from compressai_trainer.config import load_config, state_dict_from_checkpoint
 
 
-def load_checkpoint(arch: str, checkpoint_path: str) -> nn.Module:
+def load_checkpoint(arch: str, no_update: bool, checkpoint_path: str) -> nn.Module:
     # NOTE a bit hacky
     pattern = r"^(?P<run_root>.*/runs/(?P<run_hash>[^/]*))/checkpoints/.*$"
     m = re.match(pattern, checkpoint_path)
 
     if m is None:
-        ckpt = torch.load(checkpoint_path)
-        state_dict = state_dict_from_checkpoint(ckpt)
-        state_dict = load_state_dict(state_dict)  # for pre-trained models
-        model = MODELS[arch].from_state_dict(state_dict).eval()
+        model = load_checkpoint_from_state_dict(arch, checkpoint_path)
     else:
         run_root = m.group("run_root")
         conf = load_config(run_root)
         model = load_checkpoint_from_config(conf).eval()
-    model.update(force=True)  # type: ignore
+
+    if not no_update:
+        model.update(force=True)
+
+    return model
+
+
+def load_checkpoint_from_state_dict(arch: str, checkpoint_path: str):
+    ckpt = torch.load(checkpoint_path)
+    state_dict = state_dict_from_checkpoint(ckpt)
+    state_dict = load_state_dict(state_dict)  # for pre-trained models
+    model = MODELS[arch].from_state_dict(state_dict).eval()
     return model
 
 
