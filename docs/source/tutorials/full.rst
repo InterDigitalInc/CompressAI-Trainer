@@ -454,15 +454,19 @@ Resuming training
 Loading model checkpoints/weights
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. note:: This starts a *fresh* run in the experiment tracker with a new run hash. To log to an existing run, see :ref:`continuing-run`.
+
 To load a checkpoint containing model/optimizer/scheduler/etc state, override ``paths.checkpoint``:
 
 .. code-block:: bash
 
     ++paths.checkpoint="/path/to/checkpoints/runner.last.pth"
 
-To load *only* the model ``state_dict`` (i.e. weights), and not other training state, override ``paths.model_checkpoint`` instead.
+To load *only* the model ``state_dict`` (i.e. weights), and not other training state, override ``paths.model_checkpoint`` instead:
 
-.. note:: This starts a *fresh* run with a new run hash. To log to an existing run, see :ref:`continuing-run`.
+.. code-block:: bash
+
+    ++paths.model_checkpoint="/path/to/checkpoints/runner.last.pth"
 
 
 .. _continuing-run:
@@ -479,7 +483,7 @@ To continue an existing run that was paused/cancelled during training, load the 
 
     --config-path="${RUNS_ROOT}/${RUN_HASH}/configs"
     --config-name="config"
-    ++paths.checkpoint="${paths.checkpoints}/runner.last.pth"
+    ++paths.checkpoint='${paths.checkpoints}/runner.last.pth'
 
 
 
