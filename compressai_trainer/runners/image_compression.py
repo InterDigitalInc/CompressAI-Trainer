@@ -281,20 +281,24 @@ def inference(model, x: torch.Tensor, skip_decompress: bool = False) -> dict[str
     """Run compression model on image batch."""
     n, _, h, w = x.shape
     pad, unpad = compute_padding(h, w)
-
     x_padded = F.pad(x, pad, mode="constant", value=0)
+
+    # Compress using forward.
     out_net = model(x_padded)
     out_net["x_hat"] = F.pad(out_net["x_hat"], unpad)
+
+    # Compress using compress/decompress.
     out_enc = model.compress(x_padded)
-    if skip_decompress:
+    if not skip_decompress:
+        out_dec = model.decompress(out_enc["strings"], out_enc["shape"])
+    else:
         out_dec = dict(out_net)
         del out_dec["likelihoods"]
-    else:
-        out_dec = model.decompress(out_enc["strings"], out_enc["shape"])
     out_dec["x_hat"] = F.pad(out_dec["x_hat"], unpad)
 
-    num_pixels = n * h * w
+    # Compute bpp.
     num_bits = sum(sum(map(len, s)) for s in out_enc["strings"]) * 8.0
+    num_pixels = n * h * w
     bpp = num_bits / num_pixels
 
     return {
