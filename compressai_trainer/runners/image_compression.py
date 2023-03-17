@@ -277,10 +277,15 @@ class ImageCompressionRunner(BaseRunner):
 
 
 @torch.no_grad()
-def inference(model, x: torch.Tensor, skip_decompress: bool = False) -> dict[str, Any]:
+def inference(
+    model: CompressionModel,
+    x: torch.Tensor,
+    skip_decompress: bool = False,
+    min_div: int = 64,
+) -> dict[str, Any]:
     """Run compression model on image batch."""
     n, _, h, w = x.shape
-    pad, unpad = compute_padding(h, w)
+    pad, unpad = compute_padding(h, w, min_div=min_div)
     x_padded = F.pad(x, pad, mode="constant", value=0)
 
     # Compress using forward.
