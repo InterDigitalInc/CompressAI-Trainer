@@ -403,6 +403,7 @@ class RdFigureLogger:
         loader: str = "infer",
         metric: str = "psnr",
         opt_metric: str = "mse",
+        log_figure: bool = True,
         **kwargs,
     ):
         hover_data = kwargs.get("scatter_kwargs", {}).get("hover_data", [])
@@ -416,15 +417,17 @@ class RdFigureLogger:
         fig = plot_rd(df, metric=metric, **kwargs)
         for trace in traces:
             fig.add_trace(trace)
-        context = {
-            # "_" is used to order the figures in the experiment tracker.
-            "_": int(metric != (opt_metric if opt_metric != "mse" else "psnr")),
-            "dataset": dataset,
-            "loader": loader,
-            "metric": metric,
-            "opt_metric": opt_metric,
-        }
-        runner.log_figure(f"rd-curves", fig, context=context)
+        if log_figure:
+            context = {
+                # "_" is used to order the figures in the experiment tracker.
+                "_": int(metric != (opt_metric if opt_metric != "mse" else "psnr")),
+                "dataset": dataset,
+                "loader": loader,
+                "metric": metric,
+                "opt_metric": opt_metric,
+            }
+            runner.log_figure(f"rd-curves", fig, context=context)
+        return fig
 
 
 def _reorder_dataframe_columns(df: pd.DataFrame, head: list[str]) -> pd.DataFrame:
