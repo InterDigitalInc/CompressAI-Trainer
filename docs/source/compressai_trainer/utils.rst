@@ -25,14 +25,6 @@ Catalyst
 CompressAI
 ~~~~~~~~~~
 
-.. automodule:: compressai_trainer.utils.compressai.__main__
-   :members:
-   :undoc-members:
-
-.. automodule:: compressai_trainer.utils.compressai.eval_model
-   :members:
-   :undoc-members:
-
 .. automodule:: compressai_trainer.utils.compressai.results
    :members:
    :undoc-members:
