@@ -27,12 +27,13 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from . import config, plot, registry, runners, typing, utils
+from . import config, plot, registry, run, runners, typing, utils
 
 __all__ = [
     "config",
     "plot",
     "registry",
+    "run",
     "runners",
     "typing",
     "utils",

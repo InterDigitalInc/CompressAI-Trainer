@@ -85,7 +85,7 @@ To train a model using the example configuration, run:
 .. code-block:: bash
 
     # Train using conf/example.yaml, and override criterion.lmbda.
-    python train.py --config-name="example" ++criterion.lmbda=0.035
+    python -m compressai_trainer.run.train --config-name="example" ++criterion.lmbda=0.035
 
 This creates a new and unique Aim run hash that is specific to the training run. For more details on output logs directory structure, see the section :ref:`output-directory-structure`.
 
@@ -378,7 +378,7 @@ One may also define or override configuration within the YAML file itself:
           batch_size: 8
 
     # Alternatively, one can also override the above via a command line argument:
-    # python train.py [...] ++dataset.train.loader.batch_size=8
+    # python -m compressai_trainer.run.train [...] ++dataset.train.loader.batch_size=8
 
 
 Creating your own config
@@ -421,7 +421,7 @@ Modify it as desired. Then, train using:
 
 .. code-block:: bash
 
-    python train.py --config-name="custom-config"
+    python -m compressai_trainer.run.train --config-name="custom-config"
 
 
 Specify and override configuration via command line (CLI) arguments
@@ -431,7 +431,7 @@ For example, this overrides ``criterion.lmbda``:
 
 .. code-block:: bash
 
-    python train.py --config-name="example" ++criterion.lmbda=0.035
+    python -m compressai_trainer.run.train --config-name="example" ++criterion.lmbda=0.035
 
 The above is equivalent to the following YAML configuration:
 
@@ -521,5 +521,5 @@ Example usage:
 
 .. code-block:: bash
 
-    python train.py --config-name="example" $TRAIN_CHECK
+    python -m compressai_trainer.run.train --config-name="example" $TRAIN_CHECK
 

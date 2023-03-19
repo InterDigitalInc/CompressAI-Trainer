@@ -26,16 +26,3 @@
 # WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-import warnings
-
-from compressai_trainer.run.train import main
-
-if __name__ == "__main__":
-    message = (
-        "This script is deprecated.\n"
-        "Please run using `python -m compressai_trainer.run.train` instead."
-    )
-    warnings.warn(message, DeprecationWarning)
-
-    main()

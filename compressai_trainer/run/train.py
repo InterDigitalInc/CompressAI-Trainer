@@ -27,15 +27,63 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import warnings
+from __future__ import annotations
 
-from compressai_trainer.run.train import main
+from typing import Any
+
+import catalyst
+import catalyst.callbacks
+import catalyst.utils
+import hydra
+from omegaconf import DictConfig
+
+from compressai_trainer.config import (
+    configure_conf,
+    configure_engine,
+    create_criterion,
+    create_dataloaders,
+    create_model,
+    create_optimizer,
+    create_runner,
+    create_scheduler,
+    write_outputs,
+)
+from compressai_trainer.typing import TRunner
+
+
+def setup(conf: DictConfig) -> tuple[TRunner, dict[str, Any]]:
+    catalyst.utils.set_global_seed(conf.misc.seed)
+    catalyst.utils.prepare_cudnn(benchmark=True)
+
+    configure_conf(conf)
+
+    model = create_model(conf)
+    criterion = create_criterion(conf.criterion)
+    optimizer = create_optimizer(conf.optimizer, model)
+    scheduler = create_scheduler(conf.scheduler, optimizer)
+    loaders = create_dataloaders(conf)
+
+    d = dict(
+        model=model,
+        criterion=criterion,
+        optimizer=optimizer,
+        scheduler=scheduler,
+        loaders=loaders,
+    )
+    engine_kwargs = {**d, **configure_engine(conf)}
+
+    runner = create_runner(conf.runner)
+
+    write_outputs(conf)
+
+    return runner, engine_kwargs
+
+
+@hydra.main(version_base=None, config_path="conf")
+def main(conf: DictConfig):
+    runner, engine_kwargs = setup(conf)
+    runner.train(**engine_kwargs)
+
 
 if __name__ == "__main__":
-    message = (
-        "This script is deprecated.\n"
-        "Please run using `python -m compressai_trainer.run.train` instead."
-    )
-    warnings.warn(message, DeprecationWarning)
-
     main()
