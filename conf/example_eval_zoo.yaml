@@ -1,0 +1,18 @@
+defaults:
+  - paths: default
+  - env: default
+  - runner: ImageCompressionRunner
+  - criterion: RateDistortionLoss
+  - misc: default
+  - dataset@dataset.infer: kodak/infer
+  - _self_
+
+paths:
+  output_dir: "outputs"
+
+model:
+  source: "zoo"
+  name: "bmshj2018-factorized"
+  metric: "mse"
+  quality: 3
+  pretrained: True
