@@ -29,6 +29,7 @@
 
 from __future__ import annotations
 
+import time
 from collections import defaultdict
 from typing import Any, cast
 
@@ -298,13 +299,19 @@ def inference(
     out_net["x_hat"] = F.pad(out_net["x_hat"], unpad)
 
     # Compress using compress/decompress.
+    start = time.time()
     out_enc = model.compress(x_padded)
+    enc_time = time.time() - start
+
     if not skip_decompress:
+        start = time.time()
         out_dec = model.decompress(out_enc["strings"], out_enc["shape"])
+        dec_time = time.time() - start
         out_dec["x_hat"] = F.pad(out_dec["x_hat"], unpad)
     else:
         out_dec = dict(out_net)
         del out_dec["likelihoods"]
+        dec_time = None
 
     # Compute bpp.
     num_bits = sum(sum(map(len, s)) for s in out_enc["strings"]) * 8.0
@@ -316,6 +323,8 @@ def inference(
         "out_enc": out_enc,
         "out_dec": out_dec,
         "bpp": bpp,
+        "encoding_time": enc_time,
+        "decoding_time": dec_time,
     }
 
 
