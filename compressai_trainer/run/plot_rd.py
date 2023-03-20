@@ -27,6 +27,11 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+"""
+RD curves plotter.
+
+See :ref:`tools-plot_rd` for more information.
+"""
 
 from __future__ import annotations
 
