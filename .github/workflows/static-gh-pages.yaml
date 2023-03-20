@@ -19,6 +19,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          poetry config installer.modern-installation false
           poetry install --with=docs
 
       - name: Install dependencies (compressai)
