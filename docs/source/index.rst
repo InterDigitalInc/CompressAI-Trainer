@@ -56,6 +56,7 @@ These tools give researchers more flexibility, experiment reproducibility, exper
    compressai_trainer/config
    compressai_trainer/plot
    compressai_trainer/registry
+   compressai_trainer/run
    compressai_trainer/runners
    compressai_trainer/typing
    compressai_trainer/utils
