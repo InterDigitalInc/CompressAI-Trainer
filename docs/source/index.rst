@@ -66,7 +66,10 @@ These tools give researchers more flexibility, experiment reproducibility, exper
    :caption: Tools
    :hidden:
 
+   tools/train
+   tools/eval_model
    tools/rd_plotter
+   tools/compressai
 
 .. toctree::
    :caption: Development

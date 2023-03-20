@@ -3,7 +3,9 @@
 Plot an RD curve
 ================
 
-:py:mod:`compressai_trainer.run.plot_rd` is an RD curve plotter that can query metrics from the experiment tracker (Aim).
+Documentation for :py:mod:`compressai_trainer.run.plot_rd`.
+
+This is an RD curve plotter that can query metrics from the experiment tracker (Aim).
 
 Users may specify what to plot using groups of the CLI flags
 ``--query``, ``--curves``, and ``--pareto``.

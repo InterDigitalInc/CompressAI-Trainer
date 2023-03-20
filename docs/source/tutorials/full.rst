@@ -1,3 +1,5 @@
+.. _tutorials-walkthrough:
+
 Walkthrough
 ===========
 
