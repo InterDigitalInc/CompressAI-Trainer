@@ -6,7 +6,7 @@ authors = ["InterDigital AI Lab <compressai@interdigital.com>"]
 license = "BSD 3-Clause Clear License"
 
 [tool.poetry.dependencies]
-python = ">=3.8.0,<3.11"
+python = ">=3.8.0,<3.12"
 accelerate = "0.15.0"
 aim = "^3.16.0"
 catalyst = "22.04"
