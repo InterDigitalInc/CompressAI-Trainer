@@ -1,0 +1,633 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Plot an RD curve &#8212; CompressAI Trainer</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Use compressai.utils" href="compressai.html" />
+    <link rel="prev" title="Evaluate a model" href="eval_model.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../index.html">
+      
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="../_static/logo.png" class="logo" alt="logo">
+      
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        <ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../index.html">
+   Home
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Guides
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../tutorials/installation.html">
+   Installation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../tutorials/full.html">
+   Walkthrough
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  CompressAI Trainer API
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../compressai_trainer/config.html">
+   compressai_trainer.config
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../compressai_trainer/plot.html">
+   compressai_trainer.plot
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../compressai_trainer/registry.html">
+   compressai_trainer.registry
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../compressai_trainer/run.html">
+   compressai_trainer.run
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../compressai_trainer/runners.html">
+   compressai_trainer.runners
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../compressai_trainer/typing.html">
+   compressai_trainer.typing
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../compressai_trainer/utils.html">
+   compressai_trainer.utils
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Tools
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="train.html">
+   Train a model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="eval_model.html">
+   Evaluate a model
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   Plot an RD curve
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="compressai.html">
+   Use
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     compressai.utils
+    </span>
+   </code>
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Development
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference external" href="https://github.com/InterDigitalInc/CompressAI-Trainer/">
+   Github repository
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
+
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
+        
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right"><a href="https://github.com/InterDigitalInc/CompressAI-Trainer/"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="bottom"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="../_sources/tools/rd_plotter.rst.txt"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.rst</span>
+</a>
+
+      </li>
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#cli-help">
+   CLI help
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#aim-repo">
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       --aim_repo
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#query">
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       --query
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#curves">
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       --curves
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#pareto">
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       --pareto
+      </span>
+     </code>
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#examples">
+   Examples
+  </a>
+ </li>
+</ul>
+
+    </nav>
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>Plot an RD curve</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#cli-help">
+   CLI help
+  </a>
+  <ul class="nav section-nav flex-column">
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#aim-repo">
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       --aim_repo
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#query">
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       --query
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#curves">
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       --curves
+      </span>
+     </code>
+    </a>
+   </li>
+   <li class="toc-h3 nav-item toc-entry">
+    <a class="reference internal nav-link" href="#pareto">
+     <code class="docutils literal notranslate">
+      <span class="pre">
+       --pareto
+      </span>
+     </code>
+    </a>
+   </li>
+  </ul>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#examples">
+   Examples
+  </a>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
+  <section id="plot-an-rd-curve">
+<span id="tools-plot-rd"></span><h1>Plot an RD curve<a class="headerlink" href="#plot-an-rd-curve" title="Permalink to this headline">#</a></h1>
+<p>Documentation for <a class="reference internal" href="../compressai_trainer/run.html#module-compressai_trainer.run.plot_rd" title="compressai_trainer.run.plot_rd"><code class="xref py py-mod docutils literal notranslate"><span class="pre">compressai_trainer.run.plot_rd</span></code></a>.</p>
+<p>This is an RD curve plotter that can query metrics from the experiment tracker (Aim).</p>
+<p>Users may specify what to plot using groups of the CLI flags
+<code class="docutils literal notranslate"><span class="pre">--query</span></code>, <code class="docutils literal notranslate"><span class="pre">--curves</span></code>, and <code class="docutils literal notranslate"><span class="pre">--pareto</span></code>.
+If desired, one may plot multiple query groups within the same plot.</p>
+<section id="cli-help">
+<h2>CLI help<a class="headerlink" href="#cli-help" title="Permalink to this headline">#</a></h2>
+<section id="aim-repo">
+<h3><code class="docutils literal notranslate"><span class="pre">--aim_repo</span></code><a class="headerlink" href="#aim-repo" title="Permalink to this headline">#</a></h3>
+<p>Aim repo to query metrics from.</p>
+</section>
+<section id="query">
+<h3><code class="docutils literal notranslate"><span class="pre">--query</span></code><a class="headerlink" href="#query" title="Permalink to this headline">#</a></h3>
+<p>Query selector for relevant runs to aggregate plotting data from.</p>
+<p>Default:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>--query<span class="o">=</span><span class="s1">&#39;&#39;</span><span class="w">  </span><span class="c1"># Gets all runs.</span>
+</pre></div>
+</div>
+<p>Examples:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>--query<span class="o">=</span><span class="s1">&#39;run.hash == &quot;e4e6d4d5e5c59c69f3bd7be2&quot;&#39;</span>
+--query<span class="o">=</span><span class="s1">&#39;run.model.name == &quot;bmshj2018-factorized&quot;&#39;</span>
+--query<span class="o">=</span><span class="s1">&#39;run.experiment.startswith(&quot;some-prefix-&quot;)&#39;</span>
+--query<span class="o">=</span><span class="s1">&#39;run.created_at &gt;= datetime(1970, 1, 1)&#39;</span>
+--query<span class="o">=</span><span class="s1">&#39;run.criterion.lmbda &lt; 0.02 and run.hp.M == 3 * 2**6&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="curves">
+<h3><code class="docutils literal notranslate"><span class="pre">--curves</span></code><a class="headerlink" href="#curves" title="Permalink to this headline">#</a></h3>
+<p>For the current query, specify a grouping and format for the
+curves. One may specify multiple such groupings for a given
+query within a list. Each unique “name” produces a unique curve.
+If a key (e.g. <code class="docutils literal notranslate"><span class="pre">&quot;name&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;x&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;y&quot;</span></code>) is not specified,
+its default value is used.
+For <code class="docutils literal notranslate"><span class="pre">&quot;name&quot;</span></code>, one may specify a hparam by key via <code class="docutils literal notranslate"><span class="pre">&quot;{hparam}&quot;</span></code>.</p>
+<p>Default (where <code class="docutils literal notranslate"><span class="pre">--x=&quot;bpp&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">--y=&quot;psnr&quot;</span></code>):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>--curves<span class="o">=</span><span class="s1">&#39;[{&quot;name&quot;: &quot;{experiment}&quot;, &quot;x&quot;: args.x, &quot;y&quot;: args.y}]&#39;</span>
+</pre></div>
+</div>
+<p>Examples:</p>
+<ul>
+<li><p>Show both model name and experiment name:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>--curves<span class="o">=</span><span class="s1">&#39;[{&quot;name&quot;: &quot;{model.name} {experiment}&quot;}]&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Group by <code class="docutils literal notranslate"><span class="pre">hp.M</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>--curves<span class="o">=</span><span class="s1">&#39;[{&quot;name&quot;: &quot;{experiment} (M={hp.M})&quot;}]&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Multiple metrics as separate curves:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>--curves<span class="o">=</span><span class="s1">&#39;[</span>
+<span class="s1">    {&quot;name&quot;: &quot;{experiment} (RGB-PSNR)&quot;, &quot;y&quot;: &quot;psnr_rgb&quot;},</span>
+<span class="s1">    {&quot;name&quot;: &quot;{experiment} (YUV-PSNR)&quot;, &quot;y&quot;: &quot;psnr_yuv&quot;},</span>
+<span class="s1">]&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Multi-rate models (e.g. G-VAE):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>--curves<span class="o">=</span><span class="s1">&#39;[{</span>
+<span class="s1">    &quot;name&quot;: &quot;{experiment} {run.hash}&quot;,</span>
+<span class="s1">    &quot;x&quot;: [&quot;bpp_0&quot;, &quot;bpp_1&quot;, &quot;bpp_2&quot;, &quot;bpp_3&quot;],</span>
+<span class="s1">    &quot;y&quot;: [&quot;psnr_0&quot;, &quot;psnr_1&quot;, &quot;psnr_2&quot;, &quot;psnr_3&quot;],</span>
+<span class="s1">}]&#39;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+<section id="pareto">
+<h3><code class="docutils literal notranslate"><span class="pre">--pareto</span></code><a class="headerlink" href="#pareto" title="Permalink to this headline">#</a></h3>
+<p>Show only pareto-optimal points on curve for respective query.</p>
+<p>Default:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>--pareto<span class="o">=</span>False
+</pre></div>
+</div>
+</section>
+</section>
+<section id="examples">
+<h2>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">#</a></h2>
+<ul>
+<li><p>Plot all experiments since date, automatically grouping curves by experiment/model:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>compressai_trainer.run.plot_rd<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--aim_repo<span class="o">=</span><span class="s2">&quot;./logs/aim/main&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--query<span class="o">=</span><span class="s1">&#39;run.created_at &gt;= datetime(1970, 1, 1)&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Plot simple curve for specific run hashes:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>compressai_trainer.run.plot_rd<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--aim_repo<span class="o">=</span><span class="s2">&quot;./logs/aim/main&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--query<span class="o">=</span><span class="s1">&#39;run.hash in [</span>
+<span class="s1">        &quot;e4e6d4d5e5c59c69f3bd7be2&quot;,</span>
+<span class="s1">        &quot;b3d5Bb2c5e3a6f49c69f39f6&quot;,</span>
+<span class="s1">        &quot;d4e6e4c5e5d59c69f3bd7bd3&quot;,</span>
+<span class="s1">        ...</span>
+<span class="s1">    ]&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Plot single multi-rate model (e.g. G-VAE):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>compressai_trainer.run.plot_rd<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--aim_repo<span class="o">=</span><span class="s2">&quot;./logs/aim/main&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--query<span class="o">=</span><span class="s1">&#39;run.hash == &quot;e4e6d4d5e5c59c69f3bd7be2&quot;&#39;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--curves<span class="o">=</span><span class="s1">&#39;[{</span>
+<span class="s1">        &quot;x&quot;: [&quot;bpp_0&quot;, &quot;bpp_1&quot;, &quot;bpp_2&quot;, &quot;bpp_3&quot;],</span>
+<span class="s1">        &quot;y&quot;: [&quot;psnr_0&quot;, &quot;psnr_1&quot;, &quot;psnr_2&quot;, &quot;psnr_3&quot;],</span>
+<span class="s1">    }]&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Plot multiple metrics (e.g. <code class="docutils literal notranslate"><span class="pre">psnr_rgb</span></code> and <code class="docutils literal notranslate"><span class="pre">psnr_low</span></code>) on the same plot:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>compressai_trainer.run.plot_rd<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--aim_repo<span class="o">=</span><span class="s2">&quot;./logs/aim/main&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--curves<span class="o">=</span><span class="s1">&#39;[</span>
+<span class="s1">        {&quot;name&quot;: &quot;{experiment} (RGB-PSNR)&quot;, &quot;y&quot;: &quot;psnr_rgb&quot;},</span>
+<span class="s1">        {&quot;name&quot;: &quot;{experiment} (YUV-PSNR)&quot;, &quot;y&quot;: &quot;psnr_yuv&quot;},</span>
+<span class="s1">    ]&#39;</span>
+</pre></div>
+</div>
+</li>
+<li><p>Plot multiple metrics (e.g. <code class="docutils literal notranslate"><span class="pre">psnr_base</span></code> and <code class="docutils literal notranslate"><span class="pre">psnr_enhancement</span></code>) on the same plot:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>compressai_trainer.run.plot_rd<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--aim_repo<span class="o">=</span><span class="s2">&quot;./logs/aim/main&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--curves<span class="o">=</span><span class="s1">&#39;[</span>
+<span class="s1">        {&quot;name&quot;: &quot;{experiment} (base layer)&quot;, &quot;y&quot;: &quot;psnr_base&quot;},</span>
+<span class="s1">        {&quot;name&quot;: &quot;{experiment} (enhancement layer)&quot;, &quot;y&quot;: &quot;psnr_enhancement&quot;},</span>
+<span class="s1">    ]&#39;</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</section>
+</section>
+
+
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="eval_model.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">Evaluate a model</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="compressai.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Use <code class="docutils literal notranslate"><span class="pre">compressai.utils</span></code></p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By InterDigital Communications, Inc.<br/>
+  
+      &copy; Copyright 2023, InterDigital Communications, Inc.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+
+  </body>
+</html>

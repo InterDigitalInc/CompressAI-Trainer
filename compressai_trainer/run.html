@@ -1,0 +1,639 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>compressai_trainer.run &#8212; CompressAI Trainer</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="../_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="../_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" href="../_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="compressai_trainer.runners" href="runners.html" />
+    <link rel="prev" title="compressai_trainer.registry" href="registry.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="../index.html">
+      
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="../_static/logo.png" class="logo" alt="logo">
+      
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="../search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        <ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../index.html">
+   Home
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Guides
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../tutorials/installation.html">
+   Installation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../tutorials/full.html">
+   Walkthrough
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  CompressAI Trainer API
+ </span>
+</p>
+<ul class="current nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="config.html">
+   compressai_trainer.config
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="plot.html">
+   compressai_trainer.plot
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="registry.html">
+   compressai_trainer.registry
+  </a>
+ </li>
+ <li class="toctree-l1 current active">
+  <a class="current reference internal" href="#">
+   compressai_trainer.run
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="runners.html">
+   compressai_trainer.runners
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="typing.html">
+   compressai_trainer.typing
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="utils.html">
+   compressai_trainer.utils
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Tools
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="../tools/train.html">
+   Train a model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../tools/eval_model.html">
+   Evaluate a model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../tools/rd_plotter.html">
+   Plot an RD curve
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="../tools/compressai.html">
+   Use
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     compressai.utils
+    </span>
+   </code>
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Development
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference external" href="https://github.com/InterDigitalInc/CompressAI-Trainer/">
+   Github repository
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
+
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
+        
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right"><a href="https://github.com/InterDigitalInc/CompressAI-Trainer/"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="bottom"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+<div class="menu-dropdown menu-dropdown-download-buttons">
+  <button class="headerbtn menu-dropdown__trigger"
+      aria-label="Download this page">
+      <i class="fas fa-download"></i>
+  </button>
+  <div class="menu-dropdown__content">
+    <ul>
+      <li>
+        <a href="../_sources/compressai_trainer/run.rst.txt"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="left"
+title="Download source file"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file"></i>
+  </span>
+<span class="headerbtn__text-container">.rst</span>
+</a>
+
+      </li>
+      
+      <li>
+        
+<button onclick="printPdf(this)"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="left"
+title="Print to PDF"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-file-pdf"></i>
+  </span>
+<span class="headerbtn__text-container">.pdf</span>
+</button>
+
+      </li>
+      
+    </ul>
+  </div>
+</div>
+<label for="__page-toc"
+  class="headerbtn headerbtn-page-toc"
+  
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-list"></i>
+  </span>
+
+</label>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+    <div class="tocsection onthispage pt-5 pb-3">
+        <i class="fas fa-list"></i> Contents
+    </div>
+    <nav id="bd-toc-nav" aria-label="Page">
+        <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-compressai_trainer.run.train">
+   train
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-compressai_trainer.run.eval_model">
+   eval_model
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-compressai_trainer.run.plot_rd">
+   plot_rd
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-compressai_trainer.run.compressai">
+   compressai
+  </a>
+ </li>
+</ul>
+
+    </nav>
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1>compressai_trainer.run</h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                        <div>
+                            <h2> Contents </h2>
+                        </div>
+                        <nav aria-label="Page">
+                            <ul class="visible nav section-nav flex-column">
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-compressai_trainer.run.train">
+   train
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-compressai_trainer.run.eval_model">
+   eval_model
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-compressai_trainer.run.plot_rd">
+   plot_rd
+  </a>
+ </li>
+ <li class="toc-h2 nav-item toc-entry">
+  <a class="reference internal nav-link" href="#module-compressai_trainer.run.compressai">
+   compressai
+  </a>
+ </li>
+</ul>
+
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
+  <section id="compressai-trainer-run">
+<h1>compressai_trainer.run<a class="headerlink" href="#compressai-trainer-run" title="Permalink to this headline">#</a></h1>
+<p>Runnable CLI utilities, including:</p>
+<table class="colwidths-given table">
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 75%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Module name</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference internal" href="#module-compressai_trainer.run.train" title="compressai_trainer.run.train"><code class="xref py py-mod docutils literal notranslate"><span class="pre">train</span></code></a></p></td>
+<td><p>Training.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#module-compressai_trainer.run.eval_model" title="compressai_trainer.run.eval_model"><code class="xref py py-mod docutils literal notranslate"><span class="pre">eval_model</span></code></a></p></td>
+<td><p>Evaluate metrics and generate outputs (e.g. bitstreams, reconstructed input) on input dataset.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#module-compressai_trainer.run.plot_rd" title="compressai_trainer.run.plot_rd"><code class="xref py py-mod docutils literal notranslate"><span class="pre">plot_rd</span></code></a></p></td>
+<td><p>RD curve plotter that can query metrics from the experiment tracker (Aim).</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#module-compressai_trainer.run.compressai" title="compressai_trainer.run.compressai"><code class="xref py py-mod docutils literal notranslate"><span class="pre">compressai</span></code></a></p></td>
+<td><p>Wrapper around <code class="xref py py-mod docutils literal notranslate"><span class="pre">compressai.utils</span></code> to work with CompressAI Trainer.</p></td>
+</tr>
+</tbody>
+</table>
+<section id="module-compressai_trainer.run.train">
+<span id="train"></span><h2>train<a class="headerlink" href="#module-compressai_trainer.run.train" title="Permalink to this headline">#</a></h2>
+<p>Train a model.</p>
+<p>Please see <a class="reference internal" href="../tutorials/full.html#tutorials-walkthrough"><span class="std std-ref">Walkthrough</span></a> for a complete guide.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="compressai_trainer.run.train.main">
+<span class="sig-prename descclassname"><span class="pre">compressai_trainer.run.train.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">omegaconf.dictconfig.DictConfig</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compressai_trainer/run/train.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.run.train.main" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="compressai_trainer.run.train.setup">
+<span class="sig-prename descclassname"><span class="pre">compressai_trainer.run.train.</span></span><span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">omegaconf.dictconfig.DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://catalyst-team.github.io/catalyst/api/runners.html#catalyst.runners.runner.Runner" title="(in Catalyst v22.04)"><span class="pre">catalyst.runners.runner.Runner</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.11)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/compressai_trainer/run/train.html#setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.run.train.setup" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-compressai_trainer.run.eval_model">
+<span id="eval-model"></span><h2>eval_model<a class="headerlink" href="#module-compressai_trainer.run.eval_model" title="Permalink to this headline">#</a></h2>
+<p>Evaluate a model.</p>
+<p>Evaluates a model on the configured <code class="docutils literal notranslate"><span class="pre">dataset.infer</span></code> (i.e. test set).
+Saves bitstreams and reconstructed images to <code class="docutils literal notranslate"><span class="pre">paths.output_dir</span></code>.
+Computes metrics and saves per-file results and averaged results to
+JSON and TSV files.</p>
+<p>To evaluate a model trained using CompressAI Trainer:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>compressai_trainer.run.eval_model<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-path<span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/data/runs/e4e6d4d5e5c59c69f3bd7be2/configs&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;config&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>++model.source<span class="o">=</span><span class="s2">&quot;config&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>++paths.output_dir<span class="o">=</span><span class="s2">&quot;outputs&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>++paths.model_checkpoint<span class="o">=</span><span class="s1">&#39;${paths.checkpoints}/runner.last.pth&#39;</span>
+</pre></div>
+</div>
+<p>To evaluate a model from the CompressAI zoo:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>compressai_trainer.run.eval_model<span class="w"> </span>--config-name<span class="o">=</span><span class="s2">&quot;example_eval_zoo&quot;</span>
+</pre></div>
+</div>
+<p>The model is evaluated on <code class="docutils literal notranslate"><span class="pre">dataset.infer</span></code>, which may be configured as follows:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">dataset</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">infer</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;ImageFolder&quot;</span>
+<span class="w">    </span><span class="nt">config</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">root</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/path/to/directory/containing/images&quot;</span>
+<span class="w">      </span><span class="nt">split</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;&quot;</span>
+<span class="w">    </span><span class="nt">loader</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">shuffle</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">False</span>
+<span class="w">      </span><span class="nt">batch_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="w">      </span><span class="nt">num_workers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">    </span><span class="nt">settings</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">transforms</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="s">&quot;ToTensor&quot;</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">{}</span>
+<span class="w">    </span><span class="nt">meta</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;Custom</span><span class="nv"> </span><span class="s">dataset&quot;</span>
+<span class="w">      </span><span class="nt">identifier</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;image/custom&quot;</span>
+<span class="w">      </span><span class="nt">num_samples</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0</span><span class="w">  </span><span class="c1"># ignored during eval</span>
+</pre></div>
+</div>
+<p>To evaluate a model on a custom directory of samples, use the above
+config and override <code class="docutils literal notranslate"><span class="pre">dataset.infer.config.root</span></code>.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="compressai_trainer.run.eval_model.get_filenames">
+<span class="sig-prename descclassname"><span class="pre">compressai_trainer.run.eval_model.</span></span><span class="sig-name descname"><span class="pre">get_filenames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_files</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compressai_trainer/run/eval_model.html#get_filenames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.run.eval_model.get_filenames" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="compressai_trainer.run.eval_model.load_checkpoint_from_state_dict">
+<span class="sig-prename descclassname"><span class="pre">compressai_trainer.run.eval_model.</span></span><span class="sig-name descname"><span class="pre">load_checkpoint_from_state_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpoint_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compressai_trainer/run/eval_model.html#load_checkpoint_from_state_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.run.eval_model.load_checkpoint_from_state_dict" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="compressai_trainer.run.eval_model.load_model">
+<span class="sig-prename descclassname"><span class="pre">compressai_trainer.run.eval_model.</span></span><span class="sig-name descname"><span class="pre">load_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">omegaconf.dictconfig.DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch v2.0)"><span class="pre">torch.nn.modules.module.Module</span></a></span></span><a class="reference internal" href="../_modules/compressai_trainer/run/eval_model.html#load_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.run.eval_model.load_model" title="Permalink to this definition">#</a></dt>
+<dd><p>Load a model from one of various sources.</p>
+<p>The source is determined by setting the config setting
+<code class="docutils literal notranslate"><span class="pre">model.source</span></code> to one of the following:</p>
+<ul>
+<li><dl class="simple">
+<dt>“config”:</dt><dd><p>Uses CompressAI Trainer standard config.
+(e.g. <code class="docutils literal notranslate"><span class="pre">hp</span></code>, <code class="docutils literal notranslate"><span class="pre">paths.model_checkpoint</span></code>, etc.)</p>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>“from_state_dict”:</dt><dd><p>Uses model’s <code class="docutils literal notranslate"><span class="pre">from_state_dict()</span></code> factory method.
+Requires <code class="docutils literal notranslate"><span class="pre">model.name</span></code> and <code class="docutils literal notranslate"><span class="pre">paths.model_checkpoint</span></code> to be set.
+For example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">model</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;bmshj2018-factorized&quot;</span>
+<span class="nt">paths</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">model_checkpoint</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/home/user/.cache/torch/hub/checkpoints/bmshj2018-factorized-prior-3-5c6f152b.pth.tar&quot;</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</li>
+<li><dl>
+<dt>“zoo”:</dt><dd><p>Uses CompressAI’s zoo of models.
+Requires <code class="docutils literal notranslate"><span class="pre">model.name</span></code>, <code class="docutils literal notranslate"><span class="pre">model.metric</span></code>, <code class="docutils literal notranslate"><span class="pre">model.quality</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">model.pretrained</span></code> to be set.
+For example:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">model</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;bmshj2018-factorized&quot;</span>
+<span class="w">  </span><span class="nt">metric</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mse&quot;</span>
+<span class="w">  </span><span class="nt">quality</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">  </span><span class="nt">pretrained</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</li>
+</ul>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="compressai_trainer.run.eval_model.main">
+<span class="sig-prename descclassname"><span class="pre">compressai_trainer.run.eval_model.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">omegaconf.dictconfig.DictConfig</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compressai_trainer/run/eval_model.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.run.eval_model.main" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="compressai_trainer.run.eval_model.run_eval_model">
+<span class="sig-prename descclassname"><span class="pre">compressai_trainer.run.eval_model.</span></span><span class="sig-name descname"><span class="pre">run_eval_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">runner</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batches</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filenames</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metrics</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compressai_trainer/run/eval_model.html#run_eval_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.run.eval_model.run_eval_model" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="compressai_trainer.run.eval_model.setup">
+<span class="sig-prename descclassname"><span class="pre">compressai_trainer.run.eval_model.</span></span><span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">omegaconf.dictconfig.DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://catalyst-team.github.io/catalyst/api/runners.html#catalyst.runners.runner.Runner" title="(in Catalyst v22.04)"><span class="pre">catalyst.runners.runner.Runner</span></a></span></span><a class="reference internal" href="../_modules/compressai_trainer/run/eval_model.html#setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.run.eval_model.setup" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="compressai_trainer.run.eval_model.write_results">
+<span class="sig-prename descclassname"><span class="pre">compressai_trainer.run.eval_model.</span></span><span class="sig-name descname"><span class="pre">write_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metrics</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compressai_trainer/run/eval_model.html#write_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.run.eval_model.write_results" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-compressai_trainer.run.plot_rd">
+<span id="plot-rd"></span><h2>plot_rd<a class="headerlink" href="#module-compressai_trainer.run.plot_rd" title="Permalink to this headline">#</a></h2>
+<p>RD curves plotter.</p>
+<p>See <a class="reference internal" href="../tools/rd_plotter.html#tools-plot-rd"><span class="std std-ref">Plot an RD curve</span></a> for more information.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="compressai_trainer.run.plot_rd.build_args">
+<span class="sig-prename descclassname"><span class="pre">compressai_trainer.run.plot_rd.</span></span><span class="sig-name descname"><span class="pre">build_args</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argv</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compressai_trainer/run/plot_rd.html#build_args"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.run.plot_rd.build_args" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="compressai_trainer.run.plot_rd.create_dataframe">
+<span class="sig-prename descclassname"><span class="pre">compressai_trainer.run.plot_rd.</span></span><span class="sig-name descname"><span class="pre">create_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">repo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compressai_trainer/run/plot_rd.html#create_dataframe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.run.plot_rd.create_dataframe" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="compressai_trainer.run.plot_rd.main">
+<span class="sig-prename descclassname"><span class="pre">compressai_trainer.run.plot_rd.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">argv</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compressai_trainer/run/plot_rd.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.run.plot_rd.main" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="compressai_trainer.run.plot_rd.plot_dataframe">
+<span class="sig-prename descclassname"><span class="pre">compressai_trainer.run.plot_rd.</span></span><span class="sig-name descname"><span class="pre">plot_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v1.5.3)"><span class="pre">pandas.core.frame.DataFrame</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compressai_trainer/run/plot_rd.html#plot_dataframe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.run.plot_rd.plot_dataframe" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+</section>
+<section id="module-compressai_trainer.run.compressai">
+<span id="compressai"></span><h2>compressai<a class="headerlink" href="#module-compressai_trainer.run.compressai" title="Permalink to this headline">#</a></h2>
+<p>Wrapper around CompressAI scripts to work more easily with CompressAI Train.</p>
+<p>Example usage:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>compressai_trainer.run.compressai<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>eval_model<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>checkpoint<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--architecture<span class="o">=</span><span class="s2">&quot;bmshj2018-factorized&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--path<span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/data/runs/e4e6d4d5e5c59c69f3bd7be2/checkpoints/runner.best.pth&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/data/datasets/kodak/test&quot;</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+    <a class='left-prev' id="prev-link" href="registry.html" title="previous page">
+        <i class="fas fa-angle-left"></i>
+        <div class="prev-next-info">
+            <p class="prev-next-subtitle">previous</p>
+            <p class="prev-next-title">compressai_trainer.registry</p>
+        </div>
+    </a>
+    <a class='right-next' id="next-link" href="runners.html" title="next page">
+    <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">compressai_trainer.runners</p>
+    </div>
+    <i class="fas fa-angle-right"></i>
+    </a>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By InterDigital Communications, Inc.<br/>
+  
+      &copy; Copyright 2023, InterDigital Communications, Inc.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+
+  </body>
+</html>

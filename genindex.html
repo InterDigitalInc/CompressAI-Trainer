@@ -1,0 +1,984 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Index &#8212; CompressAI Trainer</title>
+    
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+<link href="_static/styles/pydata-sphinx-theme.css?digest=1999514e3f237ded88cf" rel="stylesheet">
+
+    
+  <link rel="stylesheet"
+    href="_static/vendor/fontawesome/5.13.0/css/all.min.css">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-solid-900.woff2">
+  <link rel="preload" as="font" type="font/woff2" crossorigin
+    href="_static/vendor/fontawesome/5.13.0/webfonts/fa-brands-400.woff2">
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" href="_static/styles/sphinx-book-theme.css?digest=5115cc725059bd94278eecd172e13a965bf8f5a9" type="text/css" />
+    
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf">
+
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/scripts/sphinx-book-theme.js?digest=9c920249402e914e316237a7dbc6769907cce411"></script>
+    <link rel="index" title="Index" href="#" />
+    <link rel="search" title="Search" href="search.html" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="docsearch:language" content="None">
+    
+
+    <!-- Google Analytics -->
+    
+  </head>
+  <body data-spy="scroll" data-target="#bd-toc-nav" data-offset="60">
+<!-- Checkboxes to toggle the left sidebar -->
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation" aria-label="Toggle navigation sidebar">
+<label class="overlay overlay-navbar" for="__navigation">
+    <div class="visually-hidden">Toggle navigation sidebar</div>
+</label>
+<!-- Checkboxes to toggle the in-page toc -->
+<input type="checkbox" class="sidebar-toggle" name="__page-toc" id="__page-toc" aria-label="Toggle in-page Table of Contents">
+<label class="overlay overlay-pagetoc" for="__page-toc">
+    <div class="visually-hidden">Toggle in-page Table of Contents</div>
+</label>
+<!-- Headers at the top -->
+<div class="announcement header-item noprint"></div>
+<div class="header header-item noprint"></div>
+
+    
+    <div class="container-fluid" id="banner"></div>
+
+    
+
+    <div class="container-xl">
+      <div class="row">
+          
+<!-- Sidebar -->
+<div class="bd-sidebar noprint" id="site-navigation">
+    <div class="bd-sidebar__content">
+        <div class="bd-sidebar__top"><div class="navbar-brand-box">
+    <a class="navbar-brand text-wrap" href="index.html">
+      
+        <!-- `logo` is deprecated in Sphinx 4.0, so remove this when we stop supporting 3 -->
+        
+      
+      
+      <img src="_static/logo.png" class="logo" alt="logo">
+      
+      
+    </a>
+</div><form class="bd-search d-flex align-items-center" action="search.html" method="get">
+  <i class="icon fas fa-search"></i>
+  <input type="search" class="form-control" name="q" id="search-input" placeholder="Search the docs ..." aria-label="Search the docs ..." autocomplete="off" >
+</form><nav class="bd-links" id="bd-docs-nav" aria-label="Main">
+    <div class="bd-toc-item active">
+        <ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="index.html">
+   Home
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Guides
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="tutorials/installation.html">
+   Installation
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="tutorials/full.html">
+   Walkthrough
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  CompressAI Trainer API
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="compressai_trainer/config.html">
+   compressai_trainer.config
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="compressai_trainer/plot.html">
+   compressai_trainer.plot
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="compressai_trainer/registry.html">
+   compressai_trainer.registry
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="compressai_trainer/run.html">
+   compressai_trainer.run
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="compressai_trainer/runners.html">
+   compressai_trainer.runners
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="compressai_trainer/typing.html">
+   compressai_trainer.typing
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="compressai_trainer/utils.html">
+   compressai_trainer.utils
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Tools
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference internal" href="tools/train.html">
+   Train a model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="tools/eval_model.html">
+   Evaluate a model
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="tools/rd_plotter.html">
+   Plot an RD curve
+  </a>
+ </li>
+ <li class="toctree-l1">
+  <a class="reference internal" href="tools/compressai.html">
+   Use
+   <code class="docutils literal notranslate">
+    <span class="pre">
+     compressai.utils
+    </span>
+   </code>
+  </a>
+ </li>
+</ul>
+<p aria-level="2" class="caption" role="heading">
+ <span class="caption-text">
+  Development
+ </span>
+</p>
+<ul class="nav bd-sidenav">
+ <li class="toctree-l1">
+  <a class="reference external" href="https://github.com/InterDigitalInc/CompressAI-Trainer/">
+   Github repository
+  </a>
+ </li>
+</ul>
+
+    </div>
+</nav></div>
+        <div class="bd-sidebar__bottom">
+             <!-- To handle the deprecated key -->
+            
+        </div>
+    </div>
+    <div id="rtd-footer-container"></div>
+</div>
+
+
+          
+
+
+          
+<!-- A tiny helper pixel to detect if we've scrolled -->
+<div class="sbt-scroll-pixel-helper"></div>
+<!-- Main content -->
+<div class="col py-0 content-container">
+    
+    <div class="header-article row sticky-top noprint">
+        
+
+
+
+<div class="col py-1 d-flex header-article-main">
+    <div class="header-article__left">
+        
+        <label for="__navigation"
+  class="headerbtn"
+  data-toggle="tooltip"
+data-placement="right"
+title="Toggle navigation"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fas fa-bars"></i>
+  </span>
+
+</label>
+
+        
+    </div>
+    <div class="header-article__right"><a href="https://github.com/InterDigitalInc/CompressAI-Trainer/"
+   class="headerbtn"
+   data-toggle="tooltip"
+data-placement="bottom"
+title="Source repository"
+>
+  
+
+<span class="headerbtn__icon-container">
+  <i class="fab fa-github"></i>
+  </span>
+
+</a>
+
+    </div>
+</div>
+
+<!-- Table of contents -->
+<div class="col-md-3 bd-toc show noprint">
+</div>
+    </div>
+    <div class="article row">
+        <div class="col pl-md-3 pl-lg-5 content-container">
+            <!-- Table of contents that is only displayed when printing the page -->
+            <div id="jb-print-docs-body" class="onlyprint">
+                <h1></h1>
+                <!-- Table of contents -->
+                <div id="print-main-content">
+                    <div id="jb-print-toc">
+                        
+                    </div>
+                </div>
+            </div>
+            <main id="main-content" role="main">
+                
+              <div>
+                
+
+<h1 id="index">Index</h1>
+
+<div class="genindex-jumpbox">
+ <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
+ | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
+ | <a href="#H"><strong>H</strong></a>
+ | <a href="#I"><strong>I</strong></a>
+ | <a href="#L"><strong>L</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
+ | <a href="#P"><strong>P</strong></a>
+ | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
+ | <a href="#U"><strong>U</strong></a>
+ | <a href="#W"><strong>W</strong></a>
+ 
+</div>
+<h2 id="A">A</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.catalyst.loggers.AimLogger">AimLogger (class in compressai_trainer.utils.catalyst.loggers)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.utils.arg_pareto_optimal_set">arg_pareto_optimal_set() (in module compressai_trainer.utils.utils)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/runners.html#compressai_trainer.runners.BaseRunner">BaseRunner (class in compressai_trainer.runners)</a>
+</li>
+      <li><a href="compressai_trainer/runners.html#compressai_trainer.runners.BaseRunner.batch_meters">batch_meters (compressai_trainer.runners.BaseRunner attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.aim.query.best_metric_index">best_metric_index() (in module compressai_trainer.utils.aim.query)</a>
+</li>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.git.branch_name">branch_name() (in module compressai_trainer.utils.git)</a>
+</li>
+      <li><a href="compressai_trainer/run.html#compressai_trainer.run.plot_rd.build_args">build_args() (in module compressai_trainer.run.plot_rd)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.catalyst.loggers.AimLogger.close_log">close_log() (compressai_trainer.utils.catalyst.loggers.AimLogger method)</a>
+</li>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.git.commit_hash">commit_hash() (in module compressai_trainer.utils.git)</a>
+</li>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.git.common_ancestor_hash">common_ancestor_hash() (in module compressai_trainer.utils.git)</a>
+</li>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.compressai.results.compressai_dataframe">compressai_dataframe() (in module compressai_trainer.utils.compressai.results)</a>
+</li>
+      <li>
+    compressai_trainer.config
+
+      <ul>
+        <li><a href="compressai_trainer/config.html#module-compressai_trainer.config">module</a>
+</li>
+      </ul></li>
+      <li>
+    compressai_trainer.config.config
+
+      <ul>
+        <li><a href="compressai_trainer/config.html#module-compressai_trainer.config.config">module</a>
+</li>
+      </ul></li>
+      <li>
+    compressai_trainer.config.dataset
+
+      <ul>
+        <li><a href="compressai_trainer/config.html#module-compressai_trainer.config.dataset">module</a>
+</li>
+      </ul></li>
+      <li>
+    compressai_trainer.config.engine
+
+      <ul>
+        <li><a href="compressai_trainer/config.html#module-compressai_trainer.config.engine">module</a>
+</li>
+      </ul></li>
+      <li>
+    compressai_trainer.config.env
+
+      <ul>
+        <li><a href="compressai_trainer/config.html#module-compressai_trainer.config.env">module</a>
+</li>
+      </ul></li>
+      <li>
+    compressai_trainer.config.load
+
+      <ul>
+        <li><a href="compressai_trainer/config.html#module-compressai_trainer.config.load">module</a>
+</li>
+      </ul></li>
+      <li>
+    compressai_trainer.config.outputs
+
+      <ul>
+        <li><a href="compressai_trainer/config.html#module-compressai_trainer.config.outputs">module</a>
+</li>
+      </ul></li>
+      <li>
+    compressai_trainer.plot
+
+      <ul>
+        <li><a href="compressai_trainer/plot.html#module-compressai_trainer.plot">module</a>
+</li>
+      </ul></li>
+      <li>
+    compressai_trainer.registry
+
+      <ul>
+        <li><a href="compressai_trainer/registry.html#module-compressai_trainer.registry">module</a>
+</li>
+      </ul></li>
+      <li>
+    compressai_trainer.registry.catalyst
+
+      <ul>
+        <li><a href="compressai_trainer/registry.html#module-compressai_trainer.registry.catalyst">module</a>
+</li>
+      </ul></li>
+      <li>
+    compressai_trainer.registry.torch
+
+      <ul>
+        <li><a href="compressai_trainer/registry.html#module-compressai_trainer.registry.torch">module</a>
+</li>
+      </ul></li>
+      <li>
+    compressai_trainer.run.compressai
+
+      <ul>
+        <li><a href="compressai_trainer/run.html#module-compressai_trainer.run.compressai">module</a>
+</li>
+      </ul></li>
+      <li>
+    compressai_trainer.run.eval_model
+
+      <ul>
+        <li><a href="compressai_trainer/run.html#module-compressai_trainer.run.eval_model">module</a>
+</li>
+      </ul></li>
+      <li>
+    compressai_trainer.run.plot_rd
+
+      <ul>
+        <li><a href="compressai_trainer/run.html#module-compressai_trainer.run.plot_rd">module</a>
+</li>
+      </ul></li>
+      <li>
+    compressai_trainer.run.train
+
+      <ul>
+        <li><a href="compressai_trainer/run.html#module-compressai_trainer.run.train">module</a>
+</li>
+      </ul></li>
+      <li>
+    compressai_trainer.runners
+
+      <ul>
+        <li><a href="compressai_trainer/runners.html#module-compressai_trainer.runners">module</a>
+</li>
+      </ul></li>
+      <li>
+    compressai_trainer.typing
+
+      <ul>
+        <li><a href="compressai_trainer/typing.html#module-compressai_trainer.typing">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    compressai_trainer.utils
+
+      <ul>
+        <li><a href="compressai_trainer/utils.html#module-compressai_trainer.utils">module</a>
+</li>
+      </ul></li>
+      <li>
+    compressai_trainer.utils.aim.query
+
+      <ul>
+        <li><a href="compressai_trainer/utils.html#module-compressai_trainer.utils.aim.query">module</a>
+</li>
+      </ul></li>
+      <li>
+    compressai_trainer.utils.catalyst.loggers
+
+      <ul>
+        <li><a href="compressai_trainer/utils.html#module-compressai_trainer.utils.catalyst.loggers">module</a>
+</li>
+      </ul></li>
+      <li>
+    compressai_trainer.utils.compressai.results
+
+      <ul>
+        <li><a href="compressai_trainer/utils.html#module-compressai_trainer.utils.compressai.results">module</a>
+</li>
+      </ul></li>
+      <li>
+    compressai_trainer.utils.git
+
+      <ul>
+        <li><a href="compressai_trainer/utils.html#module-compressai_trainer.utils.git">module</a>
+</li>
+      </ul></li>
+      <li>
+    compressai_trainer.utils.metrics
+
+      <ul>
+        <li><a href="compressai_trainer/utils.html#module-compressai_trainer.utils.metrics">module</a>
+</li>
+      </ul></li>
+      <li>
+    compressai_trainer.utils.pip
+
+      <ul>
+        <li><a href="compressai_trainer/utils.html#module-compressai_trainer.utils.pip">module</a>
+</li>
+      </ul></li>
+      <li>
+    compressai_trainer.utils.system
+
+      <ul>
+        <li><a href="compressai_trainer/utils.html#module-compressai_trainer.utils.system">module</a>
+</li>
+      </ul></li>
+      <li>
+    compressai_trainer.utils.utils
+
+      <ul>
+        <li><a href="compressai_trainer/utils.html#module-compressai_trainer.utils.utils">module</a>
+</li>
+      </ul></li>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.metrics.compute_metrics">compute_metrics() (in module compressai_trainer.utils.metrics)</a>
+</li>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.utils.compute_padding">compute_padding() (in module compressai_trainer.utils.utils)</a>
+</li>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.utils.ConfigStringFormatter">ConfigStringFormatter (class in compressai_trainer.utils.utils)</a>
+</li>
+      <li><a href="compressai_trainer/config.html#compressai_trainer.config.config.configure_conf">configure_conf() (in module compressai_trainer.config.config)</a>
+</li>
+      <li><a href="compressai_trainer/config.html#compressai_trainer.config.engine.configure_engine">configure_engine() (in module compressai_trainer.config.engine)</a>
+</li>
+      <li><a href="compressai_trainer/config.html#compressai_trainer.config.engine.create_callback">create_callback() (in module compressai_trainer.config.engine)</a>
+</li>
+      <li><a href="compressai_trainer/config.html#compressai_trainer.config.config.create_criterion">create_criterion() (in module compressai_trainer.config.config)</a>
+</li>
+      <li><a href="compressai_trainer/config.html#compressai_trainer.config.dataset.create_data_transform">create_data_transform() (in module compressai_trainer.config.dataset)</a>
+</li>
+      <li><a href="compressai_trainer/config.html#compressai_trainer.config.dataset.create_data_transform_composition">create_data_transform_composition() (in module compressai_trainer.config.dataset)</a>
+</li>
+      <li><a href="compressai_trainer/run.html#compressai_trainer.run.plot_rd.create_dataframe">create_dataframe() (in module compressai_trainer.run.plot_rd)</a>
+</li>
+      <li><a href="compressai_trainer/config.html#compressai_trainer.config.dataset.create_dataloader">create_dataloader() (in module compressai_trainer.config.dataset)</a>
+</li>
+      <li><a href="compressai_trainer/config.html#compressai_trainer.config.config.create_dataloaders">create_dataloaders() (in module compressai_trainer.config.config)</a>
+</li>
+      <li><a href="compressai_trainer/config.html#compressai_trainer.config.dataset.create_dataset">create_dataset() (in module compressai_trainer.config.dataset)</a>
+</li>
+      <li><a href="compressai_trainer/config.html#compressai_trainer.config.dataset.create_dataset_tuple">create_dataset_tuple() (in module compressai_trainer.config.dataset)</a>
+</li>
+      <li><a href="compressai_trainer/config.html#compressai_trainer.config.engine.create_logger">create_logger() (in module compressai_trainer.config.engine)</a>
+</li>
+      <li><a href="compressai_trainer/config.html#compressai_trainer.config.config.create_model">create_model() (in module compressai_trainer.config.config)</a>
+</li>
+      <li><a href="compressai_trainer/config.html#compressai_trainer.config.config.create_module">create_module() (in module compressai_trainer.config.config)</a>
+</li>
+      <li><a href="compressai_trainer/config.html#compressai_trainer.config.config.create_optimizer">create_optimizer() (in module compressai_trainer.config.config)</a>
+</li>
+      <li><a href="compressai_trainer/config.html#compressai_trainer.config.engine.create_runner">create_runner() (in module compressai_trainer.config.engine)</a>
+</li>
+      <li><a href="compressai_trainer/config.html#compressai_trainer.config.config.create_scheduler">create_scheduler() (in module compressai_trainer.config.config)</a>
+</li>
+      <li><a href="compressai_trainer/runners.html#compressai_trainer.runners.BaseRunner.criterion">criterion (compressai_trainer.runners.BaseRunner attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/config.html#compressai_trainer.config.dataset.DatasetTuple.dataset">dataset (compressai_trainer.config.dataset.DatasetTuple attribute)</a>
+</li>
+      <li><a href="compressai_trainer/config.html#compressai_trainer.config.dataset.DatasetTuple">DatasetTuple (class in compressai_trainer.config.dataset)</a>
+</li>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.metrics.db">db() (in module compressai_trainer.utils.metrics)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.compressai.results.deep_codec_result">deep_codec_result() (in module compressai_trainer.utils.compressai.results)</a>
+</li>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.git.diff">diff() (in module compressai_trainer.utils.git)</a>
+</li>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.catalyst.loggers.DistributionSuperlogger">DistributionSuperlogger (class in compressai_trainer.utils.catalyst.loggers)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.catalyst.loggers.AimLogger.exclude">exclude (compressai_trainer.utils.catalyst.loggers.AimLogger attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="F">F</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/plot.html#compressai_trainer.plot.featuremap_image">featuremap_image() (in module compressai_trainer.plot)</a>
+</li>
+      <li><a href="compressai_trainer/plot.html#compressai_trainer.plot.featuremap_matplotlib">featuremap_matplotlib() (in module compressai_trainer.plot)</a>
+</li>
+      <li><a href="compressai_trainer/plot.html#compressai_trainer.plot.featuremap_matplotlib_looptiled">featuremap_matplotlib_looptiled() (in module compressai_trainer.plot)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.catalyst.loggers.FigureSuperlogger">FigureSuperlogger (class in compressai_trainer.utils.catalyst.loggers)</a>
+</li>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.utils.format_dataframe">format_dataframe() (in module compressai_trainer.utils.utils)</a>
+</li>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.pip.freeze">freeze() (in module compressai_trainer.utils.pip)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.compressai.results.generic_codec_result">generic_codec_result() (in module compressai_trainer.utils.compressai.results)</a>
+</li>
+      <li><a href="compressai_trainer/config.html#compressai_trainer.config.load.get_checkpoint_path">get_checkpoint_path() (in module compressai_trainer.config.load)</a>
+</li>
+      <li><a href="compressai_trainer/config.html#compressai_trainer.config.env.get_env">get_env() (in module compressai_trainer.config.env)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.utils.ConfigStringFormatter.get_field">get_field() (compressai_trainer.utils.utils.ConfigStringFormatter method)</a>
+</li>
+      <li><a href="compressai_trainer/run.html#compressai_trainer.run.eval_model.get_filenames">get_filenames() (in module compressai_trainer.run.eval_model)</a>
+</li>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.aim.query.get_runs_dataframe">get_runs_dataframe() (in module compressai_trainer.utils.aim.query)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="H">H</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/runners.html#compressai_trainer.runners.ImageCompressionRunner.handle_batch">handle_batch() (compressai_trainer.runners.ImageCompressionRunner method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.system.hostname">hostname() (in module compressai_trainer.utils.system)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/runners.html#compressai_trainer.runners.ImageCompressionRunner">ImageCompressionRunner (class in compressai_trainer.runners)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.pip.list">list() (in module compressai_trainer.utils.pip)</a>
+</li>
+      <li><a href="compressai_trainer/config.html#compressai_trainer.config.load.load_checkpoint">load_checkpoint() (in module compressai_trainer.config.load)</a>
+</li>
+      <li><a href="compressai_trainer/run.html#compressai_trainer.run.eval_model.load_checkpoint_from_state_dict">load_checkpoint_from_state_dict() (in module compressai_trainer.run.eval_model)</a>
+</li>
+      <li><a href="compressai_trainer/config.html#compressai_trainer.config.load.load_config">load_config() (in module compressai_trainer.config.load)</a>
+</li>
+      <li><a href="compressai_trainer/run.html#compressai_trainer.run.eval_model.load_model">load_model() (in module compressai_trainer.run.eval_model)</a>
+</li>
+      <li><a href="compressai_trainer/config.html#compressai_trainer.config.dataset.DatasetTuple.loader">loader (compressai_trainer.config.dataset.DatasetTuple attribute)</a>
+</li>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.catalyst.loggers.AimLogger.log_artifact">log_artifact() (compressai_trainer.utils.catalyst.loggers.AimLogger method)</a>
+</li>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.catalyst.loggers.AimLogger.log_distribution">log_distribution() (compressai_trainer.utils.catalyst.loggers.AimLogger method)</a>
+
+      <ul>
+        <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.catalyst.loggers.DistributionSuperlogger.log_distribution">(compressai_trainer.utils.catalyst.loggers.DistributionSuperlogger method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.catalyst.loggers.AimLogger.log_figure">log_figure() (compressai_trainer.utils.catalyst.loggers.AimLogger method)</a>
+
+      <ul>
+        <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.catalyst.loggers.FigureSuperlogger.log_figure">(compressai_trainer.utils.catalyst.loggers.FigureSuperlogger method)</a>
+</li>
+      </ul></li>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.catalyst.loggers.AimLogger.log_hparams">log_hparams() (compressai_trainer.utils.catalyst.loggers.AimLogger method)</a>
+</li>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.catalyst.loggers.AimLogger.log_image">log_image() (compressai_trainer.utils.catalyst.loggers.AimLogger method)</a>
+</li>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.catalyst.loggers.AimLogger.log_metrics">log_metrics() (compressai_trainer.utils.catalyst.loggers.AimLogger method)</a>
+</li>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.catalyst.loggers.AimLogger.logger">logger (compressai_trainer.utils.catalyst.loggers.AimLogger property)</a>
+</li>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.catalyst.loggers.DistributionSuperlogger.loggers">loggers (compressai_trainer.utils.catalyst.loggers.DistributionSuperlogger attribute)</a>
+
+      <ul>
+        <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.catalyst.loggers.FigureSuperlogger.loggers">(compressai_trainer.utils.catalyst.loggers.FigureSuperlogger attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/run.html#compressai_trainer.run.eval_model.main">main() (in module compressai_trainer.run.eval_model)</a>
+
+      <ul>
+        <li><a href="compressai_trainer/run.html#compressai_trainer.run.plot_rd.main">(in module compressai_trainer.run.plot_rd)</a>
+</li>
+        <li><a href="compressai_trainer/run.html#compressai_trainer.run.train.main">(in module compressai_trainer.run.train)</a>
+</li>
+      </ul></li>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.git.main_branch_name">main_branch_name() (in module compressai_trainer.utils.git)</a>
+</li>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.aim.query.metrics_at_index">metrics_at_index() (in module compressai_trainer.utils.aim.query)</a>
+</li>
+      <li><a href="compressai_trainer/runners.html#compressai_trainer.runners.BaseRunner.model">model (compressai_trainer.runners.BaseRunner attribute)</a>
+</li>
+      <li><a href="compressai_trainer/runners.html#compressai_trainer.runners.BaseRunner.model_module">model_module (compressai_trainer.runners.BaseRunner property)</a>
+</li>
+      <li>
+    module
+
+      <ul>
+        <li><a href="compressai_trainer/config.html#module-compressai_trainer.config">compressai_trainer.config</a>
+</li>
+        <li><a href="compressai_trainer/config.html#module-compressai_trainer.config.config">compressai_trainer.config.config</a>
+</li>
+        <li><a href="compressai_trainer/config.html#module-compressai_trainer.config.dataset">compressai_trainer.config.dataset</a>
+</li>
+        <li><a href="compressai_trainer/config.html#module-compressai_trainer.config.engine">compressai_trainer.config.engine</a>
+</li>
+        <li><a href="compressai_trainer/config.html#module-compressai_trainer.config.env">compressai_trainer.config.env</a>
+</li>
+        <li><a href="compressai_trainer/config.html#module-compressai_trainer.config.load">compressai_trainer.config.load</a>
+</li>
+        <li><a href="compressai_trainer/config.html#module-compressai_trainer.config.outputs">compressai_trainer.config.outputs</a>
+</li>
+        <li><a href="compressai_trainer/plot.html#module-compressai_trainer.plot">compressai_trainer.plot</a>
+</li>
+        <li><a href="compressai_trainer/registry.html#module-compressai_trainer.registry">compressai_trainer.registry</a>
+</li>
+        <li><a href="compressai_trainer/registry.html#module-compressai_trainer.registry.catalyst">compressai_trainer.registry.catalyst</a>
+</li>
+        <li><a href="compressai_trainer/registry.html#module-compressai_trainer.registry.torch">compressai_trainer.registry.torch</a>
+</li>
+        <li><a href="compressai_trainer/run.html#module-compressai_trainer.run.compressai">compressai_trainer.run.compressai</a>
+</li>
+        <li><a href="compressai_trainer/run.html#module-compressai_trainer.run.eval_model">compressai_trainer.run.eval_model</a>
+</li>
+        <li><a href="compressai_trainer/run.html#module-compressai_trainer.run.plot_rd">compressai_trainer.run.plot_rd</a>
+</li>
+        <li><a href="compressai_trainer/run.html#module-compressai_trainer.run.train">compressai_trainer.run.train</a>
+</li>
+        <li><a href="compressai_trainer/runners.html#module-compressai_trainer.runners">compressai_trainer.runners</a>
+</li>
+        <li><a href="compressai_trainer/typing.html#module-compressai_trainer.typing">compressai_trainer.typing</a>
+</li>
+        <li><a href="compressai_trainer/utils.html#module-compressai_trainer.utils">compressai_trainer.utils</a>
+</li>
+        <li><a href="compressai_trainer/utils.html#module-compressai_trainer.utils.aim.query">compressai_trainer.utils.aim.query</a>
+</li>
+        <li><a href="compressai_trainer/utils.html#module-compressai_trainer.utils.catalyst.loggers">compressai_trainer.utils.catalyst.loggers</a>
+</li>
+        <li><a href="compressai_trainer/utils.html#module-compressai_trainer.utils.compressai.results">compressai_trainer.utils.compressai.results</a>
+</li>
+        <li><a href="compressai_trainer/utils.html#module-compressai_trainer.utils.git">compressai_trainer.utils.git</a>
+</li>
+        <li><a href="compressai_trainer/utils.html#module-compressai_trainer.utils.metrics">compressai_trainer.utils.metrics</a>
+</li>
+        <li><a href="compressai_trainer/utils.html#module-compressai_trainer.utils.pip">compressai_trainer.utils.pip</a>
+</li>
+        <li><a href="compressai_trainer/utils.html#module-compressai_trainer.utils.system">compressai_trainer.utils.system</a>
+</li>
+        <li><a href="compressai_trainer/utils.html#module-compressai_trainer.utils.utils">compressai_trainer.utils.utils</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.metrics.msssim">msssim() (in module compressai_trainer.utils.metrics)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.utils.np_img_to_tensor">np_img_to_tensor() (in module compressai_trainer.utils.utils)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.utils.num_parameters">num_parameters() (in module compressai_trainer.utils.utils)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/runners.html#compressai_trainer.runners.BaseRunner.on_epoch_end">on_epoch_end() (compressai_trainer.runners.BaseRunner method)</a>
+</li>
+      <li><a href="compressai_trainer/runners.html#compressai_trainer.runners.BaseRunner.on_epoch_start">on_epoch_start() (compressai_trainer.runners.BaseRunner method)</a>
+</li>
+      <li><a href="compressai_trainer/runners.html#compressai_trainer.runners.BaseRunner.on_experiment_end">on_experiment_end() (compressai_trainer.runners.BaseRunner method)</a>
+</li>
+      <li><a href="compressai_trainer/runners.html#compressai_trainer.runners.BaseRunner.on_experiment_start">on_experiment_start() (compressai_trainer.runners.BaseRunner method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/runners.html#compressai_trainer.runners.BaseRunner.on_loader_end">on_loader_end() (compressai_trainer.runners.BaseRunner method)</a>
+
+      <ul>
+        <li><a href="compressai_trainer/runners.html#compressai_trainer.runners.ImageCompressionRunner.on_loader_end">(compressai_trainer.runners.ImageCompressionRunner method)</a>
+</li>
+      </ul></li>
+      <li><a href="compressai_trainer/runners.html#compressai_trainer.runners.BaseRunner.on_loader_start">on_loader_start() (compressai_trainer.runners.BaseRunner method)</a>
+
+      <ul>
+        <li><a href="compressai_trainer/runners.html#compressai_trainer.runners.ImageCompressionRunner.on_loader_start">(compressai_trainer.runners.ImageCompressionRunner method)</a>
+</li>
+      </ul></li>
+      <li><a href="compressai_trainer/runners.html#compressai_trainer.runners.BaseRunner.optimizer">optimizer (compressai_trainer.runners.BaseRunner attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.aim.query.pareto_optimal_dataframe">pareto_optimal_dataframe() (in module compressai_trainer.utils.aim.query)</a>
+</li>
+      <li><a href="compressai_trainer/run.html#compressai_trainer.run.plot_rd.plot_dataframe">plot_dataframe() (in module compressai_trainer.run.plot_rd)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/plot.html#compressai_trainer.plot.plot_rd">plot_rd() (in module compressai_trainer.plot)</a>
+</li>
+      <li><a href="compressai_trainer/runners.html#compressai_trainer.runners.ImageCompressionRunner.predict_batch">predict_batch() (compressai_trainer.runners.ImageCompressionRunner method)</a>
+</li>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.metrics.psnr">psnr() (in module compressai_trainer.utils.metrics)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/registry.html#compressai_trainer.registry.catalyst.register_callback">register_callback() (in module compressai_trainer.registry.catalyst)</a>
+</li>
+      <li><a href="compressai_trainer/registry.html#compressai_trainer.registry.torch.register_criterion">register_criterion() (in module compressai_trainer.registry.torch)</a>
+</li>
+      <li><a href="compressai_trainer/registry.html#compressai_trainer.registry.torch.register_dataset">register_dataset() (in module compressai_trainer.registry.torch)</a>
+</li>
+      <li><a href="compressai_trainer/registry.html#compressai_trainer.registry.torch.register_model">register_model() (in module compressai_trainer.registry.torch)</a>
+</li>
+      <li><a href="compressai_trainer/registry.html#compressai_trainer.registry.torch.register_module">register_module() (in module compressai_trainer.registry.torch)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/registry.html#compressai_trainer.registry.torch.register_optimizer">register_optimizer() (in module compressai_trainer.registry.torch)</a>
+</li>
+      <li><a href="compressai_trainer/registry.html#compressai_trainer.registry.catalyst.register_runner">register_runner() (in module compressai_trainer.registry.catalyst)</a>
+</li>
+      <li><a href="compressai_trainer/registry.html#compressai_trainer.registry.torch.register_scheduler">register_scheduler() (in module compressai_trainer.registry.torch)</a>
+</li>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.catalyst.loggers.AimLogger.run">run (compressai_trainer.utils.catalyst.loggers.AimLogger attribute)</a>
+</li>
+      <li><a href="compressai_trainer/run.html#compressai_trainer.run.eval_model.run_eval_model">run_eval_model() (in module compressai_trainer.run.eval_model)</a>
+</li>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.aim.query.runs_by_query">runs_by_query() (in module compressai_trainer.utils.aim.query)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/run.html#compressai_trainer.run.eval_model.setup">setup() (in module compressai_trainer.run.eval_model)</a>
+
+      <ul>
+        <li><a href="compressai_trainer/run.html#compressai_trainer.run.train.setup">(in module compressai_trainer.run.train)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/config.html#compressai_trainer.config.load.state_dict_from_checkpoint">state_dict_from_checkpoint() (in module compressai_trainer.config.load)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/typing.html#compressai_trainer.typing.TCallback">TCallback (in module compressai_trainer.typing)</a>
+</li>
+      <li><a href="compressai_trainer/typing.html#compressai_trainer.typing.TCriterion">TCriterion (in module compressai_trainer.typing)</a>
+</li>
+      <li><a href="compressai_trainer/typing.html#compressai_trainer.typing.TDataLoader">TDataLoader (in module compressai_trainer.typing)</a>
+</li>
+      <li><a href="compressai_trainer/typing.html#compressai_trainer.typing.TDataset">TDataset (in module compressai_trainer.typing)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.utils.tensor_to_np_img">tensor_to_np_img() (in module compressai_trainer.utils.utils)</a>
+</li>
+      <li><a href="compressai_trainer/typing.html#compressai_trainer.typing.TModel">TModel (in module compressai_trainer.typing)</a>
+</li>
+      <li><a href="compressai_trainer/typing.html#compressai_trainer.typing.TModule">TModule (in module compressai_trainer.typing)</a>
+</li>
+      <li><a href="compressai_trainer/config.html#compressai_trainer.config.dataset.DatasetTuple.transform">transform (compressai_trainer.config.dataset.DatasetTuple attribute)</a>
+</li>
+      <li><a href="compressai_trainer/typing.html#compressai_trainer.typing.TRunner">TRunner (in module compressai_trainer.typing)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/utils.html#compressai_trainer.utils.system.username">username() (in module compressai_trainer.utils.system)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="W">W</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/config.html#compressai_trainer.config.outputs.write_config">write_config() (in module compressai_trainer.config.outputs)</a>
+</li>
+      <li><a href="compressai_trainer/config.html#compressai_trainer.config.outputs.write_git_diff">write_git_diff() (in module compressai_trainer.config.outputs)</a>
+</li>
+      <li><a href="compressai_trainer/config.html#compressai_trainer.config.outputs.write_outputs">write_outputs() (in module compressai_trainer.config.outputs)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compressai_trainer/config.html#compressai_trainer.config.outputs.write_pip_list">write_pip_list() (in module compressai_trainer.config.outputs)</a>
+</li>
+      <li><a href="compressai_trainer/config.html#compressai_trainer.config.outputs.write_pip_requirements">write_pip_requirements() (in module compressai_trainer.config.outputs)</a>
+</li>
+      <li><a href="compressai_trainer/run.html#compressai_trainer.run.eval_model.write_results">write_results() (in module compressai_trainer.run.eval_model)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+
+
+              </div>
+              
+            </main>
+            <footer class="footer-article noprint">
+                
+    <!-- Previous / next buttons -->
+<div class='prev-next-area'>
+</div>
+            </footer>
+        </div>
+    </div>
+    <div class="footer-content row">
+        <footer class="col footer"><p>
+  
+    By InterDigital Communications, Inc.<br/>
+  
+      &copy; Copyright 2023, InterDigital Communications, Inc.<br/>
+</p>
+        </footer>
+    </div>
+    
+</div>
+
+
+      </div>
+    </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/pydata-sphinx-theme.js?digest=1999514e3f237ded88cf"></script>
+
+
+  </body>
+</html>
