@@ -403,18 +403,18 @@ files = [
 
 [[package]]
 name = "catalyst"
-version = "22.2.1"
+version = "22.4"
 description = "Catalyst. Accelerated deep learning R&D with PyTorch."
 category = "main"
 optional = false
 python-versions = ">=3.7.0"
 files = [
-    {file = "catalyst-22.2.1-py2.py3-none-any.whl", hash = "sha256:c443d5adb75917922e463a56e7982392b740ca8c4a6734582a5c09f6b92dca36"},
-    {file = "catalyst-22.2.1.tar.gz", hash = "sha256:83ea55df410c5b009f4a01126a21854819a8d29256990e5b3c3602ce62055b9d"},
+    {file = "catalyst-22.4-py2.py3-none-any.whl", hash = "sha256:2ae086d653bb3e5becaaac90349ba72ee76f884f5be74f0917a42c5826c66583"},
+    {file = "catalyst-22.4.tar.gz", hash = "sha256:e226b6d68376b12a6956debe3448e8a87409259c0125317163826f0665b17c6b"},
 ]
 
 [package.dependencies]
-accelerate = "*"
+accelerate = ">=0.5.1"
 hydra-slayer = ">=0.4.0"
 numpy = ">=1.18"
 tensorboardX = ">=2.1.0"
@@ -422,11 +422,11 @@ torch = ">=1.4.0"
 tqdm = ">=4.33.0"
 
 [package.extras]
-all = ["Pillow (>=6.1)", "imageio (>=2.5.0)", "matplotlib (>=3.1.0)", "opencv-python-headless (>=4.1.1.26)", "optuna (>=2.0.0)", "pandas (>=1.0.0)", "requests", "scikit-learn (>=1.0)", "scipy (>=1.4.1)", "torchvision (>=0.5.0)"]
+all = ["Pillow (>=6.1)", "imageio (>=2.5.0)", "matplotlib (>=3.1.0)", "opencv-python-headless (>=4.2.0.32)", "optuna (>=2.0.0)", "pandas (>=1.0.0)", "requests", "scikit-learn (>=1.0)", "scipy (>=1.4.1)", "torchvision (>=0.5.0)"]
 comet = ["comet-ml"]
-cv = ["Pillow (>=6.1)", "imageio (>=2.5.0)", "opencv-python-headless (>=4.1.1.26)", "requests", "torchvision (>=0.5.0)"]
+cv = ["Pillow (>=6.1)", "imageio (>=2.5.0)", "opencv-python-headless (>=4.2.0.32)", "requests", "torchvision (>=0.5.0)"]
 deepspeed = ["deepspeed (>=0.4.0)"]
-dev = ["black (==21.8b0)", "catalyst-codestyle (==21.09.2)", "catalyst-sphinx-theme (==1.2.0)", "docutils (==0.17.1)", "mock (==3.0.5)", "path", "pre-commit (==2.13.0)", "pytest (==5.3.1)", "sphinx (==2.2.1)", "tomlkit (==0.7.2)"]
+dev = ["Jinja2 (<=3.0.3)", "black (==21.8b0)", "catalyst-codestyle (==21.09.2)", "catalyst-sphinx-theme (==1.2.0)", "click (<=8.0.4)", "docutils (==0.17.1)", "mock (==3.0.5)", "path", "pre-commit (==2.13.0)", "pytest", "sphinx (==2.2.1)", "tomlkit (==0.7.2)"]
 ml = ["matplotlib (>=3.1.0)", "pandas (>=1.0.0)", "scikit-learn (>=1.0)", "scipy (>=1.4.1)"]
 mlflow = ["mlflow"]
 neptune = ["neptune-client (>=0.9.8)"]
@@ -3157,4 +3157,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8.0,<3.11"
-content-hash = "1fa4c2c692e9e523c39608cf52ac08c27bcabcdcd9ae0a59f1900c13d83565db"
+content-hash = "e6361750b4be40183103c273e577544a0b2ee8d1f88cea0d3804bfeff12ea2d7"
