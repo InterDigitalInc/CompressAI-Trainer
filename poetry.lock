@@ -14,14 +14,14 @@ files = [
 
 [[package]]
 name = "accelerate"
-version = "0.10.0"
+version = "0.15.0"
 description = "Accelerate"
 category = "main"
 optional = false
 python-versions = ">=3.7.0"
 files = [
-    {file = "accelerate-0.10.0-py3-none-any.whl", hash = "sha256:8f38773d5234e342b7b72333861fdb67549abda90c07a5408d24028fb21db84c"},
-    {file = "accelerate-0.10.0.tar.gz", hash = "sha256:e9eb1e2b8bccf03a821db49a8720f518289980dc2a1da9e5a8e633a8d9023a58"},
+    {file = "accelerate-0.15.0-py3-none-any.whl", hash = "sha256:014833307424cd0a22f89815802e00653756257c45dfdba2453e52d428931c65"},
+    {file = "accelerate-0.15.0.tar.gz", hash = "sha256:438e25a01afa6e3ffbd25353e76a68be49677c3050f10bfac7beafaf53503efc"},
 ]
 
 [package.dependencies]
@@ -32,11 +32,14 @@ pyyaml = "*"
 torch = ">=1.4.0"
 
 [package.extras]
-dev = ["black (>=22.0,<23.0)", "datasets", "deepspeed", "evaluate", "flake8 (>=3.8.3)", "isort (>=5.5.4)", "parameterized", "pytest", "pytest-subtests", "pytest-xdist", "scipy", "sklearn", "transformers"]
-quality = ["black (>=22.0,<23.0)", "flake8 (>=3.8.3)", "isort (>=5.5.4)"]
+dev = ["black (>=22.0,<23.0)", "datasets", "deepspeed (<0.7.0)", "evaluate", "flake8 (>=3.8.3)", "hf-doc-builder (>=0.3.0)", "isort (>=5.5.4)", "parameterized", "pytest", "pytest-subtests", "pytest-xdist", "rich", "scikit-learn", "scipy", "tqdm", "transformers"]
+quality = ["black (>=22.0,<23.0)", "flake8 (>=3.8.3)", "hf-doc-builder (>=0.3.0)", "isort (>=5.5.4)"]
+rich = ["rich"]
 sagemaker = ["sagemaker"]
-test = ["datasets", "deepspeed", "evaluate", "parameterized", "pytest", "pytest-subtests", "pytest-xdist", "scipy", "sklearn", "transformers"]
+test-dev = ["datasets", "deepspeed (<0.7.0)", "evaluate", "scikit-learn", "scipy", "tqdm", "transformers"]
+test-prod = ["parameterized", "pytest", "pytest-subtests", "pytest-xdist"]
 test-trackers = ["comet-ml", "tensorboard", "wandb"]
+testing = ["datasets", "deepspeed (<0.7.0)", "evaluate", "parameterized", "pytest", "pytest-subtests", "pytest-xdist", "scikit-learn", "scipy", "tqdm", "transformers"]
 
 [[package]]
 name = "aim"
@@ -2741,4 +2744,4 @@ testing = ["func-timeout", "jaraco.itertools", "pytest (>=6)", "pytest-black (>=
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8.0,<3.11"
-content-hash = "3aa63c27d47d557cc215e968a7d659e635004ad47024360a5b81f6bc9bfd2367"
+content-hash = "c43b3bd61c0692f956bbc3cbd518df4b5d81805083cab61ea28df3a6bfe4e5fe"
