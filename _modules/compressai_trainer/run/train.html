@@ -360,10 +360,14 @@ title="Source repository"
     <span class="k">return</span> <span class="n">runner</span><span class="p">,</span> <span class="n">engine_kwargs</span></div>
 
 
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../compressai_trainer/run.html#compressai_trainer.run.train.main">[docs]</a><span class="nd">@hydra</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">version_base</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config_path</span><span class="o">=</span><span class="s2">&quot;conf&quot;</span><span class="p">)</span>
-<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">conf</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">_main</span><span class="p">(</span><span class="n">conf</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">):</span>
     <span class="n">runner</span><span class="p">,</span> <span class="n">engine_kwargs</span> <span class="o">=</span> <span class="n">setup</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
-    <span class="n">runner</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="o">**</span><span class="n">engine_kwargs</span><span class="p">)</span></div>
+    <span class="n">runner</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="o">**</span><span class="n">engine_kwargs</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../compressai_trainer/run.html#compressai_trainer.run.train.main">[docs]</a><span class="nd">@hydra</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">version_base</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config_path</span><span class="o">=</span><span class="s2">&quot;../../conf&quot;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">conf</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">):</span>
+    <span class="n">_main</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span></div>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
