@@ -29,7 +29,16 @@
 
 import warnings
 
-from compressai_trainer.run.train import main
+import hydra
+from omegaconf import DictConfig
+
+from compressai_trainer.run.train import _main
+
+
+@hydra.main(version_base=None, config_path="conf")
+def main(conf: DictConfig):
+    _main(conf)
+
 
 if __name__ == "__main__":
     message = (

@@ -84,10 +84,14 @@ def setup(conf: DictConfig) -> tuple[TRunner, dict[str, Any]]:
     return runner, engine_kwargs
 
 
-@hydra.main(version_base=None, config_path="conf")
-def main(conf: DictConfig):
+def _main(conf: DictConfig):
     runner, engine_kwargs = setup(conf)
     runner.train(**engine_kwargs)
+
+
+@hydra.main(version_base=None, config_path="../../conf")
+def main(conf: DictConfig):
+    _main(conf)
 
 
 if __name__ == "__main__":
