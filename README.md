@@ -2,8 +2,6 @@
   <img src="docs/source/_static/logo-big.png" alt="ID-CompressAI-Trainer-logo">
 </p>
 
-# CompressAI Trainer
-
 [![License](https://img.shields.io/github/license/InterDigitalInc/CompressAI-Trainer?color=blue)](https://github.com/InterDigitalInc/CompressAI-Trainer/blob/master/LICENSE)
 
 CompressAI Trainer is a training platform that assists in managing experiments for end-to-end neural network-based compression research.
@@ -62,7 +60,7 @@ poetry install
 echo "Virtual environment created in $(poetry env list --full-path)"
 
 # Link to local CompressAI source code.
-poetry run pip install --editable ../compressai
+poetry run pip install --editable /path/to/compressai
 ```
 
 To activate the virtual environment, run:
@@ -73,7 +71,7 @@ poetry shell
 
 ## Documentation
 
-- [Documentation](https://interdigitalinc.github.io/CompressAI-Trainer/)
+- [Documentation](https://interdigitalinc.github.io/CompressAI-Trainer/index.html)
 - [Walkthrough](https://interdigitalinc.github.io/CompressAI-Trainer/tutorials/full.html) (setup, training, visualizations, configuring, customizing, tips and tricks)
 
 
@@ -84,4 +82,4 @@ Please see the documentation for a complete [walkthrough](https://interdigitalin
 
 ## Authors
 
-- Mateen Ulhaq, Fabien Racapé, and InterDigital AI Lab.
+- Mateen Ulhaq, Fabien Racapé, and InterDigital Emerging Technologies Lab.
