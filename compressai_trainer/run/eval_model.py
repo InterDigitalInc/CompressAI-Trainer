@@ -350,7 +350,7 @@ def write_results(conf, outputs, metrics):
     _plot_rd(conf, results, metrics)
 
 
-@hydra.main(version_base=None, config_path="conf")
+@hydra.main(version_base=None, config_path="../../conf")
 def main(conf: DictConfig):
     runner = setup(conf)
 
