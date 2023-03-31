@@ -88,7 +88,7 @@ class BaseRunner(dl.Runner, DistributionSuperlogger, FigureSuperlogger):
     def on_loader_start(self, runner):
         super().on_loader_start(runner)
         if self.is_infer_loader:
-            self.model_module.update()
+            self.model_module.update(force=True)
         self.batch_meters = {}
 
     def on_loader_end(self, runner):

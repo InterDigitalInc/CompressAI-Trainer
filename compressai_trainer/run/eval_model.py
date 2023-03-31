@@ -222,6 +222,8 @@ def get_filenames(conf, num_files):
 
 
 def run_eval_model(runner, batches, filenames, output_dir, metrics):
+    runner.model_module.update(force=True)
+
     output_dir = Path(output_dir)
     os.makedirs(output_dir, exist_ok=True)
 
