@@ -132,6 +132,7 @@ class AimLogger(ILogger):
         scope: Optional[str] = None,
         kind: str = "text",
         context: Optional[Dict] = None,
+        track_kwargs: Optional[Dict] = None,
         **kwargs,
     ) -> None:
         """Logs a local file or directory as an artifact to the logger."""
@@ -146,7 +147,7 @@ class AimLogger(ILogger):
             "text": aim.Text,
         }
         value = kind_dict[kind](artifact, **kwargs)
-        context, track_kwargs = _aim_context(runner, scope, context)
+        context, track_kwargs = _aim_context(runner, scope, context, track_kwargs)
         self.run.track(value, tag, context=context, **track_kwargs)
 
     def log_image(
@@ -156,11 +157,12 @@ class AimLogger(ILogger):
         runner: "IRunner",
         scope: Optional[str] = None,
         context: Optional[Dict] = None,
+        track_kwargs: Optional[Dict] = None,
         **kwargs,
     ) -> None:
         """Logs image to Aim for current scope on current step."""
         value = aim.Image(image, **kwargs)
-        context, track_kwargs = _aim_context(runner, scope, context)
+        context, track_kwargs = _aim_context(runner, scope, context, track_kwargs)
         self.run.track(value, tag, context=context, **track_kwargs)
 
     def log_hparams(self, hparams: Dict, runner: "Optional[IRunner]" = None) -> None:
@@ -181,6 +183,7 @@ class AimLogger(ILogger):
         scope: str,
         runner: "IRunner",
         context: Optional[Dict] = None,
+        track_kwargs: Optional[Dict] = None,
     ) -> None:
         """Logs batch and epoch metrics to Aim."""
         if scope == "batch" and self.log_batch_metrics:
@@ -191,6 +194,7 @@ class AimLogger(ILogger):
                 loader_key=runner.loader_key,
                 scope=scope,
                 context=context,
+                track_kwargs=track_kwargs,
             )
         elif scope == "epoch" and self.log_epoch_metrics:
             for loader_key, per_loader_metrics in metrics.items():
@@ -200,6 +204,7 @@ class AimLogger(ILogger):
                     loader_key=loader_key,
                     scope=scope,
                     context=context,
+                    track_kwargs=track_kwargs,
                 )
 
     def log_distribution(
@@ -209,12 +214,13 @@ class AimLogger(ILogger):
         runner: "IRunner",
         scope: Optional[str] = None,
         context: Optional[Dict] = None,
+        track_kwargs: Optional[Dict] = None,
         **kwargs,
     ) -> None:
         """Logs distribution to Aim for current scope on current step."""
         assert unused is None
         value = aim.Distribution(**kwargs)
-        context, track_kwargs = _aim_context(runner, scope, context)
+        context, track_kwargs = _aim_context(runner, scope, context, track_kwargs)
         self.run.track(value, tag, context=context, **track_kwargs)
 
     def log_figure(
@@ -224,11 +230,12 @@ class AimLogger(ILogger):
         runner: "IRunner",
         scope: Optional[str] = None,
         context: Optional[Dict] = None,
+        track_kwargs: Optional[Dict] = None,
         **kwargs,
     ) -> None:
         """Logs figure to Aim for current scope on current step."""
         value = aim.Figure(fig, **kwargs)
-        context, track_kwargs = _aim_context(runner, scope, context)
+        context, track_kwargs = _aim_context(runner, scope, context, track_kwargs)
         self.run.track(value, tag, context=context, **track_kwargs)
 
     def close_log(self) -> None:
@@ -242,9 +249,10 @@ class AimLogger(ILogger):
         loader_key: str,
         scope: str = "",
         context: Optional[Dict] = None,
+        track_kwargs: Optional[Dict] = None,
     ):
         context, track_kwargs = _aim_context(
-            runner, scope, context, loader_key=loader_key
+            runner, scope, context, track_kwargs, loader_key=loader_key
         )
         for key, value in metrics.items():
             self.run.track(value, key, context=context, **track_kwargs)
@@ -254,6 +262,7 @@ def _aim_context(
     runner: "IRunner",
     scope: Optional[str],
     context: Optional[Dict] = None,
+    track_kwargs: Optional[Dict] = None,
     *,
     loader_key: Optional[str] = None,
     all_scope_steps: bool = False,
@@ -266,11 +275,12 @@ def _aim_context(
             context["loader"] = loader_key
         if scope is not None:
             context["scope"] = scope
-    track_kwargs = {}
-    if all_scope_steps or scope == "batch":
-        track_kwargs["step"] = runner.batch_step
-    if all_scope_steps or scope == "epoch" or scope == "loader":
-        track_kwargs["epoch"] = runner.epoch_step
+    if track_kwargs is None:
+        track_kwargs = {}
+        if all_scope_steps or scope == "batch":
+            track_kwargs["step"] = runner.batch_step
+        if all_scope_steps or scope == "epoch" or scope == "loader":
+            track_kwargs["epoch"] = runner.epoch_step
     return context, track_kwargs
 
 
