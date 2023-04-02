@@ -34,10 +34,11 @@ from typing import cast
 
 import pandas as pd
 import torch
+from compressai.entropy_models import EntropyBottleneck
 from PIL import Image
 
 from compressai_trainer import plot
-from compressai_trainer.plot import plot_rd
+from compressai_trainer.plot import plot_entropy_bottleneck_distributions, plot_rd
 from compressai_trainer.plot.featuremap import DEFAULT_COLORMAP
 from compressai_trainer.utils.catalyst.loggers import (
     DistributionSuperlogger,
@@ -108,6 +109,28 @@ class DebugOutputsLogger:
                 ).save(f"{img_path_prefix}_{name}.png")
 
 
+class EbDistributionsFigureLogger:
+    """Log EntropyBottleneck (EB) distributions figure."""
+
+    def log(self, runner: FigureSuperlogger, log_figure: bool = True, **kwargs):
+        figs = {}
+
+        for name, module in runner.model.named_modules():
+            if not isinstance(module, EntropyBottleneck):
+                continue
+
+            fig = plot_entropy_bottleneck_distributions(module, **kwargs)
+            figs[name] = fig
+
+            if log_figure:
+                context = {
+                    "module": name,
+                }
+                runner.log_figure("pdf", fig, context=context)
+
+        return figs
+
+
 class RdFigureLogger:
     """Log RD figure."""
 
@@ -144,7 +167,7 @@ class RdFigureLogger:
                 "metric": metric,
                 "opt_metric": opt_metric,
             }
-            runner.log_figure(f"rd-curves", fig, context=context)
+            runner.log_figure("rd-curves", fig, context=context)
         return fig
 
 

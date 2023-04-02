@@ -45,7 +45,12 @@ from compressai_trainer.utils.metrics import compute_metrics, db
 from compressai_trainer.utils.utils import compute_padding, tensor_to_np_img
 
 from .base import BaseRunner
-from .utils import ChannelwiseBppMeter, DebugOutputsLogger, RdFigureLogger
+from .utils import (
+    ChannelwiseBppMeter,
+    DebugOutputsLogger,
+    EbDistributionsFigureLogger,
+    RdFigureLogger,
+)
 
 METERS = [
     "loss",
@@ -105,16 +110,17 @@ class ImageCompressionRunner(BaseRunner):
     <https://github.com/InterDigitalInc/CompressAI/blob/master/examples/train.py>`_,
     with additional functionality such as:
 
-    - Plots RD curves.
+    - Plots RD curves, learned entropy bottleneck distributions,
+      and histograms for latent channel-wise rate distributions.
     - Saves inference outputs including images (``_log_outputs``) and
       featuremaps (``_debug_outputs_logger``).
     - Metrics (e.g. ``loss``). See: ``METERS`` and ``INFER_METERS``.
-    - Histograms for latent channel-wise rate distributions.
     """
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._debug_outputs_logger = DebugOutputsLogger()
+        self._eb_distributions_figure_logger = EbDistributionsFigureLogger()
         self._rd_figure_logger = RdFigureLogger()
 
     def on_loader_start(self, runner):
@@ -187,6 +193,7 @@ class ImageCompressionRunner(BaseRunner):
         super().on_loader_end(runner)
         if self.is_infer_loader:
             self._log_rd_curves()
+            self._log_eb_distributions()
             self._loader_metrics["chan_bpp"].log(self)
 
     @property
@@ -240,6 +247,9 @@ class ImageCompressionRunner(BaseRunner):
                 tensor_to_np_img(out_infer["out_dec"]["x_hat"][i].cpu())
             ).save(f"{img_path_prefix}_x_hat.png")
             self._debug_outputs_logger.log(out_infer, i, img_path_prefix)
+
+    def _log_eb_distributions(self):
+        self._eb_distributions_figure_logger.log(runner=self)
 
     def _log_rd_curves(self):
         meta = self.hparams["dataset"]["infer"]["meta"]
