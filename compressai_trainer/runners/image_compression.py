@@ -30,8 +30,7 @@
 from __future__ import annotations
 
 import time
-from collections import defaultdict
-from typing import Any, cast
+from typing import Any
 
 import pandas as pd
 import plotly.graph_objects as go
@@ -41,19 +40,12 @@ from catalyst import metrics
 from compressai.models.base import CompressionModel
 from PIL import Image
 
-from compressai_trainer import plot
-from compressai_trainer.plot import plot_rd
-from compressai_trainer.plot.featuremap import DEFAULT_COLORMAP
 from compressai_trainer.registry import register_runner
-from compressai_trainer.utils.catalyst.loggers import (
-    DistributionSuperlogger,
-    FigureSuperlogger,
-)
-from compressai_trainer.utils.compressai.results import compressai_dataframe
 from compressai_trainer.utils.metrics import compute_metrics, db
 from compressai_trainer.utils.utils import compute_padding, tensor_to_np_img
 
 from .base import BaseRunner
+from .utils import ChannelwiseBppMeter, DebugOutputsLogger, RdFigureLogger
 
 METERS = [
     "loss",
@@ -326,111 +318,3 @@ def inference(
         "encoding_time": enc_time,
         "decoding_time": dec_time,
     }
-
-
-class ChannelwiseBppMeter:
-    """Log channel-wise rates (bpp)."""
-
-    def __init__(self):
-        self._chan_bpp = defaultdict(list)
-
-    def update(self, out_net):
-        _, _, h, w = out_net["x_hat"].shape
-        chan_bpp = {
-            k: l.detach().log2().sum(axis=(-2, -1)) / -(h * w)
-            for k, l in out_net["likelihoods"].items()
-        }
-        for name, ch_bpp in chan_bpp.items():
-            self._chan_bpp[name].extend(ch_bpp)
-
-    def log(self, runner: DistributionSuperlogger):
-        for name, ch_bpp_samples in self._chan_bpp.items():
-            ch_bpp = torch.stack(ch_bpp_samples).mean(dim=0).to(torch.float16).cpu()
-            c, *_ = ch_bpp.shape
-            ch_bpp_sorted, _ = torch.sort(ch_bpp, descending=True)
-            kwargs = dict(
-                unused=None,
-                scope="epoch",
-                context={"name": name},
-                bin_range=(0, c),
-            )
-            runner.log_distribution("chan_bpp_sorted", hist=ch_bpp_sorted, **kwargs)
-            runner.log_distribution("chan_bpp_unsorted", hist=ch_bpp, **kwargs)
-
-
-class DebugOutputsLogger:
-    """Log ``debug_outputs`` from out_net/out_enc/out_dec,
-    such as featuremaps of tensors.
-
-    To use, add desired outputs to the ``debug_outputs`` key returned by
-    ``forward``/``compress``/``decompress``. For example:
-
-    .. code-block:: python
-
-        class MyModel(compressai.models.google.FactorizedPrior):
-            def compress(self, x):
-                y = self.g_a(x)
-                ...
-                return {..., "debug_outputs": {"y": y}}
-    """
-
-    def log(self, out_infer, i, img_path_prefix):
-        debug_outputs = {
-            f"debug_{mode}_{k}": v
-            for mode in ["net", "enc", "dec"]
-            for k, v in out_infer[f"out_{mode}"].get("debug_outputs", {}).items()
-        }
-
-        for name, output in debug_outputs.items():
-            if isinstance(output, torch.Tensor):
-                Image.fromarray(
-                    plot.featuremap_image(
-                        output[i].cpu().numpy(), cmap=DEFAULT_COLORMAP
-                    )
-                ).save(f"{img_path_prefix}_{name}.png")
-
-
-class RdFigureLogger:
-    """Log RD figure."""
-
-    def log(
-        self,
-        runner: FigureSuperlogger,
-        df: pd.DataFrame,
-        traces,
-        codecs: list[str],
-        dataset: str = "image/kodak",
-        loader: str = "infer",
-        metric: str = "psnr",
-        opt_metric: str = "mse",
-        log_figure: bool = True,
-        **kwargs,
-    ):
-        hover_data = kwargs.get("scatter_kwargs", {}).get("hover_data", [])
-        dfs = [
-            compressai_dataframe(name, dataset=dataset, opt_metric=opt_metric)
-            for name in codecs
-        ]
-        dfs.append(df)
-        df = pd.concat(dfs)
-        df = _reorder_dataframe_columns(df, hover_data)
-        fig = plot_rd(df, metric=metric, **kwargs)
-        for trace in traces:
-            fig.add_trace(trace)
-        if log_figure:
-            context = {
-                # "_" is used to order the figures in the experiment tracker.
-                "_": int(metric != (opt_metric if opt_metric != "mse" else "psnr")),
-                "dataset": dataset,
-                "loader": loader,
-                "metric": metric,
-                "opt_metric": opt_metric,
-            }
-            runner.log_figure(f"rd-curves", fig, context=context)
-        return fig
-
-
-def _reorder_dataframe_columns(df: pd.DataFrame, head: list[str]) -> pd.DataFrame:
-    head_set = set(head)
-    columns = head + [x for x in df.columns if x not in head_set]
-    return cast(pd.DataFrame, df[columns])
