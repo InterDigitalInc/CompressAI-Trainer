@@ -36,16 +36,17 @@ import compressai
 import numpy as np
 import pandas as pd
 
+GENERIC_CODECS = ["av1", "hm", "jpeg", "jpeg2000", "vtm", "webp"]
+
 
 def compressai_dataframe(
     codec_name: str,
     dataset: str = "image/kodak",
     opt_metric: str = "mse",
     device: str = "cuda",
+    generic_codecs: list[str] = GENERIC_CODECS,
 ) -> pd.DataFrame:
     """Returns a dataframe containing the results of a given codec."""
-    generic_codecs = ["av1", "hm", "jpeg", "jpeg2000", "vtm", "webp"]
-
     if codec_name in generic_codecs:
         d = generic_codec_result(codec_name, dataset=dataset)
     else:
