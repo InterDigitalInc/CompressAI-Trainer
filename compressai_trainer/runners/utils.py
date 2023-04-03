@@ -167,7 +167,7 @@ class RdFigureLogger:
                 "metric": metric,
                 "opt_metric": opt_metric,
             }
-            runner.log_figure("rd-curves", fig, context=context)
+            runner.log_figure("-rd-curves", fig, context=context)
         return fig
 
 
