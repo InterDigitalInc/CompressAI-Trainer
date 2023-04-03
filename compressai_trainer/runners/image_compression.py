@@ -145,10 +145,10 @@ class ImageCompressionRunner(BaseRunner):
             self._grad_clip()
             self.optimizer["net"].step()
 
-        loss["aux"] = CompressionModel.aux_loss(self.model)  # type: ignore
+        loss["aux"] = self.model_module.aux_loss()
 
         if self.is_train_loader:
-            loss["aux"].backward()  # type: ignore
+            loss["aux"].backward()
             self.optimizer["aux"].step()
             self.optimizer["net"].zero_grad()
             self.optimizer["aux"].zero_grad()
