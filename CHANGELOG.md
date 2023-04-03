@@ -1,6 +1,12 @@
 **Note:** This only highlights "important" changes. For more details, see commit history.
 
 
+### v0.3.8
+
+- [Feature] Plot `EntropyBottleneck` distributions.
+- [Fix] Ensure `update(force=True)` is called every epoch to update CDFs.
+
+
 ### v0.3.7
 
 - [Feature] CLI utilities now organized as:
