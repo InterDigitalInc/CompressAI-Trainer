@@ -34,6 +34,7 @@ Please see :ref:`tutorials-walkthrough` for a complete guide.
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
 import catalyst
@@ -54,6 +55,9 @@ from compressai_trainer.config import (
     write_outputs,
 )
 from compressai_trainer.typing import TRunner
+
+thisdir = Path(__file__).parent
+config_path = thisdir.joinpath("../../conf")
 
 
 def setup(conf: DictConfig) -> tuple[TRunner, dict[str, Any]]:
@@ -89,7 +93,7 @@ def _main(conf: DictConfig):
     runner.train(**engine_kwargs)
 
 
-@hydra.main(version_base=None, config_path="../../conf")
+@hydra.main(version_base=None, config_path=str(config_path))
 def main(conf: DictConfig):
     _main(conf)
 
