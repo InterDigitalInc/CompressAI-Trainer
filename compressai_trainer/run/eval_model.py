@@ -39,7 +39,7 @@ To evaluate a model trained using CompressAI Trainer:
 
 .. code-block:: bash
 
-    python -m compressai_trainer.run.eval_model \
+    compressai-eval \
         --config-path="$HOME/data/runs/e4e6d4d5e5c59c69f3bd7be2/configs" \
         --config-name="config" \
         ++model.source="config" \
@@ -50,7 +50,7 @@ To evaluate a model from the CompressAI zoo:
 
 .. code-block:: bash
 
-    python -m compressai_trainer.run.eval_model --config-name="example_eval_zoo"
+    compressai-eval --config-name="example_eval_zoo"
 
 The model is evaluated on ``dataset.infer``, which may be configured as follows:
 

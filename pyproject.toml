@@ -5,6 +5,11 @@ description = "CompressAI Trainer"
 authors = ["InterDigital AI Lab <compressai@interdigital.com>"]
 license = "BSD 3-Clause Clear License"
 
+[tool.poetry.scripts]
+compressai-train = "compressai_trainer.run.train:main"
+compressai-eval = "compressai_trainer.run.eval_model:main"
+compressai-plot = "compressai_trainer.run.plot_rd:main"
+
 [tool.poetry.dependencies]
 python = ">=3.8.0,<3.12"
 accelerate = "0.15.0"

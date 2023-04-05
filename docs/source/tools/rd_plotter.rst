@@ -120,7 +120,7 @@ Examples
 
   .. code-block:: bash
 
-      python -m compressai_trainer.run.plot_rd \
+      compressai-plot \
           --aim_repo="./logs/aim/main" \
           --query='run.created_at >= datetime(1970, 1, 1)'
 
@@ -128,7 +128,7 @@ Examples
 
   .. code-block:: bash
 
-      python -m compressai_trainer.run.plot_rd \
+      compressai-plot \
           --aim_repo="./logs/aim/main" \
           --query='run.hash in [
               "e4e6d4d5e5c59c69f3bd7be2",
@@ -141,7 +141,7 @@ Examples
 
   .. code-block:: bash
 
-      python -m compressai_trainer.run.plot_rd \
+      compressai-plot \
           --aim_repo="./logs/aim/main" \
           --query='run.hash == "e4e6d4d5e5c59c69f3bd7be2"' \
           --curves='[{
@@ -153,7 +153,7 @@ Examples
 
   .. code-block:: bash
 
-      python -m compressai_trainer.run.plot_rd \
+      compressai-plot \
           --aim_repo="./logs/aim/main" \
           --curves='[
               {"name": "{experiment} (RGB-PSNR)", "y": "psnr_rgb"},
@@ -164,7 +164,7 @@ Examples
 
   .. code-block:: bash
 
-      python -m compressai_trainer.run.plot_rd \
+      compressai-plot \
           --aim_repo="./logs/aim/main" \
           --curves='[
               {"name": "{experiment} (base layer)", "y": "psnr_base"},

@@ -251,12 +251,16 @@ def build_args(argv):
     return args
 
 
-def main(argv):
+def _main(argv):
     args = build_args(argv)
     repo = aim.Repo(args.aim_repo)
     df = create_dataframe(repo, args)
     plot_dataframe(df, args)
 
 
+def main():
+    _main(sys.argv[1:])
+
+
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()
