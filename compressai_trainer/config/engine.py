@@ -41,6 +41,11 @@ from compressai_trainer.utils.catalyst.loggers import AimLogger
 
 PRIMARY_LOGGER = "aim"
 
+LOGGERS = {
+    "csv": dl.CSVLogger,
+    "tensorboard": dl.TensorboardLogger,
+}
+
 
 def create_callback(conf: DictConfig) -> TCallback:
     kwargs = OmegaConf.to_container(conf, resolve=True)
@@ -63,10 +68,15 @@ def create_logger(conf: DictConfig, logger_type: str) -> dl.ILogger:
         )
         conf.env.aim.run_hash = logger.run.hash
         return logger
-    if logger_type == "tensorboard":
-        assert conf.env[PRIMARY_LOGGER].run_hash is not None
-        return dl.TensorboardLogger(
-            **conf.engine.loggers.tensorboard,
+    assert conf.env[PRIMARY_LOGGER].run_hash is not None
+    if logger_type == "mlflow":
+        return dl.MLflowLogger(
+            experiment=conf.exp.name,
+            **conf.engine.loggers.mlflow,
+        )
+    if logger_type in LOGGERS:
+        return LOGGERS[logger_type](
+            **conf.engine.loggers[logger_type],
         )
     raise ValueError(f"Unknown logger type: {logger_type}")
 

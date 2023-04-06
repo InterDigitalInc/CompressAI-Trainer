@@ -489,6 +489,41 @@ To continue an existing run that was paused/cancelled during training, load the 
 
 
 
+.. _additional-loggers:
+
+Additional loggers
+------------------
+
+By default, CompressAI Trainer logs experiments to both Aim and Tensorboard. Additional loggers can be enabled as shown below.
+
+CSV Logger
+~~~~~~~~~~
+
+Store CSV logs inside the current run directory via:
+
+.. code-block:: bash
+
+    compressai-train \
+      --config-name="example" \
+      ++engine.loggers.csv.logdir='${paths._run_root}/csv'
+
+
+MLflow Logger
+~~~~~~~~~~~~~
+
+Connect CompressAI Trainer to an MLflow experiment tracking server:
+
+.. code-block:: bash
+
+    compressai-train \
+      --config-name="example" \
+      ++exp.name="example_experiment" \
+      ++engine.loggers.mlflow.run="example_run" \
+      ++engine.loggers.mlflow.tracking_uri=http://localhost:5000 \
+      ++engine.loggers.mlflow.registry_uri=http://localhost:5000
+
+
+
 .. _tips:
 
 Tips
