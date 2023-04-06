@@ -43,6 +43,7 @@ optional = true
 [tool.poetry.group.docs.dependencies]
 sphinx = "^4.0"
 sphinx-book-theme = "^0.3.3"
+sphinx-serve = "^1.0.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

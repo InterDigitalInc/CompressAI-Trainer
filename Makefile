@@ -19,7 +19,11 @@ install: ## Install via poetry
 	@echo "poetry shell"
 
 
-.PHONY: docs
+.PHONY: docs docs-serve
 docs: ## Build documentation
 	@echo "--> Building docs"
 	@cd docs && SPHINXOPTS="-W" make html
+
+docs-serve: docs ## Serve documentation
+	@echo "--> Serving docs"
+	@cd docs && sphinx-serve --build _build

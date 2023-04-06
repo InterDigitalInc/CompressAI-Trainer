@@ -69,6 +69,25 @@ poetry shell
 ```
 
 
+### Development
+
+Installation of dependencies for documentation and development of CompressAI-Trainer
+can only be accomplished using poetry from within the `compressai-trainer` folder.
+This works with either of the above venv or poetry methods of installation.
+
+```bash
+cd ./compressai-trainer
+poetry install --only docs
+poetry install --only dev
+```
+
+You can then build and serve documentation using `make`:
+
+```bash
+make docs-serve
+```
+
+
 ## Documentation
 
 - [Documentation](https://interdigitalinc.github.io/CompressAI-Trainer/index.html)

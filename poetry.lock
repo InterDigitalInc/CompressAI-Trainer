@@ -2596,6 +2596,17 @@ doc = ["ablog (>=0.10.13,<0.11.0)", "folium", "ipywidgets", "matplotlib", "myst-
 test = ["beautifulsoup4 (>=4.6.1,<5)", "coverage", "myst-nb (>=0.13.2,<0.14.0)", "pytest (>=6.0.1,<6.1.0)", "pytest-cov", "pytest-regressions (>=2.0.1,<2.1.0)", "sphinx_thebe"]
 
 [[package]]
+name = "sphinx-serve"
+version = "1.0.1"
+description = "Preview sphinx documentation locally"
+category = "dev"
+optional = false
+python-versions = "*"
+files = [
+    {file = "sphinx-serve-1.0.1.tar.gz", hash = "sha256:8d90f6595114108500b1f935d3f4d07bf5192783c67ce83f944ef289099669c9"},
+]
+
+[[package]]
 name = "sphinxcontrib-applehelp"
 version = "1.0.4"
 description = "sphinxcontrib-applehelp is a Sphinx extension which outputs Apple help books"
@@ -3158,4 +3169,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8.0,<3.12"
-content-hash = "75ed88cd9496e6e7c0527aad1a4acf1bf238b32e5c4c8a32d14428f16cbc8dc0"
+content-hash = "bd3c4b748f20f5a6e3cac24488d3f9f6cbc625585e0369282fc6b8f3f1bc31ef"
