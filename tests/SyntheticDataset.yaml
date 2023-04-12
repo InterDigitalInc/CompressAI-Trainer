@@ -1,0 +1,53 @@
+train:
+  type: "SyntheticDataset"
+  config:
+    image_size: "${..settings.patch_size}"
+    num_samples: "${..meta.num_samples}"
+  loader:
+    shuffle: True
+    batch_size: 16
+    num_workers: 2
+  settings:
+    patch_size: [ 256, 256, ]
+  transforms: []
+  meta:
+    name: "Synthetic"
+    identifier:
+    num_samples: 32768
+    steps_per_epoch:
+
+valid:
+  type: "SyntheticDataset"
+  config:
+    image_size: "${..settings.patch_size}"
+    num_samples: "${..meta.num_samples}"
+  loader:
+    shuffle: False
+    batch_size: 64
+    num_workers: 2
+  settings:
+    patch_size: [ 256, 256, ]
+  transforms: []
+  meta:
+    name: "Synthetic"
+    identifier:
+    num_samples: 4096
+    steps_per_epoch:
+
+infer:
+  type: "SyntheticDataset"
+  config:
+    image_size: "${..settings.patch_size}"
+    num_samples: "${..meta.num_samples}"
+  loader:
+    shuffle: False
+    batch_size: 64
+    num_workers: 2
+  settings:
+    patch_size: [ 256, 256, ]
+  transforms: []
+  meta:
+    name: "Synthetic"
+    identifier:
+    num_samples: 4096
+    steps_per_epoch:
