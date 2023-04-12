@@ -78,7 +78,7 @@ def _get_entropy_bottleneck_distributions_dataframe(
     max_size = sizes.max().item()
     num_samples = max_size
 
-    t = torch.linspace(0, max_size - 1, num_samples, device="cuda")
+    t = torch.linspace(0, max_size - 1, num_samples, device=q.device)
     dy = t[None, :] - left[:, None]
     y = dy + q[:, 1, None]
 
