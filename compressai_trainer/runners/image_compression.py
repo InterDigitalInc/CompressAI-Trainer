@@ -30,7 +30,7 @@
 from __future__ import annotations
 
 import time
-from typing import Any
+from typing import Any, Optional
 
 import pandas as pd
 import plotly.graph_objects as go
@@ -38,6 +38,7 @@ import torch
 import torch.nn.functional as F
 from catalyst import metrics
 from compressai.models.base import CompressionModel
+from compressai.typing import TCriterion
 from PIL import Image
 
 from compressai_trainer.registry import register_runner
@@ -117,8 +118,9 @@ class ImageCompressionRunner(BaseRunner):
     - Metrics (e.g. ``loss``). See: ``METERS`` and ``INFER_METERS``.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, inference: dict[str, Any], *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._inference_kwargs = inference
         self._debug_outputs_logger = DebugOutputsLogger()
         self._eb_distributions_figure_logger = EbDistributionsFigureLogger()
         self._rd_figure_logger = RdFigureLogger()
@@ -160,7 +162,7 @@ class ImageCompressionRunner(BaseRunner):
 
     def _handle_batch_infer(self, batch):
         x = batch.to(self.engine.device)
-        out_infer = self.predict_batch(x)
+        out_infer = self.predict_batch(x, **self._inference_kwargs)
         out_net = out_infer["out_net"]
 
         out_criterion = self.criterion(out_net, x)
@@ -184,10 +186,9 @@ class ImageCompressionRunner(BaseRunner):
 
         self._log_outputs(x, out_infer)
 
-    def predict_batch(self, batch):
+    def predict_batch(self, batch, **kwargs):
         x = batch.to(self.engine.device)
-        out_infer = inference(self.model_module, x)
-        return out_infer
+        return inference(self.model_module, x, criterion=self.criterion, **kwargs)
 
     def on_loader_end(self, runner):
         super().on_loader_end(runner)
@@ -290,7 +291,9 @@ class ImageCompressionRunner(BaseRunner):
 def inference(
     model: CompressionModel,
     x: torch.Tensor,
+    skip_compress: bool = False,
     skip_decompress: bool = False,
+    criterion: Optional[TCriterion] = None,
     min_div: int = 64,
 ) -> dict[str, Any]:
     """Run compression model on image batch."""
@@ -303,11 +306,16 @@ def inference(
     out_net["x_hat"] = F.pad(out_net["x_hat"], unpad)
 
     # Compress using compress/decompress.
-    start = time.time()
-    out_enc = model.compress(x_padded)
-    enc_time = time.time() - start
+    if not skip_compress:
+        start = time.time()
+        out_enc = model.compress(x_padded)
+        enc_time = time.time() - start
+    else:
+        out_enc = {}
+        enc_time = None
 
     if not skip_decompress:
+        assert not skip_compress
         start = time.time()
         out_dec = model.decompress(out_enc["strings"], out_enc["shape"])
         dec_time = time.time() - start
@@ -318,9 +326,13 @@ def inference(
         dec_time = None
 
     # Compute bpp.
-    num_bits = sum(sum(map(len, s)) for s in out_enc["strings"]) * 8.0
-    num_pixels = n * h * w
-    bpp = num_bits / num_pixels
+    if not skip_compress:
+        num_bits = sum(sum(map(len, s)) for s in out_enc["strings"]) * 8.0
+        num_pixels = n * h * w
+        bpp = num_bits / num_pixels
+    else:
+        out_criterion = criterion(out_net, x)
+        bpp = out_criterion["bpp_loss"].item()
 
     return {
         "out_net": out_net,

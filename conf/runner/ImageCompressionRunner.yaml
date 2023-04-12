@@ -1,1 +1,4 @@
 type: "ImageCompressionRunner"
+inference:
+  skip_compress: False
+  skip_decompress: False
