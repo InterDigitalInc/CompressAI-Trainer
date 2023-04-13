@@ -30,7 +30,7 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from typing import cast
+from typing import Any, Optional, cast
 
 import pandas as pd
 import torch
@@ -112,7 +112,14 @@ class DebugOutputsLogger:
 class EbDistributionsFigureLogger:
     """Log EntropyBottleneck (EB) distributions figure."""
 
-    def log(self, runner: FigureSuperlogger, log_figure: bool = True, **kwargs):
+    def log(
+        self,
+        runner: FigureSuperlogger,
+        log_figure: bool = True,
+        log_kwargs: Optional[dict[str, Any]] = None,
+        **kwargs,
+    ):
+        log_kwargs = log_kwargs or {}
         figs = {}
 
         for name, module in runner.model.named_modules():
@@ -123,10 +130,8 @@ class EbDistributionsFigureLogger:
             figs[name] = fig
 
             if log_figure:
-                context = {
-                    "module": name,
-                }
-                runner.log_figure("pdf", fig, context=context)
+                context = {"module": name}
+                runner.log_figure("pdf", fig, context=context, **log_kwargs)
 
         return figs
 

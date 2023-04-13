@@ -249,7 +249,9 @@ class ImageCompressionRunner(BaseRunner):
             self._debug_outputs_logger.log(out_infer, i, img_path_prefix)
 
     def _log_eb_distributions(self):
-        self._eb_distributions_figure_logger.log(runner=self)
+        self._eb_distributions_figure_logger.log(
+            runner=self, log_kwargs=dict(track_kwargs=dict(step=0))
+        )
 
     def _log_rd_curves(self):
         meta = self.hparams["dataset"]["infer"]["meta"]
