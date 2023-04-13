@@ -119,8 +119,8 @@ class ImageCompressionRunner(BaseRunner):
         self._meters = meters
         self._grad_clip = GradientClipper(self)
         self._debug_outputs_logger = DebugOutputsLogger()
-        self._eb_distributions_figure_logger = EbDistributionsFigureLogger()
-        self._rd_figure_logger = RdFigureLogger()
+        self._eb_distributions_figure_logger = EbDistributionsFigureLogger(self)
+        self._rd_figure_logger = RdFigureLogger(self)
 
     def on_loader_start(self, runner):
         super().on_loader_start(runner)
@@ -192,7 +192,7 @@ class ImageCompressionRunner(BaseRunner):
         if self.loader_key == "infer":
             self._log_rd_curves()
             self._log_eb_distributions()
-            self._loader_metrics["chan_bpp"].log(self)
+            self._loader_metrics["chan_bpp"].log()
 
     @property
     def _current_dataframe(self):
@@ -213,7 +213,7 @@ class ImageCompressionRunner(BaseRunner):
 
     def _current_rd_traces(self, metric):
         return self._rd_figure_logger.current_rd_traces(
-            self, x="bpp", y=metric, lmbda=self.hparams["criterion"]["lmbda"]
+            x="bpp", y=metric, lmbda=self.hparams["criterion"]["lmbda"]
         )
 
     def _handle_custom_metrics(self, out_net, out_metrics):
@@ -232,14 +232,13 @@ class ImageCompressionRunner(BaseRunner):
 
     def _log_eb_distributions(self):
         self._eb_distributions_figure_logger.log(
-            runner=self, log_kwargs=dict(track_kwargs=dict(step=0))
+            log_kwargs=dict(track_kwargs=dict(step=0))
         )
 
     def _log_rd_curves(self):
         meta = self.hparams["dataset"]["infer"]["meta"]
         for metric, description in zip(RD_PLOT_METRICS, RD_PLOT_DESCRIPTIONS):
             self._rd_figure_logger.log(
-                runner=self,
                 df=self._current_dataframe,
                 traces=self._current_rd_traces(metric),
                 metric=metric,
@@ -255,7 +254,7 @@ class ImageCompressionRunner(BaseRunner):
 
     def _setup_loader_metrics(self):
         self._loader_metrics = {
-            "chan_bpp": ChannelwiseBppMeter(),
+            "chan_bpp": ChannelwiseBppMeter(self),
             **{k: [] for k in ["bpp", *RD_PLOT_METRICS]},
         }
 

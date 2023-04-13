@@ -42,10 +42,6 @@ from PIL import Image
 from compressai_trainer import plot
 from compressai_trainer.plot import plot_entropy_bottleneck_distributions, plot_rd
 from compressai_trainer.plot.featuremap import DEFAULT_COLORMAP
-from compressai_trainer.utils.catalyst.loggers import (
-    DistributionSuperlogger,
-    FigureSuperlogger,
-)
 from compressai_trainer.utils.compressai.results import compressai_dataframe
 
 
@@ -65,7 +61,8 @@ class GradientClipper:
 class ChannelwiseBppMeter:
     """Log channel-wise rates (bpp)."""
 
-    def __init__(self):
+    def __init__(self, runner):
+        self.runner = runner
         self._chan_bpp = defaultdict(list)
 
     def update(self, out_net):
@@ -77,19 +74,19 @@ class ChannelwiseBppMeter:
         for name, ch_bpp in chan_bpp.items():
             self._chan_bpp[name].extend(ch_bpp)
 
-    def log(self, runner: DistributionSuperlogger):
+    def log(self):
         for name, ch_bpp_samples in self._chan_bpp.items():
             ch_bpp = torch.stack(ch_bpp_samples).mean(dim=0).to(torch.float16).cpu()
             c, *_ = ch_bpp.shape
             ch_bpp_sorted, _ = torch.sort(ch_bpp, descending=True)
-            kwargs = dict(
+            kw = dict(
                 unused=None,
                 scope="epoch",
                 context={"name": name},
                 bin_range=(0, c),
             )
-            runner.log_distribution("chan_bpp_sorted", hist=ch_bpp_sorted, **kwargs)
-            runner.log_distribution("chan_bpp_unsorted", hist=ch_bpp, **kwargs)
+            self.runner.log_distribution("chan_bpp_sorted", hist=ch_bpp_sorted, **kw)
+            self.runner.log_distribution("chan_bpp_unsorted", hist=ch_bpp, **kw)
 
 
 class DebugOutputsLogger:
@@ -127,9 +124,11 @@ class DebugOutputsLogger:
 class EbDistributionsFigureLogger:
     """Log EntropyBottleneck (EB) distributions figure."""
 
+    def __init__(self, runner):
+        self.runner = runner
+
     def log(
         self,
-        runner: FigureSuperlogger,
         log_figure: bool = True,
         log_kwargs: Optional[dict[str, Any]] = None,
         **kwargs,
@@ -137,7 +136,7 @@ class EbDistributionsFigureLogger:
         log_kwargs = log_kwargs or {}
         figs = {}
 
-        for name, module in runner.model.named_modules():
+        for name, module in self.runner.model.named_modules():
             if not isinstance(module, EntropyBottleneck):
                 continue
 
@@ -146,7 +145,7 @@ class EbDistributionsFigureLogger:
 
             if log_figure:
                 context = {"module": name}
-                runner.log_figure("pdf", fig, context=context, **log_kwargs)
+                self.runner.log_figure("pdf", fig, context=context, **log_kwargs)
 
         return figs
 
@@ -154,9 +153,11 @@ class EbDistributionsFigureLogger:
 class RdFigureLogger:
     """Log RD figure."""
 
+    def __init__(self, runner):
+        self.runner = runner
+
     def log(
         self,
-        runner: FigureSuperlogger,
         df: pd.DataFrame,
         traces,
         codecs: list[str],
@@ -187,16 +188,16 @@ class RdFigureLogger:
                 "metric": metric,
                 "opt_metric": opt_metric,
             }
-            runner.log_figure("-rd-curves", fig, context=context)
+            self.runner.log_figure("-rd-curves", fig, context=context)
         return fig
 
-    def current_rd_traces(self, runner: dl.Runner, x: str, y: str, lmbda: float):
-        num_points = len(runner._loader_metrics[x])
+    def current_rd_traces(self, x: str, y: str, lmbda: float):
+        num_points = len(self.runner._loader_metrics[x])
         samples_scatter = go.Scatter(
-            x=runner._loader_metrics[x],
-            y=runner._loader_metrics[y],
+            x=self.runner._loader_metrics[x],
+            y=self.runner._loader_metrics[y],
             mode="markers",
-            name=f'{runner.hparams["model"]["name"]} {lmbda:.4f}',
+            name=f'{self.runner.hparams["model"]["name"]} {lmbda:.4f}',
             text=[f"lmbda={lmbda:.4f}\nsample_idx={i}" for i in range(num_points)],
             visible="legendonly",
         )
