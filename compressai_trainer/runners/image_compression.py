@@ -53,19 +53,6 @@ from .utils import (
     RdFigureLogger,
 )
 
-METERS = [
-    "loss",
-    "aux_loss",
-    "bpp_loss",
-    "mse_loss",
-]
-
-INFER_METERS = [
-    "bpp",
-    "psnr",
-    "ms-ssim",
-]
-
 RD_PLOT_METRICS = [
     "psnr",
     "ms-ssim",
@@ -115,12 +102,21 @@ class ImageCompressionRunner(BaseRunner):
       and histograms for latent channel-wise rate distributions.
     - Saves inference outputs including images (``_log_outputs``) and
       featuremaps (``_debug_outputs_logger``).
-    - Metrics (e.g. ``loss``). See: ``METERS`` and ``INFER_METERS``.
+
+    Set the input arguments by overriding the defaults in
+    ``conf/runner/ImageCompressionRunner.yaml``.
     """
 
-    def __init__(self, inference: dict[str, Any], *args, **kwargs):
+    def __init__(
+        self,
+        inference: dict[str, Any],
+        meters: dict[str, list[str]],
+        *args,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self._inference_kwargs = inference
+        self._meters = meters
         self._debug_outputs_logger = DebugOutputsLogger()
         self._eb_distributions_figure_logger = EbDistributionsFigureLogger()
         self._rd_figure_logger = RdFigureLogger()
@@ -279,11 +275,9 @@ class ImageCompressionRunner(BaseRunner):
         }
 
     def _setup_meters(self):
-        keys = list(METERS)
-        if self.is_infer_loader:
-            keys += INFER_METERS
         self.batch_meters = {
-            key: metrics.AdditiveMetric(compute_on_call=False) for key in keys
+            key: metrics.AdditiveMetric(compute_on_call=False)
+            for key in self._meters[self.loader_key]
         }
 
 

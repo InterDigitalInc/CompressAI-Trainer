@@ -1,4 +1,26 @@
 type: "ImageCompressionRunner"
+
 inference:
   skip_compress: False
   skip_decompress: False
+
+# Mean-averaged metrics to track for each data loader.
+meters:
+  train:
+    - loss
+    # - aux_loss
+    # - bpp_loss
+    # - mse_loss
+  valid:
+    - loss
+    # - aux_loss
+    # - bpp_loss
+    # - mse_loss
+  infer:
+    - loss
+    - aux_loss
+    - bpp_loss
+    - mse_loss
+    - bpp
+    - psnr
+    - ms-ssim
