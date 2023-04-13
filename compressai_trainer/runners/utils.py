@@ -33,6 +33,7 @@ from collections import defaultdict
 from typing import Any, Optional, cast
 
 import pandas as pd
+import plotly.graph_objects as go
 import torch
 from catalyst import dl
 from compressai.entropy_models import EntropyBottleneck
@@ -188,6 +189,18 @@ class RdFigureLogger:
             }
             runner.log_figure("-rd-curves", fig, context=context)
         return fig
+
+    def current_rd_traces(self, runner: dl.Runner, x: str, y: str, lmbda: float):
+        num_points = len(runner._loader_metrics[x])
+        samples_scatter = go.Scatter(
+            x=runner._loader_metrics[x],
+            y=runner._loader_metrics[y],
+            mode="markers",
+            name=f'{runner.hparams["model"]["name"]} {lmbda:.4f}',
+            text=[f"lmbda={lmbda:.4f}\nsample_idx={i}" for i in range(num_points)],
+            visible="legendonly",
+        )
+        return [samples_scatter]
 
 
 def _reorder_dataframe_columns(df: pd.DataFrame, head: list[str]) -> pd.DataFrame:

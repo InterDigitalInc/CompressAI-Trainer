@@ -33,7 +33,6 @@ import time
 from typing import Any, Optional
 
 import pandas as pd
-import plotly.graph_objects as go
 import torch
 import torch.nn.functional as F
 from catalyst import metrics
@@ -213,17 +212,9 @@ class ImageCompressionRunner(BaseRunner):
         return pd.DataFrame.from_dict([d])
 
     def _current_rd_traces(self, metric):
-        lmbda = self.hparams["criterion"]["lmbda"]
-        num_points = len(self._loader_metrics["bpp"])
-        samples_scatter = go.Scatter(
-            x=self._loader_metrics["bpp"],
-            y=self._loader_metrics[metric],
-            mode="markers",
-            name=f'{self.hparams["model"]["name"]} {lmbda:.4f}',
-            text=[f"lmbda={lmbda:.4f}\nsample_idx={i}" for i in range(num_points)],
-            visible="legendonly",
+        return self._rd_figure_logger.current_rd_traces(
+            self, x="bpp", y=metric, lmbda=self.hparams["criterion"]["lmbda"]
         )
-        return [samples_scatter]
 
     def _handle_custom_metrics(self, out_net, out_metrics):
         self._loader_metrics["chan_bpp"].update(out_net)
