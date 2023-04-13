@@ -127,7 +127,7 @@ class ImageCompressionRunner(BaseRunner):
         self._setup_meters()
 
     def handle_batch(self, batch):
-        if self.is_infer_loader:
+        if self.loader_key == "infer":
             return self._handle_batch_infer(batch)
 
         x = batch
@@ -136,14 +136,14 @@ class ImageCompressionRunner(BaseRunner):
         loss = {}
         loss["net"] = out_criterion["loss"]
 
-        if self.is_train_loader:
+        if self.loader_key == "train":
             loss["net"].backward()
             self._grad_clip()
             self.optimizer["net"].step()
 
         loss["aux"] = self.model_module.aux_loss()
 
-        if self.is_train_loader:
+        if self.loader_key == "train":
             loss["aux"].backward()
             self.optimizer["aux"].step()
             self.optimizer["net"].zero_grad()
@@ -188,7 +188,7 @@ class ImageCompressionRunner(BaseRunner):
 
     def on_loader_end(self, runner):
         super().on_loader_end(runner)
-        if self.is_infer_loader:
+        if self.loader_key == "infer":
             self._log_rd_curves()
             self._log_eb_distributions()
             self._loader_metrics["chan_bpp"].log(self)
