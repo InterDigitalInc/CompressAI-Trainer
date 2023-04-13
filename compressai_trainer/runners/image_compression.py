@@ -50,6 +50,7 @@ from .utils import (
     ChannelwiseBppMeter,
     DebugOutputsLogger,
     EbDistributionsFigureLogger,
+    GradientClipper,
     RdFigureLogger,
 )
 
@@ -117,6 +118,7 @@ class ImageCompressionRunner(BaseRunner):
         super().__init__(*args, **kwargs)
         self._inference_kwargs = inference
         self._meters = meters
+        self._grad_clip = GradientClipper(self)
         self._debug_outputs_logger = DebugOutputsLogger()
         self._eb_distributions_figure_logger = EbDistributionsFigureLogger()
         self._rd_figure_logger = RdFigureLogger()
@@ -222,14 +224,6 @@ class ImageCompressionRunner(BaseRunner):
             visible="legendonly",
         )
         return [samples_scatter]
-
-    def _grad_clip(self):
-        grad_clip = self.hparams["optimizer"].get("grad_clip", None)
-        if grad_clip is None:
-            return
-        max_norm = grad_clip.get("max_norm", None)
-        if max_norm is not None:
-            torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm)
 
     def _handle_custom_metrics(self, out_net, out_metrics):
         self._loader_metrics["chan_bpp"].update(out_net)

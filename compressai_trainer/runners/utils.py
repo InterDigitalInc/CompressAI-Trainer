@@ -34,6 +34,7 @@ from typing import Any, Optional, cast
 
 import pandas as pd
 import torch
+from catalyst import dl
 from compressai.entropy_models import EntropyBottleneck
 from PIL import Image
 
@@ -45,6 +46,19 @@ from compressai_trainer.utils.catalyst.loggers import (
     FigureSuperlogger,
 )
 from compressai_trainer.utils.compressai.results import compressai_dataframe
+
+
+class GradientClipper:
+    def __init__(self, runner: dl.Runner):
+        self.runner = runner
+
+    def __call__(self):
+        grad_clip = self.runner.hparams["optimizer"].get("grad_clip", None)
+        if grad_clip is None:
+            return
+        max_norm = grad_clip.get("max_norm", None)
+        if max_norm is not None:
+            torch.nn.utils.clip_grad_norm_(self.runner.model.parameters(), max_norm)
 
 
 class ChannelwiseBppMeter:
