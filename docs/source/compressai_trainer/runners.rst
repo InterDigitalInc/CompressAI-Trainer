@@ -11,7 +11,7 @@ The following functions are called during the training loop:
     on_experiment_start   # Once, at the beginning.
       on_epoch_start      # Beginning of an epoch.
         on_loader_start   # For each loader (train / valid / infer).
-          on_batch_start  # Rarely useful.
+          on_batch_start  # Before each batch.
             handle_batch  # For each image batch.
           on_batch_end
         on_loader_end
