@@ -41,10 +41,7 @@ def main(conf: DictConfig):
 
 
 if __name__ == "__main__":
-    message = (
-        "This script is deprecated.\n"
-        "Please run using `python -m compressai_trainer.run.train` instead."
-    )
+    message = "This script is deprecated.\nPlease run using `compressai-train` instead."
     warnings.warn(message, DeprecationWarning)
 
     main()
