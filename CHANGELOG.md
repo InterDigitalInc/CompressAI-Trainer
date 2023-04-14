@@ -1,6 +1,17 @@
 **Note:** This only highlights "important" changes. For more details, see commit history.
 
 
+### v0.3.9
+
+- [Feature] CLI utilities now launch from:
+  - `compressai-train`
+  - `compressai-eval` (evaluate a trained model to produce bitstreams/images/metrics/etc)
+  - `compressai-plot` (plot RD curves)
+  - `compressai_trainer.run.compressai` (wrapper around `compressai.utils`)
+- [Feature] Log `x_hat` images and `debug_outputs` to experiment tracker, too. (See v0.3.4 notes.)
+- [CI] Automated tests.
+- [Refactor] Simplify `ImageCompressionRunner`; expose Hydra configuration `++runner.meters` and `++runner.inference` (`skip_compress`/`skip_decompress`).
+
 ### v0.3.8
 
 - [Feature] Plot `EntropyBottleneck` distributions.
@@ -9,11 +20,7 @@
 
 ### v0.3.7
 
-- [Feature] CLI utilities now organized as:
-  - `compressai_trainer.run.train`
-  - `compressai_trainer.run.eval_model` (new! evaluate a trained model to produce bitstreams/images/metrics/etc)
-  - `compressai_trainer.run.plot_rd`
-  - `compressai_trainer.run.compressai` (wrapper around `compressai.utils`)
+- [Feature] CLI utilities reorganized into `compressai_train.run.*`
 - [Refactor] `ImageCompressionRunner.predict_batch` now *only* predicts batches.
 - [Chore] Upgrade various dependencies (`poetry update`).
 
