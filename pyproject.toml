@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "compressai-trainer"
-version = "0.3.8"
+version = "0.3.9"
 description = "CompressAI Trainer"
 authors = ["InterDigital AI Lab <compressai@interdigital.com>"]
 license = "BSD 3-Clause Clear License"
