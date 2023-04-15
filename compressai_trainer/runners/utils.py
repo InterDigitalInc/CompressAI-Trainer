@@ -116,6 +116,8 @@ class DebugOutputsLogger:
     def _log(self, out_infer, sample_offset, i):
         sample_idx = sample_offset + i
         img_path_prefix = f"{self.runner.hparams['paths']['images']}/{sample_idx:06}"
+        log_kwargs = dict(format="webp", lossless=True, quality=50, method=6)
+        log_kwargs["track_kwargs"] = dict(step=sample_idx)
 
         debug_outputs = {
             (mode, k): v
@@ -125,9 +127,9 @@ class DebugOutputsLogger:
         debug_outputs[("dec", "x_hat")] = out_infer["out_dec"]["x_hat"]
 
         for keypath, output in debug_outputs.items():
-            self._log_output(keypath, output[i], img_path_prefix)
+            self._log_output(keypath, output[i], img_path_prefix, log_kwargs)
 
-    def _log_output(self, keypath, output, img_path_prefix):
+    def _log_output(self, keypath, output, img_path_prefix, log_kwargs):
         if not isinstance(output, torch.Tensor):
             raise ValueError
 
@@ -139,6 +141,8 @@ class DebugOutputsLogger:
             arr = plot.featuremap_image(output.cpu().numpy(), cmap=DEFAULT_COLORMAP)
 
         Image.fromarray(arr).save(f"{img_path_prefix}_{mode}_{key}.png")
+        context = {"mode": mode, "key": key}
+        self.runner.log_image("output", arr, context=context, **log_kwargs)
 
 
 class EbDistributionsFigureLogger:
