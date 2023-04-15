@@ -38,11 +38,10 @@ import torch.nn.functional as F
 from catalyst import metrics
 from compressai.models.base import CompressionModel
 from compressai.typing import TCriterion
-from PIL import Image
 
 from compressai_trainer.registry import register_runner
 from compressai_trainer.utils.metrics import compute_metrics, db
-from compressai_trainer.utils.utils import compute_padding, tensor_to_np_img
+from compressai_trainer.utils.utils import compute_padding
 
 from .base import BaseRunner
 from .utils import (
@@ -118,7 +117,7 @@ class ImageCompressionRunner(BaseRunner):
         self._inference_kwargs = inference
         self._meters = meters
         self._grad_clip = GradientClipper(self)
-        self._debug_outputs_logger = DebugOutputsLogger()
+        self._debug_outputs_logger = DebugOutputsLogger(self)
         self._eb_distributions_figure_logger = EbDistributionsFigureLogger(self)
         self._rd_figure_logger = RdFigureLogger(self)
 
@@ -222,13 +221,8 @@ class ImageCompressionRunner(BaseRunner):
             self._loader_metrics[metric].append(out_metrics[metric])
 
     def _log_outputs(self, x, out_infer):
-        for i in range(len(x)):
-            sample_idx = (self.loader_batch_step - 1) * self.loader_batch_size + i + 1
-            img_path_prefix = f"{self.hparams['paths']['images']}/{sample_idx:06}"
-            Image.fromarray(
-                tensor_to_np_img(out_infer["out_dec"]["x_hat"][i].cpu())
-            ).save(f"{img_path_prefix}_x_hat.png")
-            self._debug_outputs_logger.log(out_infer, i, img_path_prefix)
+        sample_offset = (self.loader_batch_step - 1) * self.loader_batch_size + 1
+        self._debug_outputs_logger.log(out_infer, sample_offset, batch_size=len(x))
 
     def _log_eb_distributions(self):
         self._eb_distributions_figure_logger.log(

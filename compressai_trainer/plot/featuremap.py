@@ -210,6 +210,36 @@ def tile_featuremap(
     Returns:
         np.ndarray: tiled array
     """
+    if arr.ndim == 2:
+        return _tile_featuremap_2d(arr, nrows, ncols, padding, fill_value)
+    if arr.ndim == 3:
+        return _tile_featuremap_3d(arr, nrows, ncols, padding, fill_value)
+    raise NotImplementedError(f"Unsupported number of dimensions: {arr.ndim}.")
+
+
+def _tile_featuremap_2d(
+    arr: np.ndarray,
+    nrows: Optional[int] = None,
+    ncols: Optional[int] = None,
+    padding: int = 2,
+    fill_value: Optional[float] = None,
+) -> np.ndarray:
+    c, m = arr.shape
+    arr = arr.reshape(c, m, 1)
+    if nrows is None and ncols is None:
+        nrows = 1
+        ncols = c
+        padding = 0
+    return _tile_featuremap_3d(arr, nrows, ncols, padding, fill_value)
+
+
+def _tile_featuremap_3d(
+    arr: np.ndarray,
+    nrows: Optional[int] = None,
+    ncols: Optional[int] = None,
+    padding: int = 2,
+    fill_value: Optional[float] = None,
+) -> np.ndarray:
     if fill_value is None:
         fill_value = arr.min()
 

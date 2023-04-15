@@ -43,6 +43,7 @@ from compressai_trainer import plot
 from compressai_trainer.plot import plot_entropy_bottleneck_distributions, plot_rd
 from compressai_trainer.plot.featuremap import DEFAULT_COLORMAP
 from compressai_trainer.utils.compressai.results import compressai_dataframe
+from compressai_trainer.utils.utils import tensor_to_np_img
 
 
 class GradientClipper:
@@ -105,20 +106,39 @@ class DebugOutputsLogger:
                 return {..., "debug_outputs": {"y": y}}
     """
 
-    def log(self, out_infer, i, img_path_prefix):
+    def __init__(self, runner):
+        self.runner = runner
+
+    def log(self, out_infer, sample_offset, batch_size):
+        for i in range(batch_size):
+            self._log(out_infer, sample_offset, i)
+
+    def _log(self, out_infer, sample_offset, i):
+        sample_idx = sample_offset + i
+        img_path_prefix = f"{self.runner.hparams['paths']['images']}/{sample_idx:06}"
+
         debug_outputs = {
-            f"debug_{mode}_{k}": v
+            (mode, k): v
             for mode in ["net", "enc", "dec"]
             for k, v in out_infer[f"out_{mode}"].get("debug_outputs", {}).items()
         }
+        debug_outputs[("dec", "x_hat")] = out_infer["out_dec"]["x_hat"]
 
-        for name, output in debug_outputs.items():
-            if isinstance(output, torch.Tensor):
-                Image.fromarray(
-                    plot.featuremap_image(
-                        output[i].cpu().numpy(), cmap=DEFAULT_COLORMAP
-                    )
-                ).save(f"{img_path_prefix}_{name}.png")
+        for keypath, output in debug_outputs.items():
+            self._log_output(keypath, output[i], img_path_prefix)
+
+    def _log_output(self, keypath, output, img_path_prefix):
+        if not isinstance(output, torch.Tensor):
+            raise ValueError
+
+        mode, key = keypath
+
+        if key == "x_hat":
+            arr = tensor_to_np_img(output.cpu())
+        else:
+            arr = plot.featuremap_image(output.cpu().numpy(), cmap=DEFAULT_COLORMAP)
+
+        Image.fromarray(arr).save(f"{img_path_prefix}_{mode}_{key}.png")
 
 
 class EbDistributionsFigureLogger:
