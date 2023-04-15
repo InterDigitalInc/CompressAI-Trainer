@@ -42,7 +42,6 @@ DEFAULT_COLORMAP = "plasma"
 def featuremap_matplotlib_looptiled(
     arr: np.ndarray,
     *,
-    order: str = "chw",
     nrows: Optional[int] = None,
     ncols: Optional[int] = None,
     clim: Optional[Tuple[float, float]] = None,
@@ -58,7 +57,6 @@ def featuremap_matplotlib_looptiled(
 
     Args:
         arr: chw tensor
-        order: order of arr axes ("chw" or "hwc")
         nrows: number of tiled rows
         ncols: number of tiled columns
         clim: colorbar limits
@@ -66,7 +64,6 @@ def featuremap_matplotlib_looptiled(
         cbar: whether to show colorbar
         fig_kw: keyword arguments to pass to matplotlib
     """
-    arr = np_reorder_axes(arr, order, "chw")
     c, _, _ = arr.shape
 
     if clim is None:
@@ -108,7 +105,6 @@ def featuremap_matplotlib(
     arr: np.ndarray,
     title: str,
     *,
-    order: str = "chw",
     nrows: Optional[int] = None,
     ncols: Optional[int] = None,
     padding: int = 2,
@@ -122,7 +118,6 @@ def featuremap_matplotlib(
 
     Args:
         arr: chw tensor
-        order: order of arr axes ("chw" or "hwc")
         nrows: number of tiled rows
         ncols: number of tiled columns
         padding: padding between tiles
@@ -134,7 +129,6 @@ def featuremap_matplotlib(
     """
     img = featuremap_image(
         arr,
-        order=order,
         nrows=nrows,
         ncols=ncols,
         padding=padding,
@@ -155,7 +149,6 @@ def featuremap_matplotlib(
 
 def featuremap_image(
     arr: np.ndarray,
-    order: str = "chw",
     nrows: Optional[int] = None,
     ncols: Optional[int] = None,
     padding: int = 2,
@@ -167,7 +160,6 @@ def featuremap_image(
 
     Args:
         arr: chw tensor
-        order: order of arr axes ("chw" or "hwc")
         nrows: number of tiled rows
         ncols: number of tiled columns
         padding: padding between tiles
@@ -180,7 +172,7 @@ def featuremap_image(
     if fill_value is None:
         fill_value, _ = clim
 
-    arr = tile_featuremap(arr, order, nrows, ncols, padding, fill_value)
+    arr = tile_featuremap(arr, nrows, ncols, padding, fill_value)
 
     if cmap is not None:
         arr = ((arr - clim[0]) / (clim[1] - clim[0])).clip(0, 1)
@@ -191,7 +183,6 @@ def featuremap_image(
 
 def tile_featuremap(
     arr: np.ndarray,
-    order: str = "chw",
     nrows: Optional[int] = None,
     ncols: Optional[int] = None,
     padding: int = 2,
@@ -201,7 +192,6 @@ def tile_featuremap(
 
     Args:
         arr: chw tensor
-        order: order of arr axes ("chw" or "hwc")
         nrows: number of tiled rows
         ncols: number of tiled columns
         padding: padding between tiles
@@ -243,7 +233,6 @@ def _tile_featuremap_3d(
     if fill_value is None:
         fill_value = arr.min()
 
-    arr = np_reorder_axes(arr, order, "chw")
     pad = ((0, 0), (padding, padding), (padding, padding))
     arr = np.pad(arr, pad, "constant", constant_values=fill_value)
     c, h, w = arr.shape
