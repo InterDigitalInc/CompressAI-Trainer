@@ -151,18 +151,18 @@ def featuremap_image(
     arr: np.ndarray,
     nrows: Optional[int] = None,
     ncols: Optional[int] = None,
-    padding: int = 2,
+    padding: Optional[int] = None,
     fill_value: Optional[float] = None,
     clim: Optional[Tuple[float, float]] = None,
     cmap: Optional[str] = None,
 ) -> np.ndarray:
-    """Returns 2D featuremap image of tiled channels for the given 3D tensor.
+    """Returns 2D featuremap image of tiled channels for the given tensor.
 
     Args:
-        arr: chw tensor
+        arr: tensor of shape (c, ...)
         nrows: number of tiled rows
         ncols: number of tiled columns
-        padding: padding between tiles
+        padding: padding between tiles (default is 2 for arr.ndim > 2)
         fill_value: value to set remaining area to
         clim: colorbar limits
         cmap: colormap; if None, no colormap is applied
@@ -185,49 +185,50 @@ def tile_featuremap(
     arr: np.ndarray,
     nrows: Optional[int] = None,
     ncols: Optional[int] = None,
-    padding: int = 2,
+    padding: Optional[int] = None,
     fill_value: Optional[float] = None,
 ) -> np.ndarray:
     """Tiles arr into a 2D image featuremap.
 
     Args:
-        arr: chw tensor
+        arr: tensor of shape (c, ...)
         nrows: number of tiled rows
         ncols: number of tiled columns
-        padding: padding between tiles
+        padding: padding between tiles (default is 2 for arr.ndim > 2)
         fill_value: value to set remaining area to
 
     Returns:
         np.ndarray: tiled array
     """
-    if arr.ndim == 2:
-        return _tile_featuremap_2d(arr, nrows, ncols, padding, fill_value)
-    if arr.ndim == 3:
-        return _tile_featuremap_3d(arr, nrows, ncols, padding, fill_value)
-    raise NotImplementedError(f"Unsupported number of dimensions: {arr.ndim}.")
+    if arr.ndim == 0:
+        arr = arr.reshape(1)
 
-
-def _tile_featuremap_2d(
-    arr: np.ndarray,
-    nrows: Optional[int] = None,
-    ncols: Optional[int] = None,
-    padding: int = 2,
-    fill_value: Optional[float] = None,
-) -> np.ndarray:
-    c, m = arr.shape
-    arr = arr.reshape(c, m, 1)
-    if nrows is None and ncols is None:
+    if arr.ndim <= 2:
+        c, *tail = arr.shape
+        arr = arr.reshape(c, *tail, *([1] * (2 - len(tail))))
+        assert nrows is None and ncols is None and padding is None
         nrows = 1
         ncols = c
         padding = 0
-    return _tile_featuremap_3d(arr, nrows, ncols, padding, fill_value)
+        return _tile_featuremap_3d(arr, nrows, ncols, padding, fill_value)
+
+    if arr.ndim > 3:
+        *_, h, w = arr.shape
+        arr = arr.reshape(-1, h, w)
+
+    if arr.ndim == 3:
+        if padding is None:
+            padding = 2
+        return _tile_featuremap_3d(arr, nrows, ncols, padding, fill_value)
+
+    raise NotImplementedError(f"Unsupported number of dimensions: {arr.ndim}.")
 
 
 def _tile_featuremap_3d(
     arr: np.ndarray,
     nrows: Optional[int] = None,
     ncols: Optional[int] = None,
-    padding: int = 2,
+    padding: Optional[int] = None,
     fill_value: Optional[float] = None,
 ) -> np.ndarray:
     if fill_value is None:
@@ -252,14 +253,3 @@ def _tile_featuremap_3d(
         arr[prev_size:] = fill_value
 
     return arr.reshape(nrows, ncols, h, w).swapaxes(1, 2).reshape(nrows * h, ncols * w)
-
-
-def np_reorder_axes(arr: np.ndarray, src: str, dest: str) -> np.ndarray:
-    """Convert array from source to destination order."""
-    if src == dest:
-        return arr
-    if src == "chw" and dest == "hwc":
-        return np.moveaxis(arr, -3, -1)
-    if src == "hwc" and dest == "chw":
-        return np.moveaxis(arr, -1, -3)
-    raise ValueError(f"Cannot convert to {dest} from {src}")
