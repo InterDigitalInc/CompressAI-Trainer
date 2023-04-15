@@ -29,8 +29,10 @@
 
 from . import query
 from .distribution import Distribution
+from .image import Image
 
 __all__ = [
     "Distribution",
+    "Image",
     "query",
 ]
