@@ -41,14 +41,11 @@ from compressai.models.base import CompressionModel
 from torch.nn.parallel import DataParallel, DistributedDataParallel
 
 import compressai_trainer
-from compressai_trainer.utils.catalyst.loggers import (
-    DistributionSuperlogger,
-    FigureSuperlogger,
-)
+from compressai_trainer.utils.catalyst.loggers import AllSuperlogger
 from compressai_trainer.utils.utils import num_parameters
 
 
-class BaseRunner(dl.Runner, DistributionSuperlogger, FigureSuperlogger):
+class BaseRunner(dl.Runner, AllSuperlogger):
     """Generic runner for all CompressAI Trainer experiments.
 
     See the ``catalyst.dl.Runner`` documentation for info on runners.
@@ -109,6 +106,9 @@ class BaseRunner(dl.Runner, DistributionSuperlogger, FigureSuperlogger):
         if isinstance(self.model, (DataParallel, DistributedDataParallel)):
             return cast(CompressionModel, self.model.module)
         return self.model
+
+    def log_image(self, *args, **kwargs):
+        AllSuperlogger.log_image(self, *args, **kwargs)
 
     def _update_batch_metrics(self, batch_metrics):
         self.batch_metrics.update(batch_metrics)

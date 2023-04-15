@@ -28,10 +28,17 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from .aim import AimLogger
-from .logger import DistributionSuperlogger, FigureSuperlogger
+from .logger import (
+    AllSuperlogger,
+    DistributionSuperlogger,
+    FigureSuperlogger,
+    ImageSuperlogger,
+)
 
 __all__ = [
     "AimLogger",
+    "AllSuperlogger",
     "DistributionSuperlogger",
     "FigureSuperlogger",
+    "ImageSuperlogger",
 ]

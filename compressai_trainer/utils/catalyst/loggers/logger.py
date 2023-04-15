@@ -52,3 +52,25 @@ class FigureSuperlogger:
             if not hasattr(logger, "log_figure"):
                 continue
             logger.log_figure(*args, **kwargs, runner=self)  # type: ignore
+
+
+class ImageSuperlogger:
+    loggers: dict[str, ILogger]
+
+    def log_image(self, *args, **kwargs) -> None:
+        """Logs image to available loggers."""
+        for name, logger in self.loggers.items():
+            if not hasattr(logger, "log_image"):
+                continue
+            if name != "aim":
+                valid_keys = ["tag", "image", "runner", "scope"]
+                kwargs = {k: v for k, v in kwargs.items() if k in valid_keys}
+            logger.log_image(*args, **kwargs, runner=self)  # type: ignore
+
+
+class AllSuperlogger(
+    DistributionSuperlogger,
+    FigureSuperlogger,
+    ImageSuperlogger,
+):
+    pass
