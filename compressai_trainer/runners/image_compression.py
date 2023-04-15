@@ -99,8 +99,7 @@ class ImageCompressionRunner(BaseRunner):
 
     - Plots RD curves, learned entropy bottleneck distributions,
       and histograms for latent channel-wise rate distributions.
-    - Saves inference outputs including images (``_log_outputs``) and
-      featuremaps (``_debug_outputs_logger``).
+    - Saves inference outputs including images and featuremaps.
 
     Set the input arguments by overriding the defaults in
     ``conf/runner/ImageCompressionRunner.yaml``.
@@ -180,7 +179,7 @@ class ImageCompressionRunner(BaseRunner):
         self._update_batch_metrics(batch_metrics)
         self._handle_custom_metrics(out_net, out_metrics)
 
-        self._log_outputs(x, out_infer)
+        self._debug_outputs_logger.log(x, out_infer)
 
     def predict_batch(self, batch, **kwargs):
         x = batch.to(self.engine.device)
@@ -219,10 +218,6 @@ class ImageCompressionRunner(BaseRunner):
         self._loader_metrics["chan_bpp"].update(out_net)
         for metric in ["bpp", *RD_PLOT_METRICS]:
             self._loader_metrics[metric].append(out_metrics[metric])
-
-    def _log_outputs(self, x, out_infer):
-        sample_offset = (self.loader_batch_step - 1) * self.loader_batch_size + 1
-        self._debug_outputs_logger.log(out_infer, sample_offset, batch_size=len(x))
 
     def _log_eb_distributions(self):
         self._eb_distributions_figure_logger.log(

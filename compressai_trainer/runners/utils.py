@@ -109,16 +109,7 @@ class DebugOutputsLogger:
     def __init__(self, runner):
         self.runner = runner
 
-    def log(self, out_infer, sample_offset, batch_size):
-        for i in range(batch_size):
-            self._log(out_infer, sample_offset, i)
-
-    def _log(self, out_infer, sample_offset, i):
-        sample_idx = sample_offset + i
-        img_path_prefix = f"{self.runner.hparams['paths']['images']}/{sample_idx:06}"
-        log_kwargs = dict(format="webp", lossless=True, quality=50, method=6)
-        log_kwargs["track_kwargs"] = dict(step=sample_idx)
-
+    def log(self, inputs, out_infer):
         debug_outputs = {
             (mode, k): v
             for mode in ["net", "enc", "dec"]
@@ -126,22 +117,32 @@ class DebugOutputsLogger:
         }
         debug_outputs[("dec", "x_hat")] = out_infer["out_dec"]["x_hat"]
 
-        for keypath, output in debug_outputs.items():
-            self._log_output(keypath, output[i], img_path_prefix, log_kwargs)
+        for i in range(len(inputs)):
+            sample_offset = (
+                self.runner.loader_batch_step - 1
+            ) * self.runner.loader_batch_size + 1
+            sample_idx = sample_offset + i
 
-    def _log_output(self, keypath, output, img_path_prefix, log_kwargs):
-        if not isinstance(output, torch.Tensor):
-            raise ValueError
+            for (mode, key), outputs in debug_outputs.items():
+                self._log_output(mode, key, inputs[i], outputs[i], sample_idx)
 
-        mode, key = keypath
-
+    def _log_output(self, mode, key, input, output, sample_idx):
         if key == "x_hat":
             arr = tensor_to_np_img(output.cpu())
         else:
             arr = plot.featuremap_image(output.cpu().numpy(), cmap=DEFAULT_COLORMAP)
 
-        Image.fromarray(arr).save(f"{img_path_prefix}_{mode}_{key}.png")
+        img_dir = self.runner.hparams["paths"]["images"]
+        Image.fromarray(arr).save(f"{img_dir}/{sample_idx:06}_{mode}_{key}.png")
+
         context = {"mode": mode, "key": key}
+        log_kwargs = dict(
+            format="webp",
+            lossless=True,
+            quality=50,
+            method=6,
+            track_kwargs=dict(step=sample_idx),
+        )
         self.runner.log_image("output", arr, context=context, **log_kwargs)
 
 
