@@ -1,0 +1,81 @@
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+cache:
+  paths:
+    - "$CI_PROJECT_DIR/.cache/pip"
+
+stages:
+  - static-analysis
+  - test
+  - doc
+
+# flake8:
+#   stage: static-analysis
+#   image: registry.gitlab.com/mafda/python-linting
+#   before_script:
+#     - python --version
+#   script:
+#     - flake8 --max-line-length 88 compressai_trainer conf tests
+#   tags:
+#     - docker
+
+black:
+  stage: static-analysis
+  image: python:3.8-buster
+  before_script:
+    - python --version
+    - pip install black
+  script:
+    - black --check compressai_trainer conf tests
+  tags:
+    - docker
+
+isort:
+  stage: static-analysis
+  image: python:3.8-buster
+  before_script:
+    - python --version
+    - pip install isort
+  script:
+    - isort compressai_trainer tests --check-only
+  tags:
+    - docker
+
+test:
+  cache: []
+  stage: test
+  # image: pytorch/pytorch:2.0.0-cuda11.7-cudnn8-devel
+  image:  python:3.8-buster
+  before_script:
+    - python --version
+    - pip install poetry
+    - poetry config installer.modern-installation false
+    - poetry install --with=dev
+    - cd ..
+    - rm -rf compressai
+    - git clone "https://github.com/InterDigitalInc/CompressAI.git" compressai
+    - cd -
+    - poetry run pip install -e ../compressai
+  script:
+    - poetry run make tests
+  tags:
+    - docker
+
+doc:
+  stage: doc
+  image: python:3.8-buster
+  before_script:
+    - python --version
+    - pip install poetry
+    - poetry config installer.modern-installation false
+    - poetry install --with=docs
+    - cd ..
+    - rm -rf compressai
+    - git clone "https://github.com/InterDigitalInc/CompressAI.git" compressai
+    - cd -
+    - poetry run pip install -e ../compressai
+  script:
+    - poetry run make docs
+  tags:
+    - docker

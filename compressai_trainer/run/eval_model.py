@@ -116,7 +116,6 @@ from compressai_trainer.typing import TModel, TRunner
 from compressai_trainer.utils.metrics import compute_metrics, db
 from compressai_trainer.utils.utils import tensor_to_np_img
 
-
 thisdir = Path(__file__).parent
 config_path = thisdir.joinpath("../../conf")
 
