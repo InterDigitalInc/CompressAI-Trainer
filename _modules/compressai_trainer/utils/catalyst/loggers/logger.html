@@ -307,6 +307,28 @@ document.write(`
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="s2">&quot;log_figure&quot;</span><span class="p">):</span>
                 <span class="k">continue</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">log_figure</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">runner</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>  <span class="c1"># type: ignore</span></div></div>
+
+
+<div class="viewcode-block" id="ImageSuperlogger"><a class="viewcode-back" href="../../../../../compressai_trainer/utils.html#compressai_trainer.utils.catalyst.loggers.ImageSuperlogger">[docs]</a><span class="k">class</span> <span class="nc">ImageSuperlogger</span><span class="p">:</span>
+    <span class="n">loggers</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ILogger</span><span class="p">]</span>
+
+<div class="viewcode-block" id="ImageSuperlogger.log_image"><a class="viewcode-back" href="../../../../../compressai_trainer/utils.html#compressai_trainer.utils.catalyst.loggers.ImageSuperlogger.log_image">[docs]</a>    <span class="k">def</span> <span class="nf">log_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Logs image to available loggers.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">logger</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">loggers</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">logger</span><span class="p">,</span> <span class="s2">&quot;log_image&quot;</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;aim&quot;</span><span class="p">:</span>
+                <span class="n">valid_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;tag&quot;</span><span class="p">,</span> <span class="s2">&quot;image&quot;</span><span class="p">,</span> <span class="s2">&quot;runner&quot;</span><span class="p">,</span> <span class="s2">&quot;scope&quot;</span><span class="p">]</span>
+                <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">valid_keys</span><span class="p">}</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">log_image</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">runner</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>  <span class="c1"># type: ignore</span></div></div>
+
+
+<div class="viewcode-block" id="AllSuperlogger"><a class="viewcode-back" href="../../../../../compressai_trainer/utils.html#compressai_trainer.utils.catalyst.loggers.AllSuperlogger">[docs]</a><span class="k">class</span> <span class="nc">AllSuperlogger</span><span class="p">(</span>
+    <span class="n">DistributionSuperlogger</span><span class="p">,</span>
+    <span class="n">FigureSuperlogger</span><span class="p">,</span>
+    <span class="n">ImageSuperlogger</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="k">pass</span></div>
 </pre></div>
 
                 </article>

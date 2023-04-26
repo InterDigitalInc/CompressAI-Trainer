@@ -435,14 +435,14 @@ By default, this has the following directory structure:</p>
 
   runs/
     ...
-    e4e6d4d5e5c59c69f3bd7be2/   # Aim run hash.
+    e4e6d4d5e5c59c69f3bd7be2/     # Aim run hash.
       checkpoints/
         runner.last.pth
       configs/
-        config.yaml             # Final YAML configuration for reproducibility.
+        config.yaml               # Final YAML configuration for reproducibility.
       engine/
       src/
-        compressai.patch        # Auto generated git diff patch for reproducibility.
+        compressai.patch          # Auto generated git diff patch for reproducibility.
         compressai_trainer.patch  # Auto generated git diff patch for reproducibility.
       tensorboard/
 </pre></div>
@@ -577,7 +577,7 @@ By default, this has the following directory structure:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">on_experiment_start</span>   <span class="c1"># Once, at the beginning.</span>
   <span class="n">on_epoch_start</span>      <span class="c1"># Beginning of an epoch.</span>
     <span class="n">on_loader_start</span>   <span class="c1"># For each loader (train / valid / infer).</span>
-      <span class="n">on_batch_start</span>  <span class="c1"># Rarely useful.</span>
+      <span class="n">on_batch_start</span>  <span class="c1"># Before each batch.</span>
         <span class="n">handle_batch</span>  <span class="c1"># For each image batch.</span>
       <span class="n">on_batch_end</span>
     <span class="n">on_loader_end</span>

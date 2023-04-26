@@ -111,14 +111,14 @@ By default, this has the following directory structure:
   
       runs/
         ...
-        e4e6d4d5e5c59c69f3bd7be2/   # Aim run hash.
+        e4e6d4d5e5c59c69f3bd7be2/     # Aim run hash.
           checkpoints/
             runner.last.pth
           configs/
-            config.yaml             # Final YAML configuration for reproducibility.
+            config.yaml               # Final YAML configuration for reproducibility.
           engine/
           src/
-            compressai.patch        # Auto generated git diff patch for reproducibility.
+            compressai.patch          # Auto generated git diff patch for reproducibility.
             compressai_trainer.patch  # Auto generated git diff patch for reproducibility.
           tensorboard/
 
@@ -280,7 +280,7 @@ The following functions are called during the training loop:
     on_experiment_start   # Once, at the beginning.
       on_epoch_start      # Beginning of an epoch.
         on_loader_start   # For each loader (train / valid / infer).
-          on_batch_start  # Rarely useful.
+          on_batch_start  # Before each batch.
             handle_batch  # For each image batch.
           on_batch_end
         on_loader_end

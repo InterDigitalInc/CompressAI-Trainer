@@ -296,14 +296,11 @@ document.write(`
 <span class="kn">from</span> <span class="nn">torch.nn.parallel</span> <span class="kn">import</span> <span class="n">DataParallel</span><span class="p">,</span> <span class="n">DistributedDataParallel</span>
 
 <span class="kn">import</span> <span class="nn">compressai_trainer</span>
-<span class="kn">from</span> <span class="nn">compressai_trainer.utils.catalyst.loggers</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">DistributionSuperlogger</span><span class="p">,</span>
-    <span class="n">FigureSuperlogger</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">compressai_trainer.utils.catalyst.loggers</span> <span class="kn">import</span> <span class="n">AllSuperlogger</span>
 <span class="kn">from</span> <span class="nn">compressai_trainer.utils.utils</span> <span class="kn">import</span> <span class="n">num_parameters</span>
 
 
-<div class="viewcode-block" id="BaseRunner"><a class="viewcode-back" href="../../../compressai_trainer/runners.html#compressai_trainer.runners.BaseRunner">[docs]</a><span class="k">class</span> <span class="nc">BaseRunner</span><span class="p">(</span><span class="n">dl</span><span class="o">.</span><span class="n">Runner</span><span class="p">,</span> <span class="n">DistributionSuperlogger</span><span class="p">,</span> <span class="n">FigureSuperlogger</span><span class="p">):</span>
+<div class="viewcode-block" id="BaseRunner"><a class="viewcode-back" href="../../../compressai_trainer/runners.html#compressai_trainer.runners.BaseRunner">[docs]</a><span class="k">class</span> <span class="nc">BaseRunner</span><span class="p">(</span><span class="n">dl</span><span class="o">.</span><span class="n">Runner</span><span class="p">,</span> <span class="n">AllSuperlogger</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Generic runner for all CompressAI Trainer experiments.</span>
 
 <span class="sd">    See the ``catalyst.dl.Runner`` documentation for info on runners.</span>
@@ -364,6 +361,9 @@ document.write(`
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="p">(</span><span class="n">DataParallel</span><span class="p">,</span> <span class="n">DistributedDataParallel</span><span class="p">)):</span>
             <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">CompressionModel</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">module</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span>
+
+<div class="viewcode-block" id="BaseRunner.log_image"><a class="viewcode-back" href="../../../compressai_trainer/runners.html#compressai_trainer.runners.BaseRunner.log_image">[docs]</a>    <span class="k">def</span> <span class="nf">log_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">AllSuperlogger</span><span class="o">.</span><span class="n">log_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_update_batch_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_metrics</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">batch_metrics</span><span class="p">)</span>
