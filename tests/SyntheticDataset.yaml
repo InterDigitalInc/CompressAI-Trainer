@@ -5,7 +5,7 @@ train:
     num_samples: "${..meta.num_samples}"
   loader:
     shuffle: True
-    batch_size: 16
+    batch_size: 4
     num_workers: 2
   settings:
     patch_size: [ 256, 256, ]
@@ -23,7 +23,7 @@ valid:
     num_samples: "${..meta.num_samples}"
   loader:
     shuffle: False
-    batch_size: 64
+    batch_size: 8
     num_workers: 2
   settings:
     patch_size: [ 256, 256, ]
@@ -41,7 +41,7 @@ infer:
     num_samples: "${..meta.num_samples}"
   loader:
     shuffle: False
-    batch_size: 64
+    batch_size: 8
     num_workers: 2
   settings:
     patch_size: [ 256, 256, ]
