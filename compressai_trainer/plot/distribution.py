@@ -46,6 +46,7 @@ _PLOT_DISTRIBUTIONS_EB_LINE_SETTINGS_COMMON = dict(
 _PLOT_DISTRIBUTIONS_EB_LAYOUT_SETTINGS_COMMON = dict(
     xaxis_title="Δy = y - median",
     yaxis_title="p(Δy)",
+    yaxis=dict(range=[0, 1]),
 )
 
 
@@ -53,6 +54,7 @@ def plot_entropy_bottleneck_distributions(
     entropy_bottleneck: EntropyBottleneck,
     scatter_kwargs: dict[str, Any] = {},
     layout_kwargs: dict[str, Any] = {},
+    hide_delta_distributions: bool = True,
 ):
     """Plots EntropyBottleneck distributions."""
     import plotly.express as px
@@ -62,6 +64,12 @@ def plot_entropy_bottleneck_distributions(
     layout_kwargs = {**_PLOT_DISTRIBUTIONS_EB_LAYOUT_SETTINGS_COMMON, **layout_kwargs}
     fig = px.line(df, **line_kwargs)
     fig.update_layout(**layout_kwargs)
+    if hide_delta_distributions:
+        fig.for_each_trace(
+            lambda trace: trace.update(
+                visible=True if trace["y"].max() < 1 else "legendonly"
+            )
+        )
 
     return fig
 
