@@ -2,16 +2,18 @@ aim:
   repo: "${paths.aim}"
   run_hash:
 git:
+  # id = f"r{commit_count}.{commit_hash}"
+  # main_id = latest commit in common on main_branch
   compressai:
     branch:
-    hash:
+    id:
     main_branch: "master"
-    main_hash:
+    main_id:
   compressai_trainer:
     branch:
-    hash:
+    id:
     main_branch: "master"
-    main_hash:
+    main_id:
 slurm:
   account:
   job_id:

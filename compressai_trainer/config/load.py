@@ -112,7 +112,7 @@ def state_dict_from_checkpoint(ckpt) -> OrderedDict[str, Tensor]:
 def _check_git_hash(conf: DictConfig, package: ModuleType, warn_only: bool):
     name = package.__name__
     path = package.__path__[0]
-    expected = conf.env.git[name].hash
+    expected = conf.env.git[name].id.split(".")[-1]
     actual = git.commit_hash(root=path)
     hash_len = min(len(expected), len(actual))
     assert hash_len >= 7

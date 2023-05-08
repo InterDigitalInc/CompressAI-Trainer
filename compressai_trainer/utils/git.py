@@ -66,6 +66,24 @@ def common_ancestor_commit_hash(
     return commit_hash(rev=full_hash, root=root, short=short)
 
 
+def commit_count(rev: str = "HEAD", root: str = ".") -> int:
+    cmd = f"git -C {quote(root)} rev-list --count {quote(rev)}"
+    return int(os.popen(cmd).read().rstrip())
+
+
+def commit_id(rev: str = "HEAD", root: str = ".") -> str:
+    count = commit_count(rev=rev, root=root)
+    hash = commit_hash(rev=rev, short=True, root=root)
+    return f"r{count}.{hash}"
+
+
+def common_ancestor_commit_id(
+    rev1: str = "HEAD", rev2: str = "HEAD", root: str = "."
+) -> str:
+    rev = common_ancestor_commit_hash(rev1=rev1, rev2=rev2, root=root)
+    return commit_id(rev=rev, root=root)
+
+
 def diff(rev: str = "HEAD", root: str = ".") -> str:
     cmd = f"git -C {quote(root)} --no-pager diff --no-color {quote(rev)}"
     return os.popen(cmd).read().rstrip()
