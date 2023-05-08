@@ -38,8 +38,17 @@ def branch_name(rev: str = "HEAD", root: str = ".") -> str:
     return os.popen(cmd).read().rstrip()
 
 
-def common_ancestor_hash(
-    rev1: str = "HEAD", rev2: Optional[str] = None, root: str = "."
+def commit_hash(rev: str = "HEAD", root: str = ".", short: bool = False) -> str:
+    options = "--short" if short else ""
+    cmd = f"git -C {quote(root)} rev-parse {options} {quote(rev)}"
+    return os.popen(cmd).read().rstrip()
+
+
+def common_ancestor_commit_hash(
+    rev1: str = "HEAD",
+    rev2: Optional[str] = None,
+    root: str = ".",
+    short: bool = False,
 ) -> str:
     if rev2 is None:
         rev2 = main_branch_name(root=root)
@@ -52,14 +61,9 @@ def common_ancestor_hash(
         "sed -ne 's/^ //p' | head -1"
     )
     cmd_args = ["bash", "-c", cmd]
-    result = subprocess.run(cmd_args, capture_output=True, check=True).stdout
-    return result.decode("utf-8").rstrip()
-
-
-def commit_hash(rev: str = "HEAD", short: bool = False, root: str = ".") -> str:
-    options = "--short" if short else ""
-    cmd = f"git -C {quote(root)} rev-parse {options} {quote(rev)}"
-    return os.popen(cmd).read().rstrip()
+    process = subprocess.run(cmd_args, capture_output=True, check=True)
+    full_hash = process.stdout.decode("utf-8").rstrip()
+    return commit_hash(rev=full_hash, root=root, short=short)
 
 
 def diff(rev: str = "HEAD", root: str = ".") -> str:
