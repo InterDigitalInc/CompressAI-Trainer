@@ -306,8 +306,7 @@ def _plot_rd(conf, results, metrics):
         if metric not in metrics:
             continue
 
-        fig = RdFigureLogger().log(
-            runner=None,
+        fig = RdFigureLogger(runner=None).log(
             df=_current_dataframe(conf, results),
             traces=_current_rd_traces(conf, results, metric),
             metric=metric,
