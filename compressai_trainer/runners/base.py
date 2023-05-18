@@ -66,6 +66,7 @@ class BaseRunner(dl.Runner, AllSuperlogger):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        AllSuperlogger.__init__(self)
         self._has_started = False
 
     def on_experiment_start(self, runner):

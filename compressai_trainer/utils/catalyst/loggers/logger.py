@@ -31,6 +31,8 @@ from __future__ import annotations
 
 from catalyst.core.logger import ILogger
 
+IMAGE_LOGGERS = ["aim"]
+
 
 class DistributionSuperlogger:
     loggers: dict[str, ILogger]
@@ -57,9 +59,14 @@ class FigureSuperlogger:
 class ImageSuperlogger:
     loggers: dict[str, ILogger]
 
+    def __init__(self, enabled_image_loggers: list[str] = IMAGE_LOGGERS):
+        self._enabled_image_loggers = enabled_image_loggers
+
     def log_image(self, *args, **kwargs) -> None:
         """Logs image to available loggers."""
         for name, logger in self.loggers.items():
+            if name not in self._enabled_image_loggers:
+                continue
             if not hasattr(logger, "log_image"):
                 continue
             if name != "aim":
@@ -73,4 +80,7 @@ class AllSuperlogger(
     FigureSuperlogger,
     ImageSuperlogger,
 ):
-    pass
+    def __init__(self, enabled_image_loggers: list[str] = IMAGE_LOGGERS):
+        DistributionSuperlogger.__init__(self)
+        FigureSuperlogger.__init__(self)
+        ImageSuperlogger.__init__(self, enabled_image_loggers)
