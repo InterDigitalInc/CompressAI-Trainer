@@ -66,8 +66,8 @@ def get_env(conf: DictConfig) -> dict[str, Any]:
 
 def _get_git_repo_info(root: str, main_branch: str) -> dict[str, str]:
     return {
-        "id": git.commit_id(root=root),
-        "main_id": git.common_ancestor_commit_id(rev2=main_branch, root=root),
+        "version": git.commit_version(root=root),
+        "main_version": git.common_ancestor_commit_version(rev2=main_branch, root=root),
         "branch": git.branch_name(root=root),
         "main_branch": main_branch,
     }

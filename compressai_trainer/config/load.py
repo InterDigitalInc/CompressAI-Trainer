@@ -73,8 +73,8 @@ def load_checkpoint(
     This tries to reassemble/verify the same environment.
     """
     # If git hashes are different, raise error/warning.
-    _check_git_hash(conf, compressai, warn_only=warn_only)
-    _check_git_hash(conf, compressai_trainer, warn_only=warn_only)
+    _check_git_commit_version(conf, compressai, warn_only=warn_only)
+    _check_git_commit_version(conf, compressai_trainer, warn_only=warn_only)
 
     device = torch.device(conf.misc.device)
     model = create_model(conf)
@@ -109,25 +109,28 @@ def state_dict_from_checkpoint(ckpt) -> OrderedDict[str, Tensor]:
     )
 
 
-def _check_git_hash(conf: DictConfig, package: ModuleType, warn_only: bool):
+def _check_git_commit_version(conf: DictConfig, package: ModuleType, warn_only: bool):
     name = package.__name__
     path = package.__path__[0]
-    expected = conf.env.git[name].id.split(".")[-1]
-    actual = git.commit_hash(root=path)
-    hash_len = min(len(expected), len(actual))
-    assert hash_len >= 7
+    expected = conf.env.git[name].version
+    expected_hash = _git_commit_version_to_hash(expected)
+    actual = git.commit_commit_version(root=path)
 
-    if expected[:hash_len] == actual[:hash_len]:
+    if expected == actual:
         return
 
     message = (
-        f"Git hash for {name} does not match config.\n"
+        f"Git commit version for {name} does not match config.\n"
         f"Expected: {expected}.\n"
         f"Actual: {actual}.\n"
-        f"Please run: (cd {quote(path)} && git checkout {expected})"
+        f"Please run: (cd {quote(path)} && git checkout {expected_hash})"
     )
 
     if warn_only:
         warnings.warn(message)
     else:
         raise ValueError(message)
+
+
+def _git_commit_version_to_hash(version: str) -> str:
+    return version.rstrip("-dirty").rpartition("-")[-1].lstrip("g")

@@ -2,22 +2,22 @@ aim:
   repo: "${paths.aim}"
   run_hash:
 git:
-  # id = f"r{commit_count}.{commit_hash}"
-  # main_id = latest commit in common on main_branch
+  # version = f"r{commit_count}.{commit_hash}"
+  # main_version = latest commit in common on main_branch
   compressai:
     branch:
-    id:
+    version:
     main_branch: "master"
-    main_id:
+    main_version:
   compressai_trainer:
     branch:
-    id:
+    version:
     main_branch: "master"
-    main_id:
+    main_version:
 slurm:
   account:
-  job_id:
-  job_array_task_id:
+  job_version:
+  job_array_task_version:
   job_name:
 system:
   hostname:

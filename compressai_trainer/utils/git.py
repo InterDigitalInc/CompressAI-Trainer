@@ -71,17 +71,18 @@ def commit_count(rev: str = "HEAD", root: str = ".") -> int:
     return int(os.popen(cmd).read().rstrip())
 
 
-def commit_id(rev: str = "HEAD", root: str = ".") -> str:
-    count = commit_count(rev=rev, root=root)
-    hash = commit_hash(rev=rev, short=True, root=root)
-    return f"r{count}.{hash}"
+def commit_version(rev: str = "", root: str = ".") -> str:
+    cmd_flags = "--long --always --tags --match='v[0-9]*'"
+    cmd = f"git -C {quote(root)} describe {cmd_flags}"
+    cmd += " --dirty" if rev == "" else f" {quote(rev)}"
+    return os.popen(cmd).read().rstrip()
 
 
-def common_ancestor_commit_id(
+def common_ancestor_commit_version(
     rev1: str = "HEAD", rev2: str = "HEAD", root: str = "."
 ) -> str:
     rev = common_ancestor_commit_hash(rev1=rev1, rev2=rev2, root=root)
-    return commit_id(rev=rev, root=root)
+    return commit_version(rev=rev, root=root)
 
 
 def diff(rev: str = "HEAD", root: str = ".") -> str:
