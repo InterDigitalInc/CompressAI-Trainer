@@ -110,12 +110,17 @@ class DebugOutputsLogger:
         self.runner = runner
 
     def log(self, inputs, out_infer):
+        # Collect items from out_infer[*]["debug_outputs"].
         debug_outputs = {
             (mode, k): v
-            for mode in ["net", "enc", "dec"]
-            for k, v in out_infer[f"out_{mode}"].get("debug_outputs", {}).items()
+            for mode, out in out_infer.items()
+            if isinstance(out, dict) and "debug_outputs" in out
+            for k, v in out.get("debug_outputs", {}).items()
         }
-        debug_outputs[("dec", "x_hat")] = out_infer["out_dec"]["x_hat"]
+
+        # Ensure x_hat is logged, even if it is not specified in debug_outputs.
+        if "x_hat" in out_infer.get("out_dec", {}):
+            debug_outputs[("out_dec", "x_hat")] = out_infer["out_dec"]["x_hat"]
 
         for i in range(len(inputs)):
             sample_offset = (
@@ -124,6 +129,7 @@ class DebugOutputsLogger:
             sample_idx = sample_offset + i
 
             for (mode, key), outputs in debug_outputs.items():
+                mode = mode.lstrip("out_")
                 self._log_output(mode, key, inputs[i], outputs[i], sample_idx)
 
     def _log_output(self, mode, key, input, output, sample_idx):
