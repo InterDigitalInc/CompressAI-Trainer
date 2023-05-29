@@ -94,7 +94,7 @@ import plotly.graph_objects as go
 import torch
 from compressai.registry import MODELS
 from compressai.zoo import load_state_dict
-from omegaconf import DictConfig
+from omegaconf import DictConfig, OmegaConf
 from PIL import Image
 
 from compressai_trainer.config import (
@@ -135,6 +135,7 @@ def setup(conf: DictConfig) -> TRunner:
     runner.criterion = criterion
     runner.loaders = loaders
     runner.engine = catalyst.utils.get_available_engine()
+    runner._hparams = OmegaConf.to_container(conf, resolve=True)
 
     return runner
 
