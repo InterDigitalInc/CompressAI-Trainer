@@ -8,7 +8,7 @@ Documentation for :py:mod:`compressai_trainer.run.plot_rd`.
 This is an RD curve plotter that can query metrics from the experiment tracker (Aim).
 
 Users may specify what to plot using groups of the CLI flags
-``--query``, ``--curves``, and ``--pareto``.
+``--query``, ``--curves``, and ``--optimal``.
 If desired, one may plot multiple query groups within the same plot.
 
 
@@ -93,16 +93,18 @@ Examples:
       }]'
 
 
-``--pareto``
+``--optimal``
 ~~~~~~~~~~~~
 
-Show only pareto-optimal points on curve for respective query.
+Show only optimal points on curve for respective query.
+
+Choices: ``none``, ``pareto``, ``convex``.
 
 Default:
 
 .. code-block:: bash
 
-    --pareto=False
+    --optimal="none"
 
 
 ..

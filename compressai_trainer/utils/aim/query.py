@@ -35,7 +35,7 @@ import aim
 import pandas as pd
 from aim.storage.context import Context
 
-from compressai_trainer.utils.utils import arg_pareto_optimal_set
+from compressai_trainer.utils.utils import arg_optimal_set
 
 T = TypeVar("T")
 
@@ -74,7 +74,7 @@ def get_runs_dataframe(
     return df
 
 
-def pareto_optimal_dataframe(
+def optimal_dataframe(
     df: pd.DataFrame,
     *,
     x: str = "bpp",
@@ -82,17 +82,21 @@ def pareto_optimal_dataframe(
     x_objective: str = "min",
     y_objective: str = "max",
     keep_run_hash: Optional[str] = None,
+    method: str = "pareto",
 ) -> pd.DataFrame:
-    """Returns dataframe of best models at pareto frontier.
+    """Returns dataframe of best models at frontier.
 
-    Keeps only pareto-optimal data points in that dataframe based
+    Keeps only optimal data points in that dataframe based
     on given x and y and their corresponding objectives (min, max).
     Optionally, also keeps data points that are part of a given run.
+
+    Valid methods are "none", "pareto", and "convex".
     """
     df = df.copy()
     df.sort_values(["name", x, y], inplace=True)
     df.reset_index(drop=True, inplace=True)
-    idxs = arg_pareto_optimal_set([df[x], df[y]], [x_objective, y_objective])
+    points = df[[x, y]].values.T
+    idxs = arg_optimal_set(points, [x_objective, y_objective], method)
     if keep_run_hash is not None:
         idxs.extend(df.index[df["run_hash"] == keep_run_hash].tolist())
         idxs = sorted(set(idxs))

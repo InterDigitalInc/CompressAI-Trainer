@@ -46,7 +46,7 @@ import pandas as pd
 from compressai_trainer.plot import plot_rd
 from compressai_trainer.utils.aim.query import (
     get_runs_dataframe,
-    pareto_optimal_dataframe,
+    optimal_dataframe,
     runs_by_query,
 )
 from compressai_trainer.utils.compressai.results import compressai_dataframe
@@ -86,15 +86,15 @@ HOVER_DATA += HOVER_HPARAMS + HOVER_METRICS
 
 def create_dataframe(repo, args):
     dfs = [
-        _create_dataframe(repo, args.x, args.y, query, curves, pareto)
-        for query, curves, pareto in zip(args.query, args.curves, args.pareto)
+        _create_dataframe(repo, args.x, args.y, query, curves, optimal)
+        for query, curves, optimal in zip(args.query, args.curves, args.optimal)
     ]
     df = pd.concat([REFERENCE_DF, *dfs])
     df = _reorder_dataframe_columns(df)
     return df
 
 
-def _create_dataframe(repo, x, y, query, curves, pareto):
+def _create_dataframe(repo, x, y, query, curves, optimal):
     runs = runs_by_query(repo, query)
     metrics = sorted(
         {x, y, *HOVER_METRICS}
@@ -111,8 +111,7 @@ def _create_dataframe(repo, x, y, query, curves, pareto):
     df = format_dataframe(df, x, y, curves, skip_nan=True)
     df.sort_values(["name", x, y], inplace=True)
     df.reset_index(drop=True, inplace=True)
-    if pareto:
-        df = pareto_optimal_dataframe(df, x=x, y=y)
+    df = optimal_dataframe(df, x=x, y=y, method=optimal)
     return df
 
 
@@ -162,7 +161,7 @@ def build_args(argv):
             "Plot.\n"
             "\n"
             "Queries experiment tracker (Aim) repository for relevant metrics and plots. "
-            "Users may specify what to plot using groups of --query, --curves, and --pareto. "
+            "Users may specify what to plot using groups of --query, --curves, and --optimal. "
             "If desired, one may plot multiple query groups within the same plot.\n"
         ),
         "show": "Show figure in browser.",
@@ -210,9 +209,10 @@ def build_args(argv):
                 "    }]\n"
             )
         ),
-        "pareto": (
-            "Show only pareto-optimal points on curve for respective query.\n"
-            "Default: False.\n"
+        "optimal": (
+            "Show only optimal points on curve for respective query.\n"
+            "Choices: none, pareto, convex.\n"
+            "Default: none.\n"
         ),
     }
 
@@ -236,7 +236,7 @@ def build_args(argv):
         default=[],
         help=help["curves"],
     )
-    parser.add_argument("--pareto", action="append", default=[], help=help["pareto"])
+    parser.add_argument("--optimal", action="append", default=[], help=help["optimal"])
     args = parser.parse_args(argv)
 
     if len(args.query) == 0:
@@ -246,7 +246,7 @@ def build_args(argv):
     args.curves = [eval(x) for x in args.curves]  # WARNING: unsafe!
     args.curves = [[{**curves_default, **x} for x in xs] for xs in args.curves]
     args.curves += [[curves_default]] * (num_queries - len(args.curves))
-    args.pareto += [False] * (num_queries - len(args.pareto))
+    args.optimal += ["none"] * (num_queries - len(args.optimal))
 
     return args
 
