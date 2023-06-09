@@ -94,7 +94,7 @@ Examples:
 
 
 ``--optimal``
-~~~~~~~~~~~~
+~~~~~~~~~~~~~
 
 Show only optimal points on curve for respective query.
 
