@@ -81,26 +81,23 @@ def optimal_dataframe(
     y: str = "psnr",
     x_objective: str = "min",
     y_objective: str = "max",
-    keep_run_hash: Optional[str] = None,
+    keep: Optional[str] = None,
     method: str = "pareto",
 ) -> pd.DataFrame:
     """Returns dataframe of best models at frontier.
 
     Keeps only optimal data points in that dataframe based
     on given x and y and their corresponding objectives (min, max).
-    Optionally, also keeps data points that are part of a given run.
+    Optionally, also keeps data points that are marked by the keep key.
 
     Valid methods are "none", "pareto", and "convex".
     """
-    df = df.copy()
-    df.sort_values(["name", x, y], inplace=True)
-    df.reset_index(drop=True, inplace=True)
     points = df[[x, y]].values.T
     idxs = arg_optimal_set(points, [x_objective, y_objective], method)
-    if keep_run_hash is not None:
-        idxs.extend(df.index[df["run_hash"] == keep_run_hash].tolist())
-        idxs = sorted(set(idxs))
-    df = df.iloc[idxs]
+    if keep is not None:
+        idxs = {*idxs, *df.index[df[keep] == True]}
+    df = df.iloc[sorted(idxs)]
+    df.sort_values([x, y], inplace=True)
     df.reset_index(drop=True, inplace=True)
     return df
 
