@@ -75,7 +75,7 @@ def optimal_dataframe(
     idxs = arg_optimal_set(points, [x_objective, y_objective], method)
     if keep is not None:
         idxs = {*idxs, *df.index[df[keep] == True]}
-    df = df.iloc[sorted(idxs)]
+    df = df.iloc[sorted(idxs)].reset_index(drop=True)
     df.sort_values([x, y], inplace=True)
     df.reset_index(drop=True, inplace=True)
     return df
