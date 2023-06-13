@@ -27,7 +27,7 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from . import aim, catalyst, compressai, git, metrics, pip, system, utils
+from . import aim, catalyst, compressai, git, metrics, optimal, pip, system, utils
 
 __all__ = [
     "aim",
@@ -35,6 +35,7 @@ __all__ = [
     "compressai",
     "git",
     "metrics",
+    "optimal",
     "pip",
     "system",
     "utils",

@@ -35,8 +35,6 @@ import aim
 import pandas as pd
 from aim.storage.context import Context
 
-from compressai_trainer.utils.utils import arg_optimal_set
-
 T = TypeVar("T")
 
 
@@ -70,52 +68,6 @@ def get_runs_dataframe(
     ]
     df = pd.DataFrame.from_records(records)
     df.sort_values(["name"], inplace=True)
-    df.reset_index(drop=True, inplace=True)
-    return df
-
-
-def optimal_dataframe(
-    df: pd.DataFrame,
-    *,
-    x: str = "bpp",
-    y: str = "psnr",
-    x_objective: str = "min",
-    y_objective: str = "max",
-    keep: Optional[str] = None,
-    method: str = "pareto",
-    groupby: Optional[str] = None,
-) -> pd.DataFrame:
-    """Returns dataframe of best models at frontier.
-
-    Keeps only optimal data points in that dataframe based
-    on given x and y and their corresponding objectives (min, max).
-    Optionally, also keeps data points that are marked by the keep key.
-
-    Valid methods are "none", "pareto", and "convex".
-    """
-    if groupby is not None:
-        return (
-            df.sort_values(groupby)
-            .groupby(groupby)
-            .apply(
-                lambda df_group: optimal_dataframe(
-                    df=df_group,
-                    x=x,
-                    y=y,
-                    x_objective=x_objective,
-                    y_objective=y_objective,
-                    keep=keep,
-                    method=method,
-                )
-            )
-            .reset_index(drop=True)
-        )
-    points = df[[x, y]].values.T
-    idxs = arg_optimal_set(points, [x_objective, y_objective], method)
-    if keep is not None:
-        idxs = {*idxs, *df.index[df[keep] == True]}
-    df = df.iloc[sorted(idxs)]
-    df.sort_values([x, y], inplace=True)
     df.reset_index(drop=True, inplace=True)
     return df
 

@@ -44,12 +44,9 @@ import aim
 import pandas as pd
 
 from compressai_trainer.plot import plot_rd
-from compressai_trainer.utils.aim.query import (
-    get_runs_dataframe,
-    optimal_dataframe,
-    runs_by_query,
-)
+from compressai_trainer.utils.aim.query import get_runs_dataframe, runs_by_query
 from compressai_trainer.utils.compressai.results import compressai_dataframe
+from compressai_trainer.utils.optimal import optimal_dataframe
 from compressai_trainer.utils.utils import format_dataframe
 
 TITLE = "Performance evaluation on Kodak - PSNR (RGB)"
