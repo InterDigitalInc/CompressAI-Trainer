@@ -104,23 +104,28 @@ def arg_optimal_set(points, objectives, method="pareto"):
     raise ValueError(f"Unknown method: {method}")
 
 
-def arg_pareto_optimal_set(points, objectives):
-    """Returns pareto-optimal set indexes."""
+def _arg_optimal_canonicalize(points, objectives):
     if len(points) != 2:
         raise NotImplementedError
 
     if np.isnan(points).any():
         raise ValueError("points contains NaN values.")
 
-    xs, ys = points
-    xo, yo = [-1 if o == "min" else 1 for o in objectives]
-
     # Force objectives to be ("min", "max").
-    xs = xs * -xo
-    ys = ys * yo
+    signs = [-1 if o == "min" else 1 for o in objectives]
+    points = np.array(points)
+    points[0, :] *= -signs[0]
+    points[1, :] *= signs[1]
 
-    # Sort by x.
-    idxs = xs.argsort()
+    return points
+
+
+def arg_pareto_optimal_set(points, objectives):
+    """Returns pareto-optimal set indexes."""
+    xs, ys = _arg_optimal_canonicalize(points, objectives)
+
+    # Sort by x (ascending) and y (descending).
+    idxs = np.lexsort((-ys, xs))
     # xs = xs[idxs]  # Not needed.
     ys = ys[idxs]
 
@@ -135,47 +140,25 @@ def arg_pareto_optimal_set(points, objectives):
 
 def arg_convex_optimal_set(points, objectives):
     """Returns convex-optimal set indexes."""
-    if len(points) != 2:
-        raise NotImplementedError
+    points = _arg_optimal_canonicalize(points, objectives)
 
-    if np.isnan(points).any():
-        raise ValueError("points contains NaN values.")
-
-    xs, ys = points
-    xo, yo = [-1 if o == "min" else 1 for o in objectives]
-
-    # Force objectives to be ("min", "max").
-    xs = xs * -xo
-    ys = ys * yo
-
-    # Sort by x.
-    idxs = xs.argsort()
-    xs = xs[idxs]
-    ys = ys[idxs]
-
-    # Optimization: pareto optimal set is a subset of convex optimal set.
-    idxs_pareto = arg_pareto_optimal_set([xs, ys], ["min", "max"])
-    xs = xs[idxs_pareto]
-    ys = ys[idxs_pareto]
-    idxs = idxs[idxs_pareto]
+    # perf: convex optimal set is a subset of pareto optimal set.
+    idxs_pareto = arg_pareto_optimal_set(points, ["min", "max"])
+    points = points[:, idxs_pareto]
 
     idxs_convex = [0]
     i = 0
 
-    while i < len(xs) - 1:
+    while i < points.shape[1] - 1:
         # Compute dy/dx for each point to the right of current convex point.
-        # TODO(perf): Do we really need to recompute dy/dx for each point?
-        dx = xs[i + 1 :] - xs[i]
-        dy = ys[i + 1 :] - ys[i]
-        dy_dx = dy / dx
+        d = points[:, i + 1 :] - points[:, i, None]
+        dy_dx = d[1] / d[0]
 
         # Choose the point with largest "dy/dx" as a convex point.
-        d_i = dy_dx.argmax() + 1
-        i += d_i
+        i += dy_dx.argmax() + 1
         idxs_convex.append(i)
 
-    idxs = idxs[idxs_convex]
-
+    idxs = idxs_pareto[idxs_convex]
     return idxs
 
 
