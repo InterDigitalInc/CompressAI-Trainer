@@ -109,9 +109,9 @@ def _create_dataframe(repo, x, y, query, curves, optimal):
         epoch="best",
     )
     df = format_dataframe(df, x, y, curves, skip_nan=True)
+    df = optimal_dataframe(df, x=x, y=y, method=optimal, groupby="name")
     df.sort_values(["name", x, y], inplace=True)
     df.reset_index(drop=True, inplace=True)
-    df = optimal_dataframe(df, x=x, y=y, method=optimal)
     return df
 
 

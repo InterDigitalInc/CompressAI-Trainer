@@ -83,6 +83,7 @@ def optimal_dataframe(
     y_objective: str = "max",
     keep: Optional[str] = None,
     method: str = "pareto",
+    groupby: Optional[str] = None,
 ) -> pd.DataFrame:
     """Returns dataframe of best models at frontier.
 
@@ -92,6 +93,23 @@ def optimal_dataframe(
 
     Valid methods are "none", "pareto", and "convex".
     """
+    if groupby is not None:
+        return (
+            df.sort_values(groupby)
+            .groupby(groupby)
+            .apply(
+                lambda df_group: optimal_dataframe(
+                    df=df_group,
+                    x=x,
+                    y=y,
+                    x_objective=x_objective,
+                    y_objective=y_objective,
+                    keep=keep,
+                    method=method,
+                )
+            )
+            .reset_index(drop=True)
+        )
     points = df[[x, y]].values.T
     idxs = arg_optimal_set(points, [x_objective, y_objective], method)
     if keep is not None:
