@@ -38,34 +38,42 @@ from aim.storage.context import Context
 T = TypeVar("T")
 
 
-def runs_by_query(repo: aim.Repo, query: str) -> list[aim.Run]:
-    """Returns runs that match given query."""
+def run_hashes_by_query(repo: aim.Repo, query: str) -> list[str]:
+    """Returns hashes of runs that match given query."""
+
+    def _to_hash(run: aim.Run) -> str:
+        _close_run(run)  # Free up open file descriptors.
+        return run.hash
+
     if query == "":
-        return list(repo.iter_runs())
-    runs = [x.run for x in repo.query_runs(query).iter_runs()]  # type: ignore
-    return runs
+        return [_to_hash(run) for run in repo.iter_runs()]
+    return [_to_hash(x.run) for x in repo.query_runs(query).iter_runs()]
 
 
 def get_runs_dataframe(
-    runs: list[aim.Run],
+    run_hashes: list[str],
+    repo: aim.Repo,
     *,
     min_metric: str = "loss",
     metrics: list[str] = ["bpp", "psnr", "ms-ssim"],
     hparams: list[str] = [],
     epoch: int | Literal["best"] | Literal["last"] = "best",
-):
+) -> pd.DataFrame:
     """Returns dataframe of best model metrics for runs.
 
     For each run, accumulates infer metric values at a particular epoch
     into a dataframe.
     If epoch == "best", the epoch minimizing the min_metric is chosen.
     """
-    idxs = [_find_index(run, epoch, min_metric) for run in runs]
-    records = [
-        metrics_at_index(run, metrics, hparams, idx)
-        for run, idx in zip(runs, idxs)
-        if idx is not None
-    ]
+    records = []
+
+    for run_hash in run_hashes:
+        run = aim.Run(run_hash=run_hash, repo=repo, read_only=True)
+        idx = _find_index(run, epoch, min_metric)
+        if idx is None:
+            continue
+        records.append(metrics_at_index(run, metrics, hparams, idx))
+
     df = pd.DataFrame.from_records(records)
     df.sort_values(["name"], inplace=True)
     df.reset_index(drop=True, inplace=True)
@@ -153,3 +161,28 @@ def _get_path(x, path: Sequence[str]):
     for key in path:
         x = x[key]
     return x
+
+
+def _close_run(run: aim.Run):
+    """Close Aim run.
+
+    Workaround to `run.close()` not working if run is read-only
+    in Aim <=3.17.5.
+
+    See issue: https://github.com/aimhubio/aim/issues/2844
+    """
+    if not aim.__version__.__version__.startswith("3."):
+        run.close()
+        return
+
+    if run._resources is None:
+        return
+    run._resources.close()
+    if not run.read_only:
+        run._tracker.sequence_infos.clear()
+    # de-reference trees and other resources
+    del run._resources
+    del run._props
+    run._resources = None
+    run._props = None
+    run._cleanup_trees()

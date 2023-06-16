@@ -44,7 +44,7 @@ import aim
 import pandas as pd
 
 from compressai_trainer.plot import plot_rd
-from compressai_trainer.utils.aim.query import get_runs_dataframe, runs_by_query
+from compressai_trainer.utils.aim.query import get_runs_dataframe, run_hashes_by_query
 from compressai_trainer.utils.compressai.results import compressai_dataframe
 from compressai_trainer.utils.optimal import optimal_dataframe
 from compressai_trainer.utils.utils import format_dataframe
@@ -92,7 +92,7 @@ def create_dataframe(repo, args):
 
 
 def _create_dataframe(repo, x, y, query, curves, optimal):
-    runs = runs_by_query(repo, query)
+    run_hashes = run_hashes_by_query(repo, query)
     metrics = sorted(
         {x, y, *HOVER_METRICS}
         | set(_needed_metrics(curves, "x"))
@@ -100,7 +100,8 @@ def _create_dataframe(repo, x, y, query, curves, optimal):
     )
     hparams = HOVER_HPARAMS
     df = get_runs_dataframe(
-        runs=runs,
+        run_hashes=run_hashes,
+        repo=repo,
         metrics=metrics,
         hparams=hparams,
         epoch="best",
