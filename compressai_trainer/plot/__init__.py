@@ -33,7 +33,7 @@ from .featuremap import (
     featuremap_matplotlib,
     featuremap_matplotlib_looptiled,
 )
-from .plot import plot_rd
+from .rd import plot_rd
 
 __all__ = [
     "featuremap_image",
