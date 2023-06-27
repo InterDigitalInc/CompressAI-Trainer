@@ -37,14 +37,16 @@ from omegaconf import DictConfig, OmegaConf
 import compressai_trainer
 from compressai_trainer.utils import git, pip
 
+PACKAGES = [compressai, compressai_trainer]
+
 CONFIG_DIR = "configs"
 CONFIG_NAME = "config.yaml"
 
 
 def write_outputs(conf: DictConfig):
     write_config(conf)
-    write_git_diff(conf, compressai_trainer)
-    write_git_diff(conf, compressai)
+    for package in PACKAGES:
+        write_git_diff(conf, package)
     write_pip_list(conf)
     write_pip_requirements(conf)
     os.makedirs(conf["paths"]["images"], exist_ok=True)

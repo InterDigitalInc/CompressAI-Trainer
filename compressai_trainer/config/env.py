@@ -39,6 +39,8 @@ from omegaconf import DictConfig
 import compressai_trainer
 from compressai_trainer.utils import git, system
 
+PACKAGES = [compressai, compressai_trainer]
+
 
 def get_env(conf: DictConfig) -> dict[str, Any]:
     return {
@@ -46,9 +48,9 @@ def get_env(conf: DictConfig) -> dict[str, Any]:
         "git": {
             package.__name__: _get_git_repo_info(
                 package.__path__[0],
-                conf.env.git[package.__name__].main_branch,
+                conf.env.git.get(package.__name__, {}).get("main_branch", "HEAD"),
             )
-            for package in [compressai, compressai_trainer]
+            for package in PACKAGES
         },
         "slurm": {
             "account": os.environ.get("SLURM_JOB_ACCOUNT"),

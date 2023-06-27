@@ -44,6 +44,8 @@ import compressai_trainer
 from compressai_trainer.utils.catalyst.loggers import AllSuperlogger
 from compressai_trainer.utils.utils import num_parameters
 
+PACKAGES = [compressai, compressai_trainer]
+
 
 class BaseRunner(dl.Runner, AllSuperlogger):
     """Generic runner for all CompressAI Trainer experiments.
@@ -72,8 +74,8 @@ class BaseRunner(dl.Runner, AllSuperlogger):
     def on_experiment_start(self, runner):
         super().on_experiment_start(runner)
         self._log_config()
-        self._log_git_diff(compressai)
-        self._log_git_diff(compressai_trainer)
+        for package in PACKAGES:
+            self._log_git_diff(package)
         self._log_pip()
         self._log_model_info()
 
@@ -136,7 +138,7 @@ class BaseRunner(dl.Runner, AllSuperlogger):
 
     def _log_git_diff(self, package: ModuleType):
         self._log_artifact(
-            f"{package.__name__}_git_diff", f"{package.__name__}.patch", "src"
+            f"git_diff_{package.__name__}", f"{package.__name__}.patch", "src"
         )
 
     def _log_state(self):
