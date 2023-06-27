@@ -49,6 +49,8 @@ from compressai_trainer.utils.compressai.results import compressai_dataframe
 from compressai_trainer.utils.optimal import optimal_dataframe
 from compressai_trainer.utils.utils import format_dataframe
 
+DATASET = "image/kodak"
+
 TITLE = "Performance evaluation on Kodak - PSNR (RGB)"
 
 COMPRESSAI_CODECS = [
@@ -57,10 +59,6 @@ COMPRESSAI_CODECS = [
     "mbt2018",
     "cheng2020-anchor",
 ]
-
-REFERENCE_DF = pd.concat(
-    [compressai_dataframe(name, dataset="image/kodak") for name in COMPRESSAI_CODECS]
-)
 
 HOVER_HPARAMS = [
     "criterion.lmbda",
@@ -81,12 +79,17 @@ HOVER_DATA = [
 HOVER_DATA += HOVER_HPARAMS + HOVER_METRICS
 
 
+def _reference_dataframes():
+    return [compressai_dataframe(name, dataset=DATASET) for name in COMPRESSAI_CODECS]
+
+
 def create_dataframe(repo, args):
+    reference_dfs = _reference_dataframes()
     dfs = [
         _create_dataframe(repo, args.x, args.y, query, curves, optimal)
         for query, curves, optimal in zip(args.query, args.curves, args.optimal)
     ]
-    df = pd.concat([REFERENCE_DF, *dfs])
+    df = pd.concat([*reference_dfs, *dfs])
     df = _reorder_dataframe_columns(df)
     return df
 
