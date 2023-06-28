@@ -169,10 +169,30 @@ def featuremap_image(
     """
     if clim is None:
         clim = (arr.min(), arr.max())
+
     if fill_value is None:
         fill_value, _ = clim
 
-    arr = tile_featuremap(arr, nrows, ncols, padding, fill_value)
+    if arr.ndim == 0:
+        arr = arr.reshape(1)
+
+    if arr.ndim > 3:
+        *_, h, w = arr.shape
+        arr = arr.reshape(-1, h, w)
+
+    if arr.ndim <= 2:
+        c, *tail = arr.shape
+        arr = arr.reshape(c, *tail, *([1] * (2 - len(tail))))
+        if nrows is None and ncols is None:
+            nrows, ncols = 1, c
+        if padding is None:
+            padding = 0
+
+    if arr.ndim == 3:
+        if padding is None:
+            padding = 2
+
+    arr = _tile_featuremap_3d(arr, nrows, ncols, padding, fill_value)
 
     if cmap is not None:
         arr = ((arr - clim[0]) / (clim[1] - clim[0])).clip(0, 1)
@@ -181,54 +201,11 @@ def featuremap_image(
     return arr
 
 
-def tile_featuremap(
-    arr: np.ndarray,
-    nrows: Optional[int] = None,
-    ncols: Optional[int] = None,
-    padding: Optional[int] = None,
-    fill_value: Optional[float] = None,
-) -> np.ndarray:
-    """Tiles arr into a 2D image featuremap.
-
-    Args:
-        arr: tensor of shape (c, ...)
-        nrows: number of tiled rows
-        ncols: number of tiled columns
-        padding: padding between tiles (default is 2 for arr.ndim > 2)
-        fill_value: value to set remaining area to
-
-    Returns:
-        np.ndarray: tiled array
-    """
-    if arr.ndim == 0:
-        arr = arr.reshape(1)
-
-    if arr.ndim <= 2:
-        c, *tail = arr.shape
-        arr = arr.reshape(c, *tail, *([1] * (2 - len(tail))))
-        assert nrows is None and ncols is None and padding is None
-        nrows = 1
-        ncols = c
-        padding = 0
-        return _tile_featuremap_3d(arr, nrows, ncols, padding, fill_value)
-
-    if arr.ndim > 3:
-        *_, h, w = arr.shape
-        arr = arr.reshape(-1, h, w)
-
-    if arr.ndim == 3:
-        if padding is None:
-            padding = 2
-        return _tile_featuremap_3d(arr, nrows, ncols, padding, fill_value)
-
-    raise NotImplementedError(f"Unsupported number of dimensions: {arr.ndim}.")
-
-
 def _tile_featuremap_3d(
     arr: np.ndarray,
     nrows: Optional[int] = None,
     ncols: Optional[int] = None,
-    padding: Optional[int] = None,
+    padding: int = 0,
     fill_value: Optional[float] = None,
 ) -> np.ndarray:
     if fill_value is None:
