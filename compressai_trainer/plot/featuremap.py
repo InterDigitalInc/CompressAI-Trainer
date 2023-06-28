@@ -80,10 +80,7 @@ def featuremap_matplotlib(
 
         if clim is None:
             clim = (arr.min(), arr.max())
-        if nrows is None:
-            nrows = ceil(sqrt(c))
-        if ncols is None:
-            ncols = ceil(c / nrows)
+        nrows, ncols = _compute_tiling(c, nrows, ncols)
 
         fig, axs = plt.subplots(nrows, ncols, squeeze=False, **fig_kw)
         im = None
@@ -206,12 +203,7 @@ def _tile_featuremap_3d(
     arr = np.pad(arr, pad, "constant", constant_values=fill_value)
     c, h, w = arr.shape
 
-    if nrows is None:
-        nrows = ceil(sqrt(c))
-    if ncols is None:
-        ncols = ceil(c / nrows)
-
-    assert c <= nrows * ncols
+    nrows, ncols = _compute_tiling(c, nrows, ncols)
 
     # Ensure nrows * ncols channels by creating empty channels if needed.
     if c < nrows * ncols:
@@ -221,3 +213,14 @@ def _tile_featuremap_3d(
         arr[prev_size:] = fill_value
 
     return arr.reshape(nrows, ncols, h, w).swapaxes(1, 2).reshape(nrows * h, ncols * w)
+
+
+def _compute_tiling(c, nrows, ncols):
+    if nrows is None and ncols is None:
+        nrows = ceil(sqrt(c))
+    if nrows is None:
+        nrows = ceil(c / ncols)
+    if ncols is None:
+        ncols = ceil(c / nrows)
+    assert c <= nrows * ncols
+    return nrows, ncols
