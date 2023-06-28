@@ -28,17 +28,12 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from .distribution import plot_entropy_bottleneck_distributions
-from .featuremap import (
-    featuremap_image,
-    featuremap_matplotlib,
-    featuremap_matplotlib_looptiled,
-)
+from .featuremap import featuremap_image, featuremap_matplotlib
 from .rd import plot_rd
 
 __all__ = [
     "featuremap_image",
     "featuremap_matplotlib",
-    "featuremap_matplotlib_looptiled",
     "plot_entropy_bottleneck_distributions",
     "plot_rd",
 ]

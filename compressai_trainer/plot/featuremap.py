@@ -39,82 +39,25 @@ import numpy as np
 DEFAULT_COLORMAP = "plasma"
 
 
-def featuremap_matplotlib_looptiled(
-    arr: np.ndarray,
-    *,
-    nrows: Optional[int] = None,
-    ncols: Optional[int] = None,
-    clim: Optional[Tuple[float, float]] = None,
-    cmap: str = DEFAULT_COLORMAP,
-    cbar: bool = True,
-    **fig_kw,
-) -> Tuple[plt.Figure, np.ndarray]:
-    """Plots 3D tensor as a 2D featuremap of tiled channels.
-
-    .. note:: This is slow due to the nested loop. For a faster
-       alternative with slightly lower publication quality, try
-       ``featuremap_matplotlib`` or ``featuremap_image``.
-
-    Args:
-        arr: chw tensor
-        nrows: number of tiled rows
-        ncols: number of tiled columns
-        clim: colorbar limits
-        cmap: colormap
-        cbar: whether to show colorbar
-        fig_kw: keyword arguments to pass to matplotlib
-    """
-    c, _, _ = arr.shape
-
-    if clim is None:
-        clim = (arr.min(), arr.max())
-    if nrows is None:
-        nrows = ceil(sqrt(c))
-    if ncols is None:
-        ncols = ceil(c / nrows)
-
-    fig, axs = plt.subplots(nrows, ncols, squeeze=False, **fig_kw)
-    im = None
-
-    for i in range(nrows):
-        for j in range(ncols):
-            ax = axs[i, j]
-            idx = i * ncols + j
-            if idx >= c:
-                ax.axis("off")
-                continue
-            img = arr[idx]
-            im = ax.matshow(img, cmap=cmap)
-            im.set_clim(*clim)
-            ax.set_xticks([])
-            ax.set_yticks([])
-            ax.xaxis.set_ticklabels([])
-            ax.yaxis.set_ticklabels([])
-            ax.tick_params(axis="y", direction="in", pad=0)
-            ax.tick_params(axis="x", direction="in", pad=0)
-
-    fig.subplots_adjust(wspace=0, hspace=0)
-
-    if cbar:
-        cbar = fig.colorbar(im, ax=axs)
-
-    return fig, axs
-
-
 def featuremap_matplotlib(
     arr: np.ndarray,
-    title: str,
     *,
     nrows: Optional[int] = None,
     ncols: Optional[int] = None,
-    padding: int = 2,
+    padding: Optional[int] = None,
     fill_value: Optional[float] = None,
     clim: Optional[Tuple[float, float]] = None,
     cmap: str = DEFAULT_COLORMAP,
     cbar: bool = True,
+    ax: Optional[plt.Axes] = None,
+    tile_method: str = "reshape",
     **fig_kw,
 ) -> plt.Figure:
     """Plots 3D tensor as a 2D featuremap of tiled channels.
+
+    .. note:: ``tile_method="loop"`` is slow due to the nested loop.
+       For a faster alternative with slightly lower publication quality,
+       try ``tile_method="reshape"``.
 
     Args:
         arr: chw tensor
@@ -125,26 +68,74 @@ def featuremap_matplotlib(
         clim: colorbar limits
         cmap: colormap
         cbar: whether to show colorbar
+        tile_method: "reshape" (default, fast) or "loop" (slow)
         fig_kw: keyword arguments to pass to matplotlib
     """
-    img = featuremap_image(
-        arr,
-        nrows=nrows,
-        ncols=ncols,
-        padding=padding,
-        fill_value=fill_value,
-        clim=clim,
-    )
-    fig, ax = plt.subplots(tight_layout=True, **fig_kw)
-    im = ax.matshow(img, cmap=cmap)
-    ax.set_title(title, fontsize="xx-small")
-    ax.set_xticks([])
-    ax.set_yticks([])
-    if clim is not None:
-        im.set_clim(*clim)
-    if cbar:
-        fig.colorbar(im)
-    return fig
+    if tile_method == "loop":
+        assert padding is None
+        assert fill_value is None
+        assert ax is None
+
+        c, _, _ = arr.shape
+
+        if clim is None:
+            clim = (arr.min(), arr.max())
+        if nrows is None:
+            nrows = ceil(sqrt(c))
+        if ncols is None:
+            ncols = ceil(c / nrows)
+
+        fig, axs = plt.subplots(nrows, ncols, squeeze=False, **fig_kw)
+        im = None
+
+        for i in range(nrows):
+            for j in range(ncols):
+                ax = axs[i, j]
+                idx = i * ncols + j
+                if idx >= c:
+                    ax.axis("off")
+                    continue
+                img = arr[idx]
+                im = ax.matshow(img, cmap=cmap)
+                im.set_clim(*clim)
+                ax.set_xticks([])
+                ax.set_yticks([])
+                ax.xaxis.set_ticklabels([])
+                ax.yaxis.set_ticklabels([])
+                ax.tick_params(axis="y", direction="in", pad=0)
+                ax.tick_params(axis="x", direction="in", pad=0)
+
+        fig.subplots_adjust(wspace=0, hspace=0)
+
+        if cbar:
+            cbar = fig.colorbar(im, ax=axs)
+
+        return fig
+
+    elif tile_method == "reshape":
+        img = featuremap_image(
+            arr,
+            nrows=nrows,
+            ncols=ncols,
+            padding=padding,
+            fill_value=fill_value,
+            clim=clim,
+        )
+        if ax is None:
+            fig, ax = plt.subplots(tight_layout=True, **fig_kw)
+        else:
+            fig = ax.get_figure()
+        im = ax.matshow(img, cmap=cmap)
+        if clim is not None:
+            im.set_clim(*clim)
+        ax.set_xticks([])
+        ax.set_yticks([])
+        if cbar:
+            fig.colorbar(im, ax=ax)
+        return fig
+
+    else:
+        raise ValueError(f"Unknown tile_method: {tile_method}")
 
 
 def featuremap_image(
