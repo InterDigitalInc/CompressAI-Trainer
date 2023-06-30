@@ -122,7 +122,7 @@ config_path = thisdir.joinpath("../../conf")
 
 def setup(conf: DictConfig) -> TRunner:
     catalyst.utils.set_global_seed(conf.misc.seed)
-    catalyst.utils.prepare_cudnn(benchmark=True, deterministic=True)
+    catalyst.utils.prepare_cudnn(benchmark=False, deterministic=True)
 
     configure_conf(conf)
 

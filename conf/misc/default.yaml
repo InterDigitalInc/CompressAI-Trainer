@@ -1,2 +1,5 @@
+cudnn:
+  benchmark: True
+  deterministic: null
 device: "cuda"
 seed: 1234
