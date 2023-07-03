@@ -76,7 +76,7 @@ def featuremap_matplotlib(
         assert fill_value is None
         assert ax is None
 
-        c, _, _ = arr.shape
+        c, *_ = arr.shape
 
         if clim is None:
             clim = (arr.min(), arr.max())
