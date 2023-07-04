@@ -1,0 +1,37 @@
+type: "GVAEImageCompressionRunner"
+
+inference:
+  skip_compress: False
+  skip_decompress: False
+
+# NOTE: (GVAE-specific) The * will be expanded for each lmbda_idx.
+
+# Mean-averaged metrics to track for each data loader.
+meters:
+  train:
+    - loss
+    - loss_*
+    # - aux_loss
+    # - bpp_loss
+    # - mse_loss
+  valid:
+    - loss
+    # - loss_*
+    # - aux_loss
+    # - bpp_loss
+    # - mse_loss
+  infer:
+    - loss
+    # - aux_loss
+    # - bpp_loss
+    # - mse_loss
+    # - bpp
+    # - psnr
+    # - ms-ssim
+    - loss_*
+    # - aux_loss_*
+    - bpp_loss_*
+    - mse_loss_*
+    - bpp_*
+    - psnr_*
+    - ms-ssim_*

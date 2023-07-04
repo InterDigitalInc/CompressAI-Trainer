@@ -1,0 +1,36 @@
+defaults:
+  - paths: default
+  - env: default
+  - engine: default
+  - runner: GVAEImageCompressionRunner
+  - criterion: RateDistortionLoss
+  - optimizer: net_aux
+  - scheduler: ReduceLROnPlateau
+  - misc: default
+  - dataset@dataset.train: vimeo90k/train
+  - dataset@dataset.valid: vimeo90k/valid
+  - dataset@dataset.infer: kodak/infer
+  - _self_
+
+exp:
+  name: "${model.name}-lbr"
+
+model:
+  name: "bmshj2018-factorized-gvae"
+
+hp:
+  # Qualities 1-5
+  N: 128
+  M: 192
+  lambdas: [0.0018, 0.0035, 0.0067, 0.0130]
+  # Qualities 6-8
+  # N: 192
+  # M: 320
+
+
+
+# To resume from checkpoint, override paths.checkpoint:
+paths:
+  # checkpoint: "${.checkpoints}/runner.last.pth"
+  # model_checkpoint: ./checkpoints/runner.best.pth
+

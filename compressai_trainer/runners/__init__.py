@@ -28,9 +28,11 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from .base import BaseRunner
+from .gvae_image_compression import GVAEImageCompressionRunner
 from .image_compression import ImageCompressionRunner
 
 __all__ = [
     "BaseRunner",
+    "GVAEImageCompressionRunner",
     "ImageCompressionRunner",
 ]
