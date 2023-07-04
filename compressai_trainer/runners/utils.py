@@ -75,7 +75,7 @@ class ChannelwiseBppMeter:
         for name, ch_bpp in chan_bpp.items():
             self._chan_bpp[name].extend(ch_bpp)
 
-    def log(self):
+    def log(self, context=None):
         for name, ch_bpp_samples in self._chan_bpp.items():
             ch_bpp = torch.stack(ch_bpp_samples).mean(dim=0).to(torch.float16).cpu()
             c, *_ = ch_bpp.shape
@@ -83,7 +83,7 @@ class ChannelwiseBppMeter:
             kw = dict(
                 unused=None,
                 scope="epoch",
-                context={"name": name},
+                context={"name": name, **(context or {})},
                 bin_range=(0, c),
             )
             self.runner.log_distribution("chan_bpp_sorted", hist=ch_bpp_sorted, **kw)
@@ -109,7 +109,7 @@ class DebugOutputsLogger:
     def __init__(self, runner):
         self.runner = runner
 
-    def log(self, inputs, out_infer):
+    def log(self, inputs, out_infer, context=None):
         # Collect items from out_infer[*]["debug_outputs"].
         debug_outputs = {
             (mode, k): v
@@ -130,18 +130,20 @@ class DebugOutputsLogger:
 
             for (mode, key), outputs in debug_outputs.items():
                 mode = mode.lstrip("out_")
-                self._log_output(mode, key, inputs[i], outputs[i], sample_idx)
+                self._log_output(mode, key, inputs[i], outputs[i], sample_idx, context)
 
-    def _log_output(self, mode, key, input, output, sample_idx):
+    def _log_output(self, mode, key, input, output, sample_idx, context):
+        context = {"mode": mode, "key": key, **(context or {})}
+        context_str = "_".join(f"{v}" for v in context.values())
+
         if key == "x_hat":
             arr = tensor_to_np_img(output.cpu())
         else:
             arr = plot.featuremap_image(output.cpu().numpy(), cmap=DEFAULT_COLORMAP)
 
         img_dir = self.runner.hparams["paths"]["images"]
-        Image.fromarray(arr).save(f"{img_dir}/{sample_idx:06}_{mode}_{key}.png")
+        Image.fromarray(arr).save(f"{img_dir}/{sample_idx:06}_{context_str}.png")
 
-        context = {"mode": mode, "key": key}
         log_kwargs = dict(
             format="webp",
             lossless=True,
@@ -162,6 +164,7 @@ class EbDistributionsFigureLogger:
         self,
         log_figure: bool = True,
         log_kwargs: Optional[dict[str, Any]] = None,
+        context: Optional[dict[str, Any]] = None,
         **kwargs,
     ):
         log_kwargs = log_kwargs or {}
@@ -175,8 +178,8 @@ class EbDistributionsFigureLogger:
             figs[name] = fig
 
             if log_figure:
-                context = {"module": name}
-                self.runner.log_figure("pdf", fig, context=context, **log_kwargs)
+                context_ = {"module": name, **(context or {})}
+                self.runner.log_figure("pdf", fig, context=context_, **log_kwargs)
 
         return figs
 
@@ -197,6 +200,7 @@ class RdFigureLogger:
         metric: str = "psnr",
         opt_metric: str = "mse",
         log_figure: bool = True,
+        context: Optional[dict[str, Any]] = None,
         **kwargs,
     ):
         hover_data = kwargs.get("scatter_kwargs", {}).get("hover_data", [])
@@ -218,6 +222,7 @@ class RdFigureLogger:
                 "loader": loader,
                 "metric": metric,
                 "opt_metric": opt_metric,
+                **(context or {}),
             }
             self.runner.log_figure("-rd-curves", fig, context=context)
         return fig
