@@ -102,8 +102,6 @@ def featuremap_matplotlib(
                 ax.tick_params(axis="y", direction="in", pad=0)
                 ax.tick_params(axis="x", direction="in", pad=0)
 
-        fig.subplots_adjust(wspace=0, hspace=0)
-
         if cbar:
             cbar = fig.colorbar(im, ax=axs)
 
@@ -119,7 +117,7 @@ def featuremap_matplotlib(
             clim=clim,
         )
         if ax is None:
-            fig, ax = plt.subplots(tight_layout=True, **fig_kw)
+            fig, ax = plt.subplots(**fig_kw)
         else:
             fig = ax.get_figure()
         im = ax.matshow(img, cmap=cmap)
