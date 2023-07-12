@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/source/_static/logo-big.png" alt="ID-CompressAI-Trainer-logo">
+  <img src="docs/source/_static/logo.svg" alt="CompressAI-Trainer-logo">
 </p>
 
 [![License](https://img.shields.io/github/license/InterDigitalInc/CompressAI-Trainer?color=blue)](https://github.com/InterDigitalInc/CompressAI-Trainer/blob/master/LICENSE)
