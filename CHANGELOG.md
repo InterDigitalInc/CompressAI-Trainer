@@ -1,6 +1,15 @@
 **Note:** This only highlights "important" changes. For more details, see commit history.
 
 
+### v0.3.10
+
+- [Feature] `compressai-plot --optimal=none|pareto|convex` to select which points to display on RD curve.
+- [Feature] Log git repository versions in [new format][git_version_format], e.g. `v0.3.9-8-g643ce8b-dirty`.
+- [Feature] [`GVAEImageCompressionRunner`].
+
+[git_version_format]: https://github.com/InterDigitalInc/CompressAI-Trainer/commit/eba2080a87b4a7d48f068f6d37b45055385d0dc4
+[`GVAEImageCompressionRunner`]: ./compressai_trainer/runners/gvae_image_compression.py
+
 ### v0.3.9
 
 - [Feature] CLI utilities now launch from:
