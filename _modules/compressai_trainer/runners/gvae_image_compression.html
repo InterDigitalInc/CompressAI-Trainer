@@ -8,7 +8,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>compressai_trainer.runners.image_compression &#8212; CompressAI Trainer</title>
+    <title>compressai_trainer.runners.gvae_image_compression &#8212; CompressAI Trainer</title>
   
   
   
@@ -40,7 +40,7 @@
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
     <script src="../../../_static/scripts/sphinx-book-theme.js?digest=5a5c038af52cf7bc1a1ec88eea08e6366ee68824"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/compressai_trainer/runners/image_compression';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/compressai_trainer/runners/gvae_image_compression';</script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -251,7 +251,7 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article" role="main">
                   
-  <h1>Source code for compressai_trainer.runners.image_compression</h1><div class="highlight"><pre>
+  <h1>Source code for compressai_trainer.runners.gvae_image_compression</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright (c) 2021-2023, InterDigital Communications, Inc</span>
 <span class="c1"># All rights reserved.</span>
 
@@ -283,8 +283,11 @@ document.write(`
 
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
+<span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">chain</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">cast</span>
 
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">import</span> <span class="nn">torch</span>
@@ -298,6 +301,12 @@ document.write(`
 <span class="kn">from</span> <span class="nn">compressai_trainer.utils.utils</span> <span class="kn">import</span> <span class="n">compute_padding</span>
 
 <span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">BaseRunner</span>
+<span class="kn">from</span> <span class="nn">.image_compression</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">RD_PLOT_DESCRIPTIONS</span><span class="p">,</span>
+    <span class="n">RD_PLOT_METRICS</span><span class="p">,</span>
+    <span class="n">RD_PLOT_SETTINGS_COMMON</span><span class="p">,</span>
+    <span class="n">RD_PLOT_TITLE</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ChannelwiseBppMeter</span><span class="p">,</span>
     <span class="n">DebugOutputsLogger</span><span class="p">,</span>
@@ -306,45 +315,12 @@ document.write(`
     <span class="n">RdFigureLogger</span><span class="p">,</span>
 <span class="p">)</span>
 
-<span class="n">RD_PLOT_METRICS</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;psnr&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;ms-ssim&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;ms-ssim-db&quot;</span><span class="p">,</span>
-<span class="p">]</span>
-
-<span class="n">RD_PLOT_DESCRIPTIONS</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;PSNR (RGB)&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;MS-SSIM (RGB)&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;MS-SSIM (RGB)&quot;</span><span class="p">,</span>
-<span class="p">]</span>
-
-<span class="n">RD_PLOT_TITLE</span> <span class="o">=</span> <span class="s2">&quot;Performance evaluation on </span><span class="si">{dataset}</span><span class="s2"> - </span><span class="si">{metric}</span><span class="s2">&quot;</span>
-
-<span class="n">RD_PLOT_SETTINGS_COMMON</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-    <span class="n">codecs</span><span class="o">=</span><span class="p">[</span>
-        <span class="s2">&quot;bmshj2018-factorized&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;bmshj2018-hyperprior&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;mbt2018-mean&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;mbt2018&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;cheng2020-anchor&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;vtm&quot;</span><span class="p">,</span>
-    <span class="p">],</span>
-    <span class="n">scatter_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-        <span class="n">hover_data</span><span class="o">=</span><span class="p">[</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;bpp&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;psnr&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;ms-ssim&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;loss&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;epoch&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;criterion.lmbda&quot;</span><span class="p">,</span>
-        <span class="p">],</span>
-    <span class="p">),</span>
-<span class="p">)</span>
+<span class="n">K</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;K&quot;</span><span class="p">)</span>
+<span class="n">V</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;V&quot;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="ImageCompressionRunner"><a class="viewcode-back" href="../../../compressai_trainer/runners.html#compressai_trainer.runners.ImageCompressionRunner">[docs]</a><span class="nd">@register_runner</span><span class="p">(</span><span class="s2">&quot;ImageCompressionRunner&quot;</span><span class="p">)</span>
-<span class="k">class</span> <span class="nc">ImageCompressionRunner</span><span class="p">(</span><span class="n">BaseRunner</span><span class="p">):</span>
+<div class="viewcode-block" id="GVAEImageCompressionRunner"><a class="viewcode-back" href="../../../compressai_trainer/runners.html#compressai_trainer.runners.GVAEImageCompressionRunner">[docs]</a><span class="nd">@register_runner</span><span class="p">(</span><span class="s2">&quot;GVAEImageCompressionRunner&quot;</span><span class="p">)</span>
+<span class="k">class</span> <span class="nc">GVAEImageCompressionRunner</span><span class="p">(</span><span class="n">BaseRunner</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Runner for image compression experiments.</span>
 
 <span class="sd">    Reimplementation of CompressAI&#39;s `examples/train.py</span>
@@ -374,16 +350,19 @@ document.write(`
         <span class="bp">self</span><span class="o">.</span><span class="n">_eb_distributions_figure_logger</span> <span class="o">=</span> <span class="n">EbDistributionsFigureLogger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_rd_figure_logger</span> <span class="o">=</span> <span class="n">RdFigureLogger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ImageCompressionRunner.on_loader_start"><a class="viewcode-back" href="../../../compressai_trainer/runners.html#compressai_trainer.runners.ImageCompressionRunner.on_loader_start">[docs]</a>    <span class="k">def</span> <span class="nf">on_loader_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runner</span><span class="p">):</span>
+<div class="viewcode-block" id="GVAEImageCompressionRunner.on_loader_start"><a class="viewcode-back" href="../../../compressai_trainer/runners.html#compressai_trainer.runners.GVAEImageCompressionRunner.on_loader_start">[docs]</a>    <span class="k">def</span> <span class="nf">on_loader_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runner</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">on_loader_start</span><span class="p">(</span><span class="n">runner</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_setup_metrics</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="ImageCompressionRunner.handle_batch"><a class="viewcode-back" href="../../../compressai_trainer/runners.html#compressai_trainer.runners.ImageCompressionRunner.handle_batch">[docs]</a>    <span class="k">def</span> <span class="nf">handle_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
+<div class="viewcode-block" id="GVAEImageCompressionRunner.handle_batch"><a class="viewcode-back" href="../../../compressai_trainer/runners.html#compressai_trainer.runners.GVAEImageCompressionRunner.handle_batch">[docs]</a>    <span class="k">def</span> <span class="nf">handle_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loader_key</span> <span class="o">==</span> <span class="s2">&quot;infer&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle_batch_infer</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
 
+        <span class="c1"># Choose random lambda for this batch.</span>
+        <span class="n">lmbda_idx</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lmbdas</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
         <span class="n">x</span> <span class="o">=</span> <span class="n">batch</span>
-        <span class="n">out_net</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">out_net</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">lmbda_idx</span><span class="o">=</span><span class="n">lmbda_idx</span><span class="p">)</span>
         <span class="n">out_criterion</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">(</span><span class="n">out_net</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
         <span class="n">loss</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">loss</span><span class="p">[</span><span class="s2">&quot;net&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out_criterion</span><span class="p">[</span><span class="s2">&quot;loss&quot;</span><span class="p">]</span>
@@ -405,12 +384,35 @@ document.write(`
             <span class="s2">&quot;loss&quot;</span><span class="p">:</span> <span class="n">loss</span><span class="p">[</span><span class="s2">&quot;net&quot;</span><span class="p">],</span>
             <span class="s2">&quot;aux_loss&quot;</span><span class="p">:</span> <span class="n">loss</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">],</span>
             <span class="o">**</span><span class="n">out_criterion</span><span class="p">,</span>
+            <span class="s2">&quot;lmbda&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lmbdas</span><span class="p">[</span><span class="n">lmbda_idx</span><span class="p">],</span>
         <span class="p">}</span>
+
+        <span class="c1"># Append suffixes, i.e. f&quot;{...}_{lmbda_idx}&quot;.</span>
+        <span class="n">batch_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flatten_batch_metricses</span><span class="p">([</span><span class="n">batch_metrics</span><span class="p">],</span> <span class="p">[</span><span class="n">lmbda_idx</span><span class="p">])</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_update_batch_metrics</span><span class="p">(</span><span class="n">batch_metrics</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_handle_batch_infer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">):</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">batch</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
-        <span class="n">out_infer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_batch</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_inference_kwargs</span><span class="p">)</span>
+
+        <span class="c1"># Run inference for each lambda, then flatten results.</span>
+        <span class="n">batch_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flatten_batch_metricses</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_handle_batch_infer_lmbda</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">lmbda_idx</span><span class="o">=</span><span class="n">lmbda_idx</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">lmbda_idx</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lmbda_idxs</span>
+            <span class="p">],</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_lmbda_idxs</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_batch_metrics</span><span class="p">(</span><span class="n">batch_metrics</span><span class="p">)</span>
+
+        <span class="c1"># Save per-sample metrics, too.</span>
+        <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loader_metrics</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">metric</span> <span class="ow">in</span> <span class="n">batch_metrics</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_loader_metrics</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">batch_metrics</span><span class="p">[</span><span class="n">metric</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">_handle_batch_infer_lmbda</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">lmbda_idx</span><span class="p">):</span>
+        <span class="n">out_infer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_batch</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">lmbda_idx</span><span class="o">=</span><span class="n">lmbda_idx</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_inference_kwargs</span><span class="p">)</span>
         <span class="n">out_net</span> <span class="o">=</span> <span class="n">out_infer</span><span class="p">[</span><span class="s2">&quot;out_net&quot;</span><span class="p">]</span>
 
         <span class="n">out_criterion</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">(</span><span class="n">out_net</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
@@ -428,50 +430,70 @@ document.write(`
             <span class="o">**</span><span class="n">out_criterion</span><span class="p">,</span>
             <span class="o">**</span><span class="n">out_metrics</span><span class="p">,</span>
             <span class="s2">&quot;bpp&quot;</span><span class="p">:</span> <span class="n">out_infer</span><span class="p">[</span><span class="s2">&quot;bpp&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;lmbda&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lmbdas</span><span class="p">[</span><span class="n">lmbda_idx</span><span class="p">],</span>
         <span class="p">}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_update_batch_metrics</span><span class="p">(</span><span class="n">batch_metrics</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_handle_custom_metrics</span><span class="p">(</span><span class="n">out_net</span><span class="p">,</span> <span class="n">out_metrics</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_debug_outputs_logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out_infer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_debug_outputs_logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out_infer</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;lmbda_idx&quot;</span><span class="p">:</span> <span class="n">lmbda_idx</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loader_metrics</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;chan_bpp_</span><span class="si">{</span><span class="n">lmbda_idx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">out_net</span><span class="p">)</span>
 
-<div class="viewcode-block" id="ImageCompressionRunner.predict_batch"><a class="viewcode-back" href="../../../compressai_trainer/runners.html#compressai_trainer.runners.ImageCompressionRunner.predict_batch">[docs]</a>    <span class="k">def</span> <span class="nf">predict_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">batch_metrics</span>
+
+<div class="viewcode-block" id="GVAEImageCompressionRunner.predict_batch"><a class="viewcode-back" href="../../../compressai_trainer/runners.html#compressai_trainer.runners.GVAEImageCompressionRunner.predict_batch">[docs]</a>    <span class="k">def</span> <span class="nf">predict_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">,</span> <span class="n">lmbda_idx</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lmbda</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">batch</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">inference</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_module</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">criterion</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ImageCompressionRunner.on_loader_end"><a class="viewcode-back" href="../../../compressai_trainer/runners.html#compressai_trainer.runners.ImageCompressionRunner.on_loader_end">[docs]</a>    <span class="k">def</span> <span class="nf">on_loader_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runner</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">lmbda_idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">lmbda</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">lmbda</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lmbdas</span><span class="p">[</span><span class="n">lmbda_idx</span><span class="p">]</span>
+            <span class="n">lmbda</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lmbdas</span><span class="p">[</span><span class="n">lmbda_idx</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">inference</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_module</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">criterion</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">,</span> <span class="n">lmbda</span><span class="o">=</span><span class="n">lmbda</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="GVAEImageCompressionRunner.on_loader_end"><a class="viewcode-back" href="../../../compressai_trainer/runners.html#compressai_trainer.runners.GVAEImageCompressionRunner.on_loader_end">[docs]</a>    <span class="k">def</span> <span class="nf">on_loader_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runner</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">on_loader_end</span><span class="p">(</span><span class="n">runner</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loader_key</span> <span class="o">==</span> <span class="s2">&quot;infer&quot;</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_log_rd_curves</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_eb_distributions_figure_logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
                 <span class="n">log_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">track_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">step</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
             <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_loader_metrics</span><span class="p">[</span><span class="s2">&quot;chan_bpp&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">log</span><span class="p">()</span></div>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lmbdas</span><span class="p">)):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_loader_metrics</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;chan_bpp_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;lmbda_idx&quot;</span><span class="p">:</span> <span class="n">i</span><span class="p">})</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_current_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">r</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.4g</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">d</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;epoch&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">epoch_step</span><span class="p">,</span>
-            <span class="s2">&quot;criterion.lmbda&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;criterion&quot;</span><span class="p">][</span><span class="s2">&quot;lmbda&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;loss&quot;</span><span class="p">:</span> <span class="n">r</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loader_metrics</span><span class="p">[</span><span class="s2">&quot;loss&quot;</span><span class="p">]),</span>
-            <span class="s2">&quot;bpp&quot;</span><span class="p">:</span> <span class="n">r</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loader_metrics</span><span class="p">[</span><span class="s2">&quot;bpp&quot;</span><span class="p">]),</span>
-            <span class="s2">&quot;psnr&quot;</span><span class="p">:</span> <span class="n">r</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loader_metrics</span><span class="p">[</span><span class="s2">&quot;psnr&quot;</span><span class="p">]),</span>
-            <span class="s2">&quot;ms-ssim&quot;</span><span class="p">:</span> <span class="n">r</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loader_metrics</span><span class="p">[</span><span class="s2">&quot;ms-ssim&quot;</span><span class="p">]),</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;*&quot;</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lmbda_idxs</span><span class="p">],</span>
+            <span class="s2">&quot;epoch&quot;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">epoch_step</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lmbda_idxs</span><span class="p">],</span>
+            <span class="s2">&quot;criterion.lmbda&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lmbdas</span><span class="p">,</span>
+            <span class="s2">&quot;loss&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">r</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loader_metrics</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;loss_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lmbda_idxs</span><span class="p">],</span>
+            <span class="s2">&quot;bpp&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">r</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loader_metrics</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;bpp_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lmbda_idxs</span><span class="p">],</span>
+            <span class="s2">&quot;psnr&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">r</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loader_metrics</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;psnr_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lmbda_idxs</span><span class="p">],</span>
+            <span class="s2">&quot;ms-ssim&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">r</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loader_metrics</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;ms-ssim_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lmbda_idxs</span>
+            <span class="p">],</span>
             <span class="c1"># NOTE: The dB of the mean of MS-SSIM samples</span>
             <span class="c1"># is not the same as the mean of MS-SSIM dB samples.</span>
-            <span class="s2">&quot;ms-ssim-db&quot;</span><span class="p">:</span> <span class="n">r</span><span class="p">(</span><span class="n">db</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">loader_metrics</span><span class="p">[</span><span class="s2">&quot;ms-ssim&quot;</span><span class="p">])),</span>
+            <span class="s2">&quot;ms-ssim-db&quot;</span><span class="p">:</span> <span class="p">[</span>
+                <span class="n">r</span><span class="p">(</span><span class="n">db</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">loader_metrics</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;ms-ssim_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lmbda_idxs</span>
+            <span class="p">],</span>
         <span class="p">}</span>
-        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">([</span><span class="n">d</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_log_rd_curves</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;dataset&quot;</span><span class="p">][</span><span class="s2">&quot;infer&quot;</span><span class="p">][</span><span class="s2">&quot;meta&quot;</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">metric</span><span class="p">,</span> <span class="n">description</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">RD_PLOT_METRICS</span><span class="p">,</span> <span class="n">RD_PLOT_DESCRIPTIONS</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_rd_figure_logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
                 <span class="n">df</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_dataframe</span><span class="p">,</span>
-                <span class="n">traces</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rd_figure_logger</span><span class="o">.</span><span class="n">current_rd_traces</span><span class="p">(</span>
-                    <span class="n">x</span><span class="o">=</span><span class="s2">&quot;bpp&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span> <span class="n">lmbda</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;criterion&quot;</span><span class="p">][</span><span class="s2">&quot;lmbda&quot;</span><span class="p">]</span>
-                <span class="p">),</span>
+                <span class="n">traces</span><span class="o">=</span><span class="p">[</span>
+                    <span class="n">trace</span>
+                    <span class="k">for</span> <span class="n">lmbda_idx</span><span class="p">,</span> <span class="n">lmbda</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lmbdas</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">trace</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rd_figure_logger</span><span class="o">.</span><span class="n">current_rd_traces</span><span class="p">(</span>
+                        <span class="n">x</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;bpp_</span><span class="si">{</span><span class="n">lmbda_idx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="n">y</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">lmbda_idx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="n">lmbda</span><span class="o">=</span><span class="n">lmbda</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">],</span>
                 <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
                 <span class="n">dataset</span><span class="o">=</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;identifier&quot;</span><span class="p">],</span>
                 <span class="o">**</span><span class="n">RD_PLOT_SETTINGS_COMMON</span><span class="p">,</span>
@@ -483,21 +505,55 @@ document.write(`
                 <span class="p">),</span>
             <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_handle_custom_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out_net</span><span class="p">,</span> <span class="n">out_metrics</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_loader_metrics</span><span class="p">[</span><span class="s2">&quot;chan_bpp&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">out_net</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">metric</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;bpp&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">RD_PLOT_METRICS</span><span class="p">]:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_loader_metrics</span><span class="p">[</span><span class="n">metric</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">out_metrics</span><span class="p">[</span><span class="n">metric</span><span class="p">])</span>
+    <span class="k">def</span> <span class="nf">_flatten_batch_metricses</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_metricses</span><span class="p">,</span> <span class="n">lmbda_idxs</span><span class="p">):</span>
+        <span class="c1"># Flatten metrics for each lambda.</span>
+        <span class="n">singles</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">metric_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">lmbda_idx</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">value</span>
+            <span class="k">for</span> <span class="n">lmbda_idx</span><span class="p">,</span> <span class="n">batch_metrics</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">lmbda_idxs</span><span class="p">,</span> <span class="n">batch_metricses</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">metric_name</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">batch_metrics</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+
+        <span class="c1"># Average metrics over lambdas.</span>
+        <span class="n">averages</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">metric_name</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">metric_name</span><span class="p">,</span> <span class="n">values</span> <span class="ow">in</span> <span class="n">_transpose_list_dict</span><span class="p">(</span><span class="n">batch_metricses</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="o">**</span><span class="n">singles</span><span class="p">,</span> <span class="o">**</span><span class="n">averages</span><span class="p">}</span>
 
     <span class="k">def</span> <span class="nf">_setup_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Expand any meters containing a * to work with multiple lmbdas.</span>
+        <span class="n">meter_keys</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">[</span><span class="n">meter_name</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s2">&quot;*&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">meter_name</span>
+            <span class="k">else</span> <span class="p">[</span><span class="n">meter_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lmbda_idxs</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">meter_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_meter_keys</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">loader_key</span><span class="p">]</span>
+        <span class="p">]</span>
+        <span class="n">meter_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">chain</span><span class="p">(</span><span class="o">*</span><span class="n">meter_keys</span><span class="p">))</span>  <span class="c1"># Flatten list of lists.</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_meters</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">key</span><span class="p">:</span> <span class="n">metrics</span><span class="o">.</span><span class="n">AdditiveMetric</span><span class="p">(</span><span class="n">compute_on_call</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_meter_keys</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">loader_key</span><span class="p">]</span>
+            <span class="n">key</span><span class="p">:</span> <span class="n">metrics</span><span class="o">.</span><span class="n">AdditiveMetric</span><span class="p">(</span><span class="n">compute_on_call</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">meter_keys</span>
         <span class="p">}</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_loader_metrics</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;chan_bpp&quot;</span><span class="p">:</span> <span class="n">ChannelwiseBppMeter</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span>
+            <span class="o">**</span><span class="p">{</span><span class="sa">f</span><span class="s2">&quot;chan_bpp_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">ChannelwiseBppMeter</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lmbda_idxs</span><span class="p">},</span>
             <span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;bpp&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">RD_PLOT_METRICS</span><span class="p">]},</span>
-        <span class="p">}</span></div>
+            <span class="o">**</span><span class="p">{</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">meter_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">meter_name</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;bpp&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">RD_PLOT_METRICS</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lmbda_idxs</span>
+            <span class="p">},</span>
+        <span class="p">}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_lmbdas</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+        <span class="c1"># Alternative:</span>
+        <span class="c1"># return cast(List[float], list(self.hparams[&quot;hp&quot;][&quot;lambdas&quot;]))</span>
+        <span class="k">return</span> <span class="n">cast</span><span class="p">(</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_module</span><span class="o">.</span><span class="n">lambdas</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_lmbda_idxs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lmbdas</span><span class="p">)))</span></div>
 
 
 <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
@@ -508,6 +564,8 @@ document.write(`
     <span class="n">skip_decompress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="n">criterion</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TCriterion</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">min_div</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">64</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">lmbda</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Run compression model on image batch.&quot;&quot;&quot;</span>
     <span class="n">n</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span>
@@ -515,13 +573,13 @@ document.write(`
     <span class="n">x_padded</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">pad</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;constant&quot;</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
     <span class="c1"># Compress using forward.</span>
-    <span class="n">out_net</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x_padded</span><span class="p">)</span>
+    <span class="n">out_net</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x_padded</span><span class="p">,</span> <span class="n">lmbda</span><span class="o">=</span><span class="n">lmbda</span><span class="p">)</span>
     <span class="n">out_net</span><span class="p">[</span><span class="s2">&quot;x_hat&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">out_net</span><span class="p">[</span><span class="s2">&quot;x_hat&quot;</span><span class="p">],</span> <span class="n">unpad</span><span class="p">)</span>
 
     <span class="c1"># Compress using compress/decompress.</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_compress</span><span class="p">:</span>
         <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-        <span class="n">out_enc</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">x_padded</span><span class="p">)</span>
+        <span class="n">out_enc</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">compress</span><span class="p">(</span><span class="n">x_padded</span><span class="p">,</span> <span class="n">lmbda</span><span class="o">=</span><span class="n">lmbda</span><span class="p">)</span>
         <span class="n">enc_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">out_enc</span> <span class="o">=</span> <span class="p">{}</span>
@@ -530,7 +588,7 @@ document.write(`
     <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_decompress</span><span class="p">:</span>
         <span class="k">assert</span> <span class="ow">not</span> <span class="n">skip_compress</span>
         <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-        <span class="n">out_dec</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">out_enc</span><span class="p">[</span><span class="s2">&quot;strings&quot;</span><span class="p">],</span> <span class="n">out_enc</span><span class="p">[</span><span class="s2">&quot;shape&quot;</span><span class="p">])</span>
+        <span class="n">out_dec</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">out_enc</span><span class="p">[</span><span class="s2">&quot;strings&quot;</span><span class="p">],</span> <span class="n">out_enc</span><span class="p">[</span><span class="s2">&quot;shape&quot;</span><span class="p">],</span> <span class="n">lmbda</span><span class="o">=</span><span class="n">lmbda</span><span class="p">)</span>
         <span class="n">dec_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
         <span class="n">out_dec</span><span class="p">[</span><span class="s2">&quot;x_hat&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">out_dec</span><span class="p">[</span><span class="s2">&quot;x_hat&quot;</span><span class="p">],</span> <span class="n">unpad</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -544,7 +602,7 @@ document.write(`
         <span class="n">num_pixels</span> <span class="o">=</span> <span class="n">n</span> <span class="o">*</span> <span class="n">h</span> <span class="o">*</span> <span class="n">w</span>
         <span class="n">bpp</span> <span class="o">=</span> <span class="n">num_bits</span> <span class="o">/</span> <span class="n">num_pixels</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">out_criterion</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">out_net</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="n">out_criterion</span> <span class="o">=</span> <span class="n">criterion</span><span class="p">(</span><span class="n">out_net</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">lmbda</span><span class="o">=</span><span class="n">lmbda</span><span class="p">)</span>
         <span class="n">bpp</span> <span class="o">=</span> <span class="n">out_criterion</span><span class="p">[</span><span class="s2">&quot;bpp_loss&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="p">{</span>
@@ -555,6 +613,14 @@ document.write(`
         <span class="s2">&quot;encoding_time&quot;</span><span class="p">:</span> <span class="n">enc_time</span><span class="p">,</span>
         <span class="s2">&quot;decoding_time&quot;</span><span class="p">:</span> <span class="n">dec_time</span><span class="p">,</span>
     <span class="p">}</span>
+
+
+<span class="k">def</span> <span class="nf">_transpose_list_dict</span><span class="p">(</span><span class="n">ds</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="n">K</span><span class="p">,</span> <span class="n">V</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">K</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">V</span><span class="p">]]:</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
 </pre></div>
 
                 </article>

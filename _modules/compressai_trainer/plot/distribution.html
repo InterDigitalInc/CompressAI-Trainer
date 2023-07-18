@@ -118,8 +118,8 @@
       
     
     
-    <img src="../../../_static/logo.png" class="logo__image only-light" alt="Logo image"/>
-    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+    <img src="../../../_static/logo.svg" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../../../_static/logo.svg" class="logo__image only-dark" alt="Logo image"/>`);</script>
   
   
 </a></div>
@@ -148,7 +148,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../tools/train.html">Train a model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tools/eval_model.html">Evaluate a model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tools/rd_plotter.html">Plot an RD curve</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tools/compressai.html">Use <code class="docutils literal notranslate"><span class="pre">compressai.utils</span></code></a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul class="nav bd-sidenav">
@@ -301,6 +300,7 @@ document.write(`
 <span class="n">_PLOT_DISTRIBUTIONS_EB_LAYOUT_SETTINGS_COMMON</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
     <span class="n">xaxis_title</span><span class="o">=</span><span class="s2">&quot;Δy = y - median&quot;</span><span class="p">,</span>
     <span class="n">yaxis_title</span><span class="o">=</span><span class="s2">&quot;p(Δy)&quot;</span><span class="p">,</span>
+    <span class="n">yaxis</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="nb">range</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
 <span class="p">)</span>
 
 
@@ -308,6 +308,7 @@ document.write(`
     <span class="n">entropy_bottleneck</span><span class="p">:</span> <span class="n">EntropyBottleneck</span><span class="p">,</span>
     <span class="n">scatter_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{},</span>
     <span class="n">layout_kwargs</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{},</span>
+    <span class="n">hide_delta_distributions</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Plots EntropyBottleneck distributions.&quot;&quot;&quot;</span>
     <span class="kn">import</span> <span class="nn">plotly.express</span> <span class="k">as</span> <span class="nn">px</span>
@@ -317,6 +318,12 @@ document.write(`
     <span class="n">layout_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">_PLOT_DISTRIBUTIONS_EB_LAYOUT_SETTINGS_COMMON</span><span class="p">,</span> <span class="o">**</span><span class="n">layout_kwargs</span><span class="p">}</span>
     <span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="o">**</span><span class="n">line_kwargs</span><span class="p">)</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="o">**</span><span class="n">layout_kwargs</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">hide_delta_distributions</span><span class="p">:</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">for_each_trace</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">trace</span><span class="p">:</span> <span class="n">trace</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+                <span class="n">visible</span><span class="o">=</span><span class="kc">True</span> <span class="k">if</span> <span class="n">trace</span><span class="p">[</span><span class="s2">&quot;y&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;legendonly&quot;</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">fig</span></div>
 

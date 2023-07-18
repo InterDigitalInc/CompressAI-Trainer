@@ -118,8 +118,8 @@
       
     
     
-    <img src="../../../_static/logo.png" class="logo__image only-light" alt="Logo image"/>
-    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+    <img src="../../../_static/logo.svg" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../../../_static/logo.svg" class="logo__image only-dark" alt="Logo image"/>`);</script>
   
   
 </a></div>
@@ -148,7 +148,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../tools/train.html">Train a model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tools/eval_model.html">Evaluate a model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tools/rd_plotter.html">Plot an RD curve</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tools/compressai.html">Use <code class="docutils literal notranslate"><span class="pre">compressai.utils</span></code></a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul class="nav bd-sidenav">
@@ -292,14 +291,16 @@ document.write(`
 <span class="kn">import</span> <span class="nn">compressai_trainer</span>
 <span class="kn">from</span> <span class="nn">compressai_trainer.utils</span> <span class="kn">import</span> <span class="n">git</span><span class="p">,</span> <span class="n">pip</span>
 
+<span class="n">PACKAGES</span> <span class="o">=</span> <span class="p">[</span><span class="n">compressai</span><span class="p">,</span> <span class="n">compressai_trainer</span><span class="p">]</span>
+
 <span class="n">CONFIG_DIR</span> <span class="o">=</span> <span class="s2">&quot;configs&quot;</span>
 <span class="n">CONFIG_NAME</span> <span class="o">=</span> <span class="s2">&quot;config.yaml&quot;</span>
 
 
 <div class="viewcode-block" id="write_outputs"><a class="viewcode-back" href="../../../compressai_trainer/config.html#compressai_trainer.config.outputs.write_outputs">[docs]</a><span class="k">def</span> <span class="nf">write_outputs</span><span class="p">(</span><span class="n">conf</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">):</span>
     <span class="n">write_config</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
-    <span class="n">write_git_diff</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">compressai_trainer</span><span class="p">)</span>
-    <span class="n">write_git_diff</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">compressai</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">package</span> <span class="ow">in</span> <span class="n">PACKAGES</span><span class="p">:</span>
+        <span class="n">write_git_diff</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">package</span><span class="p">)</span>
     <span class="n">write_pip_list</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
     <span class="n">write_pip_requirements</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
     <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;paths&quot;</span><span class="p">][</span><span class="s2">&quot;images&quot;</span><span class="p">],</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>

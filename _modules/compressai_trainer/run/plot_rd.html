@@ -118,8 +118,8 @@
       
     
     
-    <img src="../../../_static/logo.png" class="logo__image only-light" alt="Logo image"/>
-    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+    <img src="../../../_static/logo.svg" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../../../_static/logo.svg" class="logo__image only-dark" alt="Logo image"/>`);</script>
   
   
 </a></div>
@@ -148,7 +148,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../tools/train.html">Train a model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tools/eval_model.html">Evaluate a model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tools/rd_plotter.html">Plot an RD curve</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tools/compressai.html">Use <code class="docutils literal notranslate"><span class="pre">compressai.utils</span></code></a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul class="nav bd-sidenav">
@@ -299,13 +298,12 @@ document.write(`
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
 <span class="kn">from</span> <span class="nn">compressai_trainer.plot</span> <span class="kn">import</span> <span class="n">plot_rd</span>
-<span class="kn">from</span> <span class="nn">compressai_trainer.utils.aim.query</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">get_runs_dataframe</span><span class="p">,</span>
-    <span class="n">pareto_optimal_dataframe</span><span class="p">,</span>
-    <span class="n">runs_by_query</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">compressai_trainer.utils.aim.query</span> <span class="kn">import</span> <span class="n">get_runs_dataframe</span><span class="p">,</span> <span class="n">run_hashes_by_query</span>
 <span class="kn">from</span> <span class="nn">compressai_trainer.utils.compressai.results</span> <span class="kn">import</span> <span class="n">compressai_dataframe</span>
+<span class="kn">from</span> <span class="nn">compressai_trainer.utils.optimal</span> <span class="kn">import</span> <span class="n">optimal_dataframe</span>
 <span class="kn">from</span> <span class="nn">compressai_trainer.utils.utils</span> <span class="kn">import</span> <span class="n">format_dataframe</span>
+
+<span class="n">DATASET</span> <span class="o">=</span> <span class="s2">&quot;image/kodak&quot;</span>
 
 <span class="n">TITLE</span> <span class="o">=</span> <span class="s2">&quot;Performance evaluation on Kodak - PSNR (RGB)&quot;</span>
 
@@ -315,10 +313,6 @@ document.write(`
     <span class="s2">&quot;mbt2018&quot;</span><span class="p">,</span>
     <span class="s2">&quot;cheng2020-anchor&quot;</span><span class="p">,</span>
 <span class="p">]</span>
-
-<span class="n">REFERENCE_DF</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
-    <span class="p">[</span><span class="n">compressai_dataframe</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="s2">&quot;image/kodak&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">COMPRESSAI_CODECS</span><span class="p">]</span>
-<span class="p">)</span>
 
 <span class="n">HOVER_HPARAMS</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;criterion.lmbda&quot;</span><span class="p">,</span>
@@ -339,18 +333,23 @@ document.write(`
 <span class="n">HOVER_DATA</span> <span class="o">+=</span> <span class="n">HOVER_HPARAMS</span> <span class="o">+</span> <span class="n">HOVER_METRICS</span>
 
 
+<span class="k">def</span> <span class="nf">_reference_dataframes</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">compressai_dataframe</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">DATASET</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">COMPRESSAI_CODECS</span><span class="p">]</span>
+
+
 <div class="viewcode-block" id="create_dataframe"><a class="viewcode-back" href="../../../compressai_trainer/run.html#compressai_trainer.run.plot_rd.create_dataframe">[docs]</a><span class="k">def</span> <span class="nf">create_dataframe</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
+    <span class="n">reference_dfs</span> <span class="o">=</span> <span class="n">_reference_dataframes</span><span class="p">()</span>
     <span class="n">dfs</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">_create_dataframe</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">curves</span><span class="p">,</span> <span class="n">pareto</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">query</span><span class="p">,</span> <span class="n">curves</span><span class="p">,</span> <span class="n">pareto</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">query</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">curves</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">pareto</span><span class="p">)</span>
+        <span class="n">_create_dataframe</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">curves</span><span class="p">,</span> <span class="n">optimal</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">query</span><span class="p">,</span> <span class="n">curves</span><span class="p">,</span> <span class="n">optimal</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">query</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">curves</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">optimal</span><span class="p">)</span>
     <span class="p">]</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">REFERENCE_DF</span><span class="p">,</span> <span class="o">*</span><span class="n">dfs</span><span class="p">])</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="o">*</span><span class="n">reference_dfs</span><span class="p">,</span> <span class="o">*</span><span class="n">dfs</span><span class="p">])</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">_reorder_dataframe_columns</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">df</span></div>
 
 
-<span class="k">def</span> <span class="nf">_create_dataframe</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">curves</span><span class="p">,</span> <span class="n">pareto</span><span class="p">):</span>
-    <span class="n">runs</span> <span class="o">=</span> <span class="n">runs_by_query</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_create_dataframe</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">curves</span><span class="p">,</span> <span class="n">optimal</span><span class="p">):</span>
+    <span class="n">run_hashes</span> <span class="o">=</span> <span class="n">run_hashes_by_query</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span>
     <span class="n">metrics</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
         <span class="p">{</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="o">*</span><span class="n">HOVER_METRICS</span><span class="p">}</span>
         <span class="o">|</span> <span class="nb">set</span><span class="p">(</span><span class="n">_needed_metrics</span><span class="p">(</span><span class="n">curves</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">))</span>
@@ -358,16 +357,16 @@ document.write(`
     <span class="p">)</span>
     <span class="n">hparams</span> <span class="o">=</span> <span class="n">HOVER_HPARAMS</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">get_runs_dataframe</span><span class="p">(</span>
-        <span class="n">runs</span><span class="o">=</span><span class="n">runs</span><span class="p">,</span>
+        <span class="n">run_hashes</span><span class="o">=</span><span class="n">run_hashes</span><span class="p">,</span>
+        <span class="n">repo</span><span class="o">=</span><span class="n">repo</span><span class="p">,</span>
         <span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span><span class="p">,</span>
         <span class="n">hparams</span><span class="o">=</span><span class="n">hparams</span><span class="p">,</span>
         <span class="n">epoch</span><span class="o">=</span><span class="s2">&quot;best&quot;</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="n">df</span> <span class="o">=</span> <span class="n">format_dataframe</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">curves</span><span class="p">,</span> <span class="n">skip_nan</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">optimal_dataframe</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">optimal</span><span class="p">,</span> <span class="n">groupby</span><span class="o">=</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
     <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">pareto</span><span class="p">:</span>
-        <span class="n">df</span> <span class="o">=</span> <span class="n">pareto_optimal_dataframe</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">df</span>
 
 
@@ -417,7 +416,7 @@ document.write(`
             <span class="s2">&quot;Plot.</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="s2">&quot;Queries experiment tracker (Aim) repository for relevant metrics and plots. &quot;</span>
-            <span class="s2">&quot;Users may specify what to plot using groups of --query, --curves, and --pareto. &quot;</span>
+            <span class="s2">&quot;Users may specify what to plot using groups of --query, --curves, and --optimal. &quot;</span>
             <span class="s2">&quot;If desired, one may plot multiple query groups within the same plot.</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="p">),</span>
         <span class="s2">&quot;show&quot;</span><span class="p">:</span> <span class="s2">&quot;Show figure in browser.&quot;</span><span class="p">,</span>
@@ -465,9 +464,10 @@ document.write(`
                 <span class="s2">&quot;    }]</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="p">)</span>
         <span class="p">),</span>
-        <span class="s2">&quot;pareto&quot;</span><span class="p">:</span> <span class="p">(</span>
-            <span class="s2">&quot;Show only pareto-optimal points on curve for respective query.</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="s2">&quot;Default: False.</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="s2">&quot;optimal&quot;</span><span class="p">:</span> <span class="p">(</span>
+            <span class="s2">&quot;Show only optimal points on curve for respective query.</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;Choices: none, pareto, convex.</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;Default: none.</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="p">),</span>
     <span class="p">}</span>
 
@@ -491,7 +491,7 @@ document.write(`
         <span class="n">default</span><span class="o">=</span><span class="p">[],</span>
         <span class="n">help</span><span class="o">=</span><span class="n">help</span><span class="p">[</span><span class="s2">&quot;curves&quot;</span><span class="p">],</span>
     <span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--pareto&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;append&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[],</span> <span class="n">help</span><span class="o">=</span><span class="n">help</span><span class="p">[</span><span class="s2">&quot;pareto&quot;</span><span class="p">])</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;--optimal&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;append&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="p">[],</span> <span class="n">help</span><span class="o">=</span><span class="n">help</span><span class="p">[</span><span class="s2">&quot;optimal&quot;</span><span class="p">])</span>
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">query</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -501,7 +501,7 @@ document.write(`
     <span class="n">args</span><span class="o">.</span><span class="n">curves</span> <span class="o">=</span> <span class="p">[</span><span class="nb">eval</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">curves</span><span class="p">]</span>  <span class="c1"># WARNING: unsafe!</span>
     <span class="n">args</span><span class="o">.</span><span class="n">curves</span> <span class="o">=</span> <span class="p">[[{</span><span class="o">**</span><span class="n">curves_default</span><span class="p">,</span> <span class="o">**</span><span class="n">x</span><span class="p">}</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">xs</span><span class="p">]</span> <span class="k">for</span> <span class="n">xs</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">curves</span><span class="p">]</span>
     <span class="n">args</span><span class="o">.</span><span class="n">curves</span> <span class="o">+=</span> <span class="p">[[</span><span class="n">curves_default</span><span class="p">]]</span> <span class="o">*</span> <span class="p">(</span><span class="n">num_queries</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">curves</span><span class="p">))</span>
-    <span class="n">args</span><span class="o">.</span><span class="n">pareto</span> <span class="o">+=</span> <span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">num_queries</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">pareto</span><span class="p">))</span>
+    <span class="n">args</span><span class="o">.</span><span class="n">optimal</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;none&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">num_queries</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">optimal</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">args</span></div>
 

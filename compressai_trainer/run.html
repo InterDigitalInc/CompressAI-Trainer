@@ -121,8 +121,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="Logo image"/>
-    <script>document.write(`<img src="../_static/logo.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+    <img src="../_static/logo.svg" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../_static/logo.svg" class="logo__image only-dark" alt="Logo image"/>`);</script>
   
   
 </a></div>
@@ -151,7 +151,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../tools/train.html">Train a model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tools/eval_model.html">Evaluate a model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tools/rd_plotter.html">Plot an RD curve</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tools/compressai.html">Use <code class="docutils literal notranslate"><span class="pre">compressai.utils</span></code></a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul class="nav bd-sidenav">
@@ -304,7 +303,6 @@ document.write(`
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-compressai_trainer.run.train">train</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-compressai_trainer.run.eval_model">eval_model</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-compressai_trainer.run.plot_rd">plot_rd</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-compressai_trainer.run.compressai">compressai</a></li>
 </ul>
             </nav>
         </div>
@@ -338,9 +336,6 @@ document.write(`
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#module-compressai_trainer.run.plot_rd" title="compressai_trainer.run.plot_rd"><code class="xref py py-mod docutils literal notranslate"><span class="pre">plot_rd</span></code></a></p></td>
 <td><p>RD curve plotter that can query metrics from the experiment tracker (Aim).</p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#module-compressai_trainer.run.compressai" title="compressai_trainer.run.compressai"><code class="xref py py-mod docutils literal notranslate"><span class="pre">compressai</span></code></a></p></td>
-<td><p>Wrapper around <code class="xref py py-mod docutils literal notranslate"><span class="pre">compressai.utils</span></code> to work with CompressAI Trainer.</p></td>
 </tr>
 </tbody>
 </table>
@@ -497,22 +492,9 @@ For example:</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="compressai_trainer.run.plot_rd.plot_dataframe">
-<span class="sig-prename descclassname"><span class="pre">compressai_trainer.run.plot_rd.</span></span><span class="sig-name descname"><span class="pre">plot_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.0.1)"><span class="pre">pandas.core.frame.DataFrame</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compressai_trainer/run/plot_rd.html#plot_dataframe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.run.plot_rd.plot_dataframe" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">compressai_trainer.run.plot_rd.</span></span><span class="sig-name descname"><span class="pre">plot_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.0.3)"><span class="pre">pandas.core.frame.DataFrame</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compressai_trainer/run/plot_rd.html#plot_dataframe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.run.plot_rd.plot_dataframe" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
-</section>
-<section id="module-compressai_trainer.run.compressai">
-<span id="compressai"></span><h2>compressai<a class="headerlink" href="#module-compressai_trainer.run.compressai" title="Permalink to this headline">#</a></h2>
-<p>Wrapper around CompressAI scripts to work more easily with CompressAI Train.</p>
-<p>Example usage:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python<span class="w"> </span>-m<span class="w"> </span>compressai_trainer.run.compressai<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>eval_model<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>checkpoint<span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--architecture<span class="o">=</span><span class="s2">&quot;bmshj2018-factorized&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--path<span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/data/runs/e4e6d4d5e5c59c69f3bd7be2/checkpoints/runner.best.pth&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/data/datasets/kodak/test&quot;</span>
-</pre></div>
-</div>
 </section>
 </section>
 
@@ -567,7 +549,6 @@ For example:</p>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-compressai_trainer.run.train">train</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-compressai_trainer.run.eval_model">eval_model</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-compressai_trainer.run.plot_rd">plot_rd</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-compressai_trainer.run.compressai">compressai</a></li>
 </ul>
   </nav></div>
 

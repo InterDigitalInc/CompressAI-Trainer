@@ -121,8 +121,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="Logo image"/>
-    <script>document.write(`<img src="../_static/logo.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+    <img src="../_static/logo.svg" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../_static/logo.svg" class="logo__image only-dark" alt="Logo image"/>`);</script>
   
   
 </a></div>
@@ -151,7 +151,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../tools/train.html">Train a model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tools/eval_model.html">Evaluate a model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tools/rd_plotter.html">Plot an RD curve</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tools/compressai.html">Use <code class="docutils literal notranslate"><span class="pre">compressai.utils</span></code></a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul class="nav bd-sidenav">
@@ -307,8 +306,8 @@ document.write(`
 <h1>compressai_trainer.runners<a class="headerlink" href="#compressai-trainer-runners" title="Permalink to this headline">#</a></h1>
 <p>Catalyst <a class="reference external" href="https://catalyst-team.github.io/catalyst/api/runners.html#catalyst.runners.runner.Runner" title="(in Catalyst v22.04)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Runner</span></code></a>s describe the process for training a model.</p>
 <p>The following functions are called during the training loop:</p>
-<div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text">Runner training loop call order.</span><a class="headerlink" href="#id1" title="Permalink to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-text">Runner training loop call order.</span><a class="headerlink" href="#id2" title="Permalink to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">on_experiment_start</span>   <span class="c1"># Once, at the beginning.</span>
   <span class="n">on_epoch_start</span>      <span class="c1"># Beginning of an epoch.</span>
     <span class="n">on_loader_start</span>   <span class="c1"># For each loader (train / valid / infer).</span>
@@ -322,8 +321,8 @@ document.write(`
 </div>
 </div>
 <p>The training loop is effectively equivalent to:</p>
-<div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text">Runner training loop pseudo-code.</span><a class="headerlink" href="#id2" title="Permalink to this code">#</a></div>
+<div class="literal-block-wrapper docutils container" id="id3">
+<div class="code-block-caption"><span class="caption-text">Runner training loop pseudo-code.</span><a class="headerlink" href="#id3" title="Permalink to this code">#</a></div>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">on_experiment_start</span><span class="p">()</span>
 
 <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_epochs</span><span class="p">):</span>
@@ -434,6 +433,69 @@ document.write(`
 <dt class="sig sig-object py" id="compressai_trainer.runners.BaseRunner.optimizer">
 <span class="sig-name descname"><span class="pre">optimizer</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">TorchOptimizer</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#compressai_trainer.runners.BaseRunner.optimizer" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="compressai_trainer.runners.GVAEImageCompressionRunner">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">compressai_trainer.runners.</span></span><span class="sig-name descname"><span class="pre">GVAEImageCompressionRunner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inference</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.11)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meters</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.11)"><span class="pre">list</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compressai_trainer/runners/gvae_image_compression.html#GVAEImageCompressionRunner"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.runners.GVAEImageCompressionRunner" title="Permalink to this definition">#</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#compressai_trainer.runners.BaseRunner" title="compressai_trainer.runners.base.BaseRunner"><code class="xref py py-class docutils literal notranslate"><span class="pre">compressai_trainer.runners.base.BaseRunner</span></code></a></p>
+<p>Runner for image compression experiments.</p>
+<p>Reimplementation of CompressAI’s <a class="reference external" href="https://github.com/InterDigitalInc/CompressAI/blob/master/examples/train.py">examples/train.py</a>,
+with additional functionality such as:</p>
+<ul class="simple">
+<li><p>Plots RD curves, learned entropy bottleneck distributions,
+and histograms for latent channel-wise rate distributions.</p></li>
+<li><p>Saves inference outputs including images and featuremaps.</p></li>
+</ul>
+<p>Set the input arguments by overriding the defaults in
+<code class="docutils literal notranslate"><span class="pre">conf/runner/ImageCompressionRunner.yaml</span></code>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="compressai_trainer.runners.GVAEImageCompressionRunner.handle_batch">
+<span class="sig-name descname"><span class="pre">handle_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compressai_trainer/runners/gvae_image_compression.html#GVAEImageCompressionRunner.handle_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.runners.GVAEImageCompressionRunner.handle_batch" title="Permalink to this definition">#</a></dt>
+<dd><p>Inner method to handle specified data batch.
+Used to make a train/valid/infer step during Experiment run.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>batch</strong> (<em>Mapping</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>Any</em><em>]</em>) – dictionary with data batches from DataLoader.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compressai_trainer.runners.GVAEImageCompressionRunner.on_loader_end">
+<span class="sig-name descname"><span class="pre">on_loader_end</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">runner</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compressai_trainer/runners/gvae_image_compression.html#GVAEImageCompressionRunner.on_loader_end"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.runners.GVAEImageCompressionRunner.on_loader_end" title="Permalink to this definition">#</a></dt>
+<dd><p>Event handler.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compressai_trainer.runners.GVAEImageCompressionRunner.on_loader_start">
+<span class="sig-name descname"><span class="pre">on_loader_start</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">runner</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compressai_trainer/runners/gvae_image_compression.html#GVAEImageCompressionRunner.on_loader_start"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.runners.GVAEImageCompressionRunner.on_loader_start" title="Permalink to this definition">#</a></dt>
+<dd><p>Event handler.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compressai_trainer.runners.GVAEImageCompressionRunner.predict_batch">
+<span class="sig-name descname"><span class="pre">predict_batch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lmbda_idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lmbda</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compressai_trainer/runners/gvae_image_compression.html#GVAEImageCompressionRunner.predict_batch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.runners.GVAEImageCompressionRunner.predict_batch" title="Permalink to this definition">#</a></dt>
+<dd><p>Run model inference on specified data batch.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> – dictionary with data batches from DataLoader.</p></li>
+<li><p><strong>**kwargs</strong> – additional kwargs to pass to the model</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Returns:  # noqa: DAR202</dt><dd><p>Mapping: model output dictionary</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#NotImplementedError" title="(in Python v3.11)"><strong>NotImplementedError</strong></a> – if not implemented yet</p>
+</dd>
+</dl>
+</dd></dl>
 
 </dd></dl>
 

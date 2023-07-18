@@ -44,7 +44,6 @@
     <script>DOCUMENTATION_OPTIONS.pagename = 'tools/rd_plotter';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Use compressai.utils" href="compressai.html" />
     <link rel="prev" title="Evaluate a model" href="eval_model.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="None"/>
@@ -121,8 +120,8 @@
       
     
     
-    <img src="../_static/logo.png" class="logo__image only-light" alt="Logo image"/>
-    <script>document.write(`<img src="../_static/logo.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+    <img src="../_static/logo.svg" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../_static/logo.svg" class="logo__image only-dark" alt="Logo image"/>`);</script>
   
   
 </a></div>
@@ -151,7 +150,6 @@
 <li class="toctree-l1"><a class="reference internal" href="train.html">Train a model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="eval_model.html">Evaluate a model</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Plot an RD curve</a></li>
-<li class="toctree-l1"><a class="reference internal" href="compressai.html">Use <code class="docutils literal notranslate"><span class="pre">compressai.utils</span></code></a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul class="nav bd-sidenav">
@@ -305,7 +303,7 @@ document.write(`
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#aim-repo"><code class="docutils literal notranslate"><span class="pre">--aim_repo</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#query"><code class="docutils literal notranslate"><span class="pre">--query</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#curves"><code class="docutils literal notranslate"><span class="pre">--curves</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pareto"><code class="docutils literal notranslate"><span class="pre">--pareto</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optimal"><code class="docutils literal notranslate"><span class="pre">--optimal</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">Examples</a></li>
@@ -325,7 +323,7 @@ document.write(`
 <p>Documentation for <a class="reference internal" href="../compressai_trainer/run.html#module-compressai_trainer.run.plot_rd" title="compressai_trainer.run.plot_rd"><code class="xref py py-mod docutils literal notranslate"><span class="pre">compressai_trainer.run.plot_rd</span></code></a>.</p>
 <p>This is an RD curve plotter that can query metrics from the experiment tracker (Aim).</p>
 <p>Users may specify what to plot using groups of the CLI flags
-<code class="docutils literal notranslate"><span class="pre">--query</span></code>, <code class="docutils literal notranslate"><span class="pre">--curves</span></code>, and <code class="docutils literal notranslate"><span class="pre">--pareto</span></code>.
+<code class="docutils literal notranslate"><span class="pre">--query</span></code>, <code class="docutils literal notranslate"><span class="pre">--curves</span></code>, and <code class="docutils literal notranslate"><span class="pre">--optimal</span></code>.
 If desired, one may plot multiple query groups within the same plot.</p>
 <section id="cli-help">
 <h2>CLI help<a class="headerlink" href="#cli-help" title="Permalink to this headline">#</a></h2>
@@ -392,11 +390,12 @@ For <code class="docutils literal notranslate"><span class="pre">&quot;name&quot
 </li>
 </ul>
 </section>
-<section id="pareto">
-<h3><code class="docutils literal notranslate"><span class="pre">--pareto</span></code><a class="headerlink" href="#pareto" title="Permalink to this headline">#</a></h3>
-<p>Show only pareto-optimal points on curve for respective query.</p>
+<section id="optimal">
+<h3><code class="docutils literal notranslate"><span class="pre">--optimal</span></code><a class="headerlink" href="#optimal" title="Permalink to this headline">#</a></h3>
+<p>Show only optimal points on curve for respective query.</p>
+<p>Choices: <code class="docutils literal notranslate"><span class="pre">none</span></code>, <code class="docutils literal notranslate"><span class="pre">pareto</span></code>, <code class="docutils literal notranslate"><span class="pre">convex</span></code>.</p>
 <p>Default:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>--pareto<span class="o">=</span>False
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>--optimal<span class="o">=</span><span class="s2">&quot;none&quot;</span>
 </pre></div>
 </div>
 </section>
@@ -479,15 +478,6 @@ For <code class="docutils literal notranslate"><span class="pre">&quot;name&quot
         <p class="prev-next-title">Evaluate a model</p>
       </div>
     </a>
-    <a class="right-next"
-       href="compressai.html"
-       title="next page">
-      <div class="prev-next-info">
-        <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Use <code class="docutils literal notranslate"><span class="pre">compressai.utils</span></code></p>
-      </div>
-      <i class="fa-solid fa-angle-right"></i>
-    </a>
 </div></div>
   
 </div>
@@ -510,7 +500,7 @@ For <code class="docutils literal notranslate"><span class="pre">&quot;name&quot
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#aim-repo"><code class="docutils literal notranslate"><span class="pre">--aim_repo</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#query"><code class="docutils literal notranslate"><span class="pre">--query</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#curves"><code class="docutils literal notranslate"><span class="pre">--curves</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#pareto"><code class="docutils literal notranslate"><span class="pre">--pareto</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#optimal"><code class="docutils literal notranslate"><span class="pre">--optimal</span></code></a></li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#examples">Examples</a></li>

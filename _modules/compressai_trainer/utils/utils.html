@@ -118,8 +118,8 @@
       
     
     
-    <img src="../../../_static/logo.png" class="logo__image only-light" alt="Logo image"/>
-    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+    <img src="../../../_static/logo.svg" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../../../_static/logo.svg" class="logo__image only-dark" alt="Logo image"/>`);</script>
   
   
 </a></div>
@@ -148,7 +148,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../tools/train.html">Train a model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tools/eval_model.html">Evaluate a model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tools/rd_plotter.html">Plot an RD curve</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tools/compressai.html">Use <code class="docutils literal notranslate"><span class="pre">compressai.utils</span></code></a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul class="nav bd-sidenav">
@@ -343,32 +342,6 @@ document.write(`
 <div class="viewcode-block" id="num_parameters"><a class="viewcode-back" href="../../../compressai_trainer/utils.html#compressai_trainer.utils.utils.num_parameters">[docs]</a><span class="k">def</span> <span class="nf">num_parameters</span><span class="p">(</span><span class="n">net</span><span class="p">:</span> <span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">,</span> <span class="n">predicate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
     <span class="n">unique</span> <span class="o">=</span> <span class="p">{</span><span class="n">x</span><span class="o">.</span><span class="n">data_ptr</span><span class="p">():</span> <span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">parameters</span><span class="p">()</span> <span class="k">if</span> <span class="n">predicate</span><span class="p">(</span><span class="n">x</span><span class="p">)}</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
     <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">unique</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="arg_pareto_optimal_set"><a class="viewcode-back" href="../../../compressai_trainer/utils.html#compressai_trainer.utils.utils.arg_pareto_optimal_set">[docs]</a><span class="k">def</span> <span class="nf">arg_pareto_optimal_set</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">objectives</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns pareto-optimal set indexes.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-
-    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;xs contains NaN values.&quot;</span><span class="p">)</span>
-
-    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">xs</span>
-    <span class="n">xo</span><span class="p">,</span> <span class="n">yo</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span> <span class="k">if</span> <span class="n">o</span> <span class="o">==</span> <span class="s2">&quot;min&quot;</span> <span class="k">else</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">objectives</span><span class="p">]</span>
-    <span class="n">perm</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">argsort</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">xo</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="n">perm</span> <span class="o">=</span> <span class="n">perm</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">yp</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">perm</span><span class="p">]</span>
-    <span class="n">best_y</span> <span class="o">=</span> <span class="o">-</span><span class="n">yo</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span>
-    <span class="n">idxs</span> <span class="o">=</span> <span class="p">[]</span>
-
-    <span class="k">for</span> <span class="n">curr_p</span><span class="p">,</span> <span class="n">curr_y</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">perm</span><span class="p">,</span> <span class="n">yp</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">yo</span> <span class="o">*</span> <span class="p">(</span><span class="n">curr_y</span> <span class="o">-</span> <span class="n">best_y</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">continue</span>
-        <span class="n">best_y</span> <span class="o">=</span> <span class="n">curr_y</span>
-        <span class="n">idxs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">curr_p</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">idxs</span></div>
 
 
 <div class="viewcode-block" id="format_dataframe"><a class="viewcode-back" href="../../../compressai_trainer/utils.html#compressai_trainer.utils.utils.format_dataframe">[docs]</a><span class="k">def</span> <span class="nf">format_dataframe</span><span class="p">(</span>

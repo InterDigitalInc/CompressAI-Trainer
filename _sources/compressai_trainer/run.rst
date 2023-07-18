@@ -15,8 +15,6 @@ Runnable CLI utilities, including:
      - Evaluate metrics and generate outputs (e.g. bitstreams, reconstructed input) on input dataset.
    * - :py:mod:`~compressai_trainer.run.plot_rd`
      - RD curve plotter that can query metrics from the experiment tracker (Aim).
-   * - :py:mod:`~compressai_trainer.run.compressai`
-     - Wrapper around :py:mod:`compressai.utils` to work with CompressAI Trainer.
 
 train
 -----
@@ -36,12 +34,5 @@ plot_rd
 -------
 
 .. automodule:: compressai_trainer.run.plot_rd
-   :members:
-   :undoc-members:
-
-compressai
-----------
-
-.. automodule:: compressai_trainer.run.compressai
    :members:
    :undoc-members:

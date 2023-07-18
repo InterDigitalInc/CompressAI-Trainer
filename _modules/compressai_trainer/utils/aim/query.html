@@ -118,8 +118,8 @@
       
     
     
-    <img src="../../../../_static/logo.png" class="logo__image only-light" alt="Logo image"/>
-    <script>document.write(`<img src="../../../../_static/logo.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+    <img src="../../../../_static/logo.svg" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../../../../_static/logo.svg" class="logo__image only-dark" alt="Logo image"/>`);</script>
   
   
 </a></div>
@@ -148,7 +148,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../tools/train.html">Train a model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tools/eval_model.html">Evaluate a model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../tools/rd_plotter.html">Plot an RD curve</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../tools/compressai.html">Use <code class="docutils literal notranslate"><span class="pre">compressai.utils</span></code></a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul class="nav bd-sidenav">
@@ -290,68 +289,47 @@ document.write(`
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">aim.storage.context</span> <span class="kn">import</span> <span class="n">Context</span>
 
-<span class="kn">from</span> <span class="nn">compressai_trainer.utils.utils</span> <span class="kn">import</span> <span class="n">arg_pareto_optimal_set</span>
-
 <span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="runs_by_query"><a class="viewcode-back" href="../../../../compressai_trainer/utils.html#compressai_trainer.utils.aim.query.runs_by_query">[docs]</a><span class="k">def</span> <span class="nf">runs_by_query</span><span class="p">(</span><span class="n">repo</span><span class="p">:</span> <span class="n">aim</span><span class="o">.</span><span class="n">Repo</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">aim</span><span class="o">.</span><span class="n">Run</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns runs that match given query.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="run_hashes_by_query"><a class="viewcode-back" href="../../../../compressai_trainer/utils.html#compressai_trainer.utils.aim.query.run_hashes_by_query">[docs]</a><span class="k">def</span> <span class="nf">run_hashes_by_query</span><span class="p">(</span><span class="n">repo</span><span class="p">:</span> <span class="n">aim</span><span class="o">.</span><span class="n">Repo</span><span class="p">,</span> <span class="n">query</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns hashes of runs that match given query.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">_to_hash</span><span class="p">(</span><span class="n">run</span><span class="p">:</span> <span class="n">aim</span><span class="o">.</span><span class="n">Run</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">_close_run</span><span class="p">(</span><span class="n">run</span><span class="p">)</span>  <span class="c1"># Free up open file descriptors.</span>
+        <span class="k">return</span> <span class="n">run</span><span class="o">.</span><span class="n">hash</span>
+
     <span class="k">if</span> <span class="n">query</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">iter_runs</span><span class="p">())</span>
-    <span class="n">runs</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">run</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">repo</span><span class="o">.</span><span class="n">query_runs</span><span class="p">(</span><span class="n">query</span><span class="p">)</span><span class="o">.</span><span class="n">iter_runs</span><span class="p">()]</span>  <span class="c1"># type: ignore</span>
-    <span class="k">return</span> <span class="n">runs</span></div>
+        <span class="k">return</span> <span class="p">[</span><span class="n">_to_hash</span><span class="p">(</span><span class="n">run</span><span class="p">)</span> <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="n">repo</span><span class="o">.</span><span class="n">iter_runs</span><span class="p">()]</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">_to_hash</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">run</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">repo</span><span class="o">.</span><span class="n">query_runs</span><span class="p">(</span><span class="n">query</span><span class="p">)</span><span class="o">.</span><span class="n">iter_runs</span><span class="p">()]</span></div>
 
 
 <div class="viewcode-block" id="get_runs_dataframe"><a class="viewcode-back" href="../../../../compressai_trainer/utils.html#compressai_trainer.utils.aim.query.get_runs_dataframe">[docs]</a><span class="k">def</span> <span class="nf">get_runs_dataframe</span><span class="p">(</span>
-    <span class="n">runs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">aim</span><span class="o">.</span><span class="n">Run</span><span class="p">],</span>
+    <span class="n">run_hashes</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">repo</span><span class="p">:</span> <span class="n">aim</span><span class="o">.</span><span class="n">Repo</span><span class="p">,</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">min_metric</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;loss&quot;</span><span class="p">,</span>
     <span class="n">metrics</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;bpp&quot;</span><span class="p">,</span> <span class="s2">&quot;psnr&quot;</span><span class="p">,</span> <span class="s2">&quot;ms-ssim&quot;</span><span class="p">],</span>
     <span class="n">hparams</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span>
     <span class="n">epoch</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;best&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;last&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;best&quot;</span><span class="p">,</span>
-<span class="p">):</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns dataframe of best model metrics for runs.</span>
 
 <span class="sd">    For each run, accumulates infer metric values at a particular epoch</span>
 <span class="sd">    into a dataframe.</span>
 <span class="sd">    If epoch == &quot;best&quot;, the epoch minimizing the min_metric is chosen.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">idxs</span> <span class="o">=</span> <span class="p">[</span><span class="n">_find_index</span><span class="p">(</span><span class="n">run</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">min_metric</span><span class="p">)</span> <span class="k">for</span> <span class="n">run</span> <span class="ow">in</span> <span class="n">runs</span><span class="p">]</span>
-    <span class="n">records</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">metrics_at_index</span><span class="p">(</span><span class="n">run</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">hparams</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">run</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">runs</span><span class="p">,</span> <span class="n">idxs</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-    <span class="p">]</span>
+    <span class="n">records</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">run_hash</span> <span class="ow">in</span> <span class="n">run_hashes</span><span class="p">:</span>
+        <span class="n">run</span> <span class="o">=</span> <span class="n">aim</span><span class="o">.</span><span class="n">Run</span><span class="p">(</span><span class="n">run_hash</span><span class="o">=</span><span class="n">run_hash</span><span class="p">,</span> <span class="n">repo</span><span class="o">=</span><span class="n">repo</span><span class="p">,</span> <span class="n">read_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">idx</span> <span class="o">=</span> <span class="n">_find_index</span><span class="p">(</span><span class="n">run</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">min_metric</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">idx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">records</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">metrics_at_index</span><span class="p">(</span><span class="n">run</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">hparams</span><span class="p">,</span> <span class="n">idx</span><span class="p">))</span>
+
     <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">(</span><span class="n">records</span><span class="p">)</span>
     <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">df</span></div>
-
-
-<div class="viewcode-block" id="pareto_optimal_dataframe"><a class="viewcode-back" href="../../../../compressai_trainer/utils.html#compressai_trainer.utils.aim.query.pareto_optimal_dataframe">[docs]</a><span class="k">def</span> <span class="nf">pareto_optimal_dataframe</span><span class="p">(</span>
-    <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
-    <span class="o">*</span><span class="p">,</span>
-    <span class="n">x</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;bpp&quot;</span><span class="p">,</span>
-    <span class="n">y</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;psnr&quot;</span><span class="p">,</span>
-    <span class="n">x_objective</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;min&quot;</span><span class="p">,</span>
-    <span class="n">y_objective</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;max&quot;</span><span class="p">,</span>
-    <span class="n">keep_run_hash</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns dataframe of best models at pareto frontier.</span>
-
-<span class="sd">    Keeps only pareto-optimal data points in that dataframe based</span>
-<span class="sd">    on given x and y and their corresponding objectives (min, max).</span>
-<span class="sd">    Optionally, also keeps data points that are part of a given run.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">],</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">idxs</span> <span class="o">=</span> <span class="n">arg_pareto_optimal_set</span><span class="p">([</span><span class="n">df</span><span class="p">[</span><span class="n">x</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="n">y</span><span class="p">]],</span> <span class="p">[</span><span class="n">x_objective</span><span class="p">,</span> <span class="n">y_objective</span><span class="p">])</span>
-    <span class="k">if</span> <span class="n">keep_run_hash</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">idxs</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;run_hash&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">keep_run_hash</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
-        <span class="n">idxs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">idxs</span><span class="p">))</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">idxs</span><span class="p">]</span>
     <span class="n">df</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">df</span></div>
 
@@ -437,6 +415,31 @@ document.write(`
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">x</span>
+
+
+<span class="k">def</span> <span class="nf">_close_run</span><span class="p">(</span><span class="n">run</span><span class="p">:</span> <span class="n">aim</span><span class="o">.</span><span class="n">Run</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Close Aim run.</span>
+
+<span class="sd">    Workaround to `run.close()` not working if run is read-only</span>
+<span class="sd">    in Aim &lt;=3.17.5.</span>
+
+<span class="sd">    See issue: https://github.com/aimhubio/aim/issues/2844</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">aim</span><span class="o">.</span><span class="n">__version__</span><span class="o">.</span><span class="n">__version__</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;3.&quot;</span><span class="p">):</span>
+        <span class="n">run</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span>
+
+    <span class="k">if</span> <span class="n">run</span><span class="o">.</span><span class="n">_resources</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="n">run</span><span class="o">.</span><span class="n">_resources</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">run</span><span class="o">.</span><span class="n">read_only</span><span class="p">:</span>
+        <span class="n">run</span><span class="o">.</span><span class="n">_tracker</span><span class="o">.</span><span class="n">sequence_infos</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
+    <span class="c1"># de-reference trees and other resources</span>
+    <span class="k">del</span> <span class="n">run</span><span class="o">.</span><span class="n">_resources</span>
+    <span class="k">del</span> <span class="n">run</span><span class="o">.</span><span class="n">_props</span>
+    <span class="n">run</span><span class="o">.</span><span class="n">_resources</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">run</span><span class="o">.</span><span class="n">_props</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">run</span><span class="o">.</span><span class="n">_cleanup_trees</span><span class="p">()</span>
 </pre></div>
 
                 </article>

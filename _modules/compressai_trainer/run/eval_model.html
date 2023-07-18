@@ -118,8 +118,8 @@
       
     
     
-    <img src="../../../_static/logo.png" class="logo__image only-light" alt="Logo image"/>
-    <script>document.write(`<img src="../../../_static/logo.png" class="logo__image only-dark" alt="Logo image"/>`);</script>
+    <img src="../../../_static/logo.svg" class="logo__image only-light" alt="Logo image"/>
+    <script>document.write(`<img src="../../../_static/logo.svg" class="logo__image only-dark" alt="Logo image"/>`);</script>
   
   
 </a></div>
@@ -148,7 +148,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../tools/train.html">Train a model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tools/eval_model.html">Evaluate a model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../tools/rd_plotter.html">Plot an RD curve</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tools/compressai.html">Use <code class="docutils literal notranslate"><span class="pre">compressai.utils</span></code></a></li>
 </ul>
 <p aria-level="2" class="caption" role="heading"><span class="caption-text">Development</span></p>
 <ul class="nav bd-sidenav">
@@ -349,7 +348,7 @@ document.write(`
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">compressai.registry</span> <span class="kn">import</span> <span class="n">MODELS</span>
 <span class="kn">from</span> <span class="nn">compressai.zoo</span> <span class="kn">import</span> <span class="n">load_state_dict</span>
-<span class="kn">from</span> <span class="nn">omegaconf</span> <span class="kn">import</span> <span class="n">DictConfig</span>
+<span class="kn">from</span> <span class="nn">omegaconf</span> <span class="kn">import</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">OmegaConf</span>
 <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
 
 <span class="kn">from</span> <span class="nn">compressai_trainer.config</span> <span class="kn">import</span> <span class="p">(</span>
@@ -371,14 +370,13 @@ document.write(`
 <span class="kn">from</span> <span class="nn">compressai_trainer.utils.metrics</span> <span class="kn">import</span> <span class="n">compute_metrics</span><span class="p">,</span> <span class="n">db</span>
 <span class="kn">from</span> <span class="nn">compressai_trainer.utils.utils</span> <span class="kn">import</span> <span class="n">tensor_to_np_img</span>
 
-
 <span class="n">thisdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
 <span class="n">config_path</span> <span class="o">=</span> <span class="n">thisdir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;../../conf&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="setup"><a class="viewcode-back" href="../../../compressai_trainer/run.html#compressai_trainer.run.eval_model.setup">[docs]</a><span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="n">conf</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TRunner</span><span class="p">:</span>
     <span class="n">catalyst</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">set_global_seed</span><span class="p">(</span><span class="n">conf</span><span class="o">.</span><span class="n">misc</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
-    <span class="n">catalyst</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">prepare_cudnn</span><span class="p">(</span><span class="n">benchmark</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">deterministic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">catalyst</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">prepare_cudnn</span><span class="p">(</span><span class="n">benchmark</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">deterministic</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="n">configure_conf</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
 
@@ -391,6 +389,7 @@ document.write(`
     <span class="n">runner</span><span class="o">.</span><span class="n">criterion</span> <span class="o">=</span> <span class="n">criterion</span>
     <span class="n">runner</span><span class="o">.</span><span class="n">loaders</span> <span class="o">=</span> <span class="n">loaders</span>
     <span class="n">runner</span><span class="o">.</span><span class="n">engine</span> <span class="o">=</span> <span class="n">catalyst</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">get_available_engine</span><span class="p">()</span>
+    <span class="n">runner</span><span class="o">.</span><span class="n">_hparams</span> <span class="o">=</span> <span class="n">OmegaConf</span><span class="o">.</span><span class="n">to_container</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">resolve</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">runner</span></div>
 
@@ -562,8 +561,7 @@ document.write(`
         <span class="k">if</span> <span class="n">metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">metrics</span><span class="p">:</span>
             <span class="k">continue</span>
 
-        <span class="n">fig</span> <span class="o">=</span> <span class="n">RdFigureLogger</span><span class="p">()</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
-            <span class="n">runner</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">RdFigureLogger</span><span class="p">(</span><span class="n">runner</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
             <span class="n">df</span><span class="o">=</span><span class="n">_current_dataframe</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">results</span><span class="p">),</span>
             <span class="n">traces</span><span class="o">=</span><span class="n">_current_rd_traces</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">metric</span><span class="p">),</span>
             <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
