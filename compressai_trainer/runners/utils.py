@@ -106,8 +106,13 @@ class DebugOutputsLogger:
                 return {..., "debug_outputs": {"y": y}}
     """
 
-    def __init__(self, runner):
+    def __init__(self, runner, data_types="image_compression"):
         self.runner = runner
+
+        if data_types == "image_compression":
+            data_types = {"x": "image", "x_hat": "image"}
+
+        self.data_types = data_types
 
     def log(self, inputs, out_infer, context=None):
         # Collect items from out_infer[*]["debug_outputs"].
@@ -136,14 +141,19 @@ class DebugOutputsLogger:
         context = {"mode": mode, "key": key, **(context or {})}
         context_str = "_".join(f"{v}" for v in context.values())
 
-        if key == "x_hat":
-            arr = tensor_to_np_img(output.cpu())
+        full_data_type = self.data_types.get(key, "tensor_as_image")
+        output_data_type, output = self._from_data_type(output, full_data_type)
+
+        if output_data_type == "skip":
+            return
+        elif output_data_type == "image":
+            self._log_output_image(output, sample_idx, context, context_str)
         else:
-            arr = plot.featuremap_image(output.cpu().numpy(), cmap=DEFAULT_COLORMAP)
+            raise ValueError(f"Unknown output_data_type: {output_data_type}")
 
+    def _log_output_image(self, output, sample_idx, context, context_str):
         img_dir = self.runner.hparams["paths"]["images"]
-        Image.fromarray(arr).save(f"{img_dir}/{sample_idx:06}_{context_str}.png")
-
+        Image.fromarray(output).save(f"{img_dir}/{sample_idx:06}_{context_str}.png")
         log_kwargs = dict(
             format="webp",
             lossless=True,
@@ -151,7 +161,17 @@ class DebugOutputsLogger:
             method=6,
             track_kwargs=dict(step=sample_idx),
         )
-        self.runner.log_image("output", arr, context=context, **log_kwargs)
+        self.runner.log_image("output", output, context=context, **log_kwargs)
+
+    def _from_data_type(self, x, data_type):
+        if data_type == "image":
+            return "image", tensor_to_np_img(x.cpu())
+        if data_type == "tensor_as_image":
+            x = plot.featuremap_image(x.cpu().numpy(), cmap=DEFAULT_COLORMAP)
+            return "image", x
+        if data_type == "skip":
+            return "skip", None
+        raise ValueError(f"Unknown data_type: {data_type}")
 
 
 class EbDistributionsFigureLogger:
