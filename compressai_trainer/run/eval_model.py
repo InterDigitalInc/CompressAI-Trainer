@@ -117,7 +117,7 @@ from compressai_trainer.utils.metrics import compute_metrics, db
 from compressai_trainer.utils.utils import tensor_to_np_img
 
 thisdir = Path(__file__).parent
-config_path = thisdir.joinpath("../../conf")
+config_path = str(thisdir.joinpath("../../conf").resolve())
 
 
 def setup(conf: DictConfig) -> TRunner:
@@ -355,7 +355,7 @@ def write_results(conf, outputs, metrics):
     _plot_rd(conf, results, metrics)
 
 
-@hydra.main(version_base=None, config_path=str(config_path))
+@hydra.main(version_base=None, config_path=config_path)
 def main(conf: DictConfig):
     runner = setup(conf)
 
