@@ -51,7 +51,7 @@ test:
     - python --version
     - pip install poetry
     - poetry config installer.modern-installation false
-    - poetry install --with=dev
+    - poetry install --with=dev,tests
     - cd ..
     - rm -rf compressai
     - git clone "https://github.com/InterDigitalInc/CompressAI.git" compressai

@@ -10,7 +10,7 @@ help: ## Show this message
 .PHONY: install
 install: ## Install via poetry
 	curl -sSL https://install.python-poetry.org | python3 -
-	poetry install
+	poetry install --with=dev,docs,tests
 	@echo "Virtual environment created in $(poetry env list --full-path)"
 	@echo ""
 	@echo "\033[1;34mIMPORTANT!\033[0mPlease run:"

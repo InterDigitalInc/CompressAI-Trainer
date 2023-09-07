@@ -71,14 +71,10 @@ poetry shell
 
 ### Development
 
-Installation of dependencies for documentation and development of CompressAI-Trainer
-can only be accomplished using poetry from within the `compressai-trainer` folder.
-This works with either of the above venv or poetry methods of installation.
+To install dependencies for documentation and development, run the following (compatible with both poetry and venv installations):
 
 ```bash
-cd ./compressai-trainer
-poetry install --only docs
-poetry install --only dev
+poetry install --with=dev,docs,tests
 ```
 
 You can then build and serve documentation using `make`:
