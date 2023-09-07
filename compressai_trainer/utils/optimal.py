@@ -56,8 +56,7 @@ def optimal_dataframe(
     """
     if groupby is not None:
         return (
-            df.sort_values(groupby)
-            .groupby(groupby)
+            df.groupby(groupby, sort=False)
             .apply(
                 lambda df_group: optimal_dataframe(
                     df=df_group,
