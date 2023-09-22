@@ -158,9 +158,10 @@ class ImageCompressionRunner(BaseRunner):
         x = batch.to(self.engine.device)
         out_infer = self.predict_batch(x, **self._inference_kwargs)
         out_net = out_infer["out_net"]
+        out_dec = out_infer["out_dec"]
 
         out_criterion = self.criterion(out_net, x)
-        out_metrics = compute_metrics(x, out_net["x_hat"], ["psnr", "ms-ssim"])
+        out_metrics = compute_metrics(x, out_dec["x_hat"], ["psnr", "ms-ssim"])
         out_metrics["bpp"] = out_infer["bpp"]
         out_metrics["ms-ssim-db"] = db(1 - out_metrics["ms-ssim"])
 
