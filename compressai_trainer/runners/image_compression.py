@@ -276,7 +276,7 @@ def inference(
     if not skip_decompress:
         assert not skip_compress
         start = time.time()
-        out_dec = model.decompress(out_enc["strings"], out_enc["shape"])
+        out_dec = model.decompress(**out_enc)
         dec_time = time.time() - start
         out_dec["x_hat"] = F.pad(out_dec["x_hat"], unpad)
     else:
