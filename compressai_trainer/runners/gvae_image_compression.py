@@ -110,18 +110,16 @@ class GVAEImageCompressionRunner(BaseRunner):
         x = batch
         out_net = self.model(x, lmbda_idx=lmbda_idx)
         out_criterion = self.criterion(out_net, x)
-        loss = {}
-        loss["net"] = out_criterion["loss"]
+        loss = {
+            "net": out_criterion["loss"],
+            "aux": self.model_module.aux_loss(),
+        }
 
         if self.loader_key == "train":
             loss["net"].backward()
+            loss["aux"].backward()
             self._grad_clip()
             self.optimizer["net"].step()
-
-        loss["aux"] = self.model_module.aux_loss()
-
-        if self.loader_key == "train":
-            loss["aux"].backward()
             self.optimizer["aux"].step()
             self.optimizer["net"].zero_grad()
             self.optimizer["aux"].zero_grad()
@@ -166,9 +164,10 @@ class GVAEImageCompressionRunner(BaseRunner):
         out_metrics["bpp"] = out_infer["bpp"]
         out_metrics["ms-ssim-db"] = db(1 - out_metrics["ms-ssim"])
 
-        loss = {}
-        loss["net"] = out_criterion["loss"]
-        loss["aux"] = self.model_module.aux_loss()
+        loss = {
+            "net": out_criterion["loss"],
+            "aux": self.model_module.aux_loss(),
+        }
 
         batch_metrics = {
             "loss": loss["net"],
