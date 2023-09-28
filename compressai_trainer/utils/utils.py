@@ -154,3 +154,16 @@ def _coerce_list(x):
     if isinstance(x, list):
         return x
     return [x]
+
+
+def flatten_values(x, value_type=object):
+    if isinstance(x, list) or isinstance(x, tuple) or isinstance(x, set):
+        for v in x:
+            yield from flatten_values(v)
+    elif isinstance(x, dict):
+        for v in x.values():
+            yield from flatten_values(v)
+    elif isinstance(x, value_type):
+        yield x
+    else:
+        raise ValueError(f"Unexpected type {type(x)}")
