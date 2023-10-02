@@ -30,11 +30,13 @@
 from __future__ import annotations
 
 import json
-from typing import Any
+from typing import Any, Optional
 
 import compressai
 import numpy as np
 import pandas as pd
+
+DEFAULT_RESULTS_ROOT = f"{compressai.__path__[0]}/../results"
 
 GENERIC_CODECS = ["av1", "hm", "jpeg", "jpeg2000", "vtm", "webp"]
 
@@ -44,47 +46,49 @@ def compressai_dataframe(
     dataset: str = "image/kodak",
     opt_metric: str = "mse",
     device: str = "cuda",
+    source: str = "compressai",
     generic_codecs: list[str] = GENERIC_CODECS,
+    base_path: Optional[str] = None,
+    filename_format: Optional[str] = None,
+    **filename_format_kwargs,
 ) -> pd.DataFrame:
     """Returns a dataframe containing the results of a given codec."""
-    if codec_name in generic_codecs:
-        d = generic_codec_result(codec_name, dataset=dataset)
-    else:
-        d = deep_codec_result(
-            codec_name, dataset=dataset, opt_metric=opt_metric, device=device
-        )
+    if base_path is None:
+        base_path = f"{DEFAULT_RESULTS_ROOT}/{dataset}"
 
-    d["results"] = _process_results(_rename_results(d["results"]))
-    df = pd.DataFrame.from_dict(d["results"])
-    df["name"] = d["name"]
-    df["model.name"] = d["name"]
-    df["description"] = d["description"]
+    if filename_format is not None:
+        pass
+    elif codec_name in generic_codecs:
+        filename_format = "{codec_name}"
+    elif source == "paper":
+        filename_format = "{source}-{codec_name}"
+    elif source == "compressai":
+        filename_format = "{source}-{codec_name}_{opt_metric}_{device}"
+    else:
+        raise ValueError(f"Unknown source: {source}")
+
+    filename = filename_format.format(
+        source=source,
+        codec_name=codec_name,
+        opt_metric=opt_metric,
+        device=device,
+        **filename_format_kwargs,
+    )
+
+    with open(f"{base_path}/{filename}.json") as f:
+        d = json.load(f)
+
+    df = _compressai_results_json_to_dataframe(d)
     return df
 
 
-def deep_codec_result(
-    model_name: str,
-    dataset: str = "image/kodak",
-    opt_metric: str = "mse",
-    device: str = "cuda",
-) -> dict[str, Any]:
-    path = (
-        f"{compressai.__path__[0]}/../results/{dataset}/"
-        f"compressai-{model_name}_{opt_metric}_{device}.json"
-    )
-
-    with open(path) as f:
-        return json.load(f)
-
-
-def generic_codec_result(
-    codec_name: str,
-    dataset: str = "image/kodak",
-) -> dict[str, Any]:
-    path = f"{compressai.__path__[0]}/../results/{dataset}/" f"{codec_name}.json"
-
-    with open(path) as f:
-        return json.load(f)
+def _compressai_results_json_to_dataframe(d: dict[str, Any]) -> pd.DataFrame:
+    d["results"] = _process_results(_rename_results(d["results"]))
+    df = pd.DataFrame.from_dict(d["results"])
+    df["name"] = d.get("name")
+    df["model.name"] = d.get("meta", {}).get("model.name")
+    df["description"] = d.get("description")
+    return df
 
 
 def _rename_results(results):
