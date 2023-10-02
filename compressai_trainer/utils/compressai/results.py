@@ -103,7 +103,10 @@ def _rename_results(results):
 
 
 def _process_results(results):
-    # NOTE: The dB of the mean of MS-SSIM samples
-    # is not the same as the mean of MS-SSIM dB samples.
-    results["ms-ssim-db"] = (-10 * np.log10(1 - np.array(results["ms-ssim"]))).tolist()
+    if "ms-ssim" in results and "ms-ssim-db" not in results:
+        # NOTE: The dB of the mean of MS-SSIM samples
+        # is not the same as the mean of MS-SSIM dB samples.
+        results["ms-ssim-db"] = (
+            -10 * np.log10(1 - np.array(results["ms-ssim"]))
+        ).tolist()
     return results
