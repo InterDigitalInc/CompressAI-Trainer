@@ -32,8 +32,10 @@ from __future__ import annotations
 import math
 from typing import Any, Dict, cast
 
+import torch
 from catalyst.utils.torch import load_checkpoint
 from omegaconf import DictConfig, OmegaConf
+from packaging import version
 
 from compressai_trainer.registry.torch import (
     CRITERIONS,
@@ -94,6 +96,10 @@ def create_model(conf: DictConfig) -> TModel:
         state_dict = state_dict_from_checkpoint(checkpoint)
         missing_keys, unexpected_keys = model.load_state_dict(state_dict, strict=False)
         print(f"Missing keys: {missing_keys}\nUnexpected keys: {unexpected_keys}")
+
+    if conf.misc.compile:
+        if version.parse(torch.__version__) >= version.parse("2.0.0"):
+            model = torch.compile(model)
 
     return model
 

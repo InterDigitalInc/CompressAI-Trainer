@@ -1,5 +1,6 @@
 cudnn:
   benchmark: True
   deterministic: null
+compile: False  # Applies @torch.compile (PyTorch 2.0+), which can significantly improve performance. Try it!
 device: "cuda"
 seed: 1234
