@@ -206,7 +206,7 @@ class GVAEImageCompressionRunner(BaseRunner):
 
     @property
     def _current_dataframe(self):
-        r = lambda x: float(f"{x:.4g}")
+        r = lambda x: float(f"{x:.6g}")
         d = {
             "name": [self.hparams["model"]["name"] + "*" for _ in self._lmbda_idxs],
             "epoch": [self.epoch_step for _ in self._lmbda_idxs],
