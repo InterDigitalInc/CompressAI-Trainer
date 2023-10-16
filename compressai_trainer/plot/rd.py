@@ -108,4 +108,12 @@ def plot_rd(
     fig = make_subplots()
     fig = px.line(df, **scatter_kwargs, markers=True)
     fig.update_layout(**layout_kwargs)
+
+    # Highlight important traces.
+    for trace in fig.data:
+        if not trace.name.endswith("*"):
+            continue
+        trace.marker.symbol = "star"
+        trace.marker.size = 10
+
     return fig
