@@ -31,13 +31,10 @@ import os
 from types import ModuleType
 from typing import Any, Mapping
 
-import compressai
 from omegaconf import DictConfig, OmegaConf
 
-import compressai_trainer
+from compressai_trainer.registry import GIT_PACKAGES
 from compressai_trainer.utils import git, pip
-
-PACKAGES = [compressai, compressai_trainer]
 
 CONFIG_DIR = "configs"
 CONFIG_NAME = "config.yaml"
@@ -45,7 +42,7 @@ CONFIG_NAME = "config.yaml"
 
 def write_outputs(conf: DictConfig):
     write_config(conf)
-    for package in PACKAGES:
+    for package in GIT_PACKAGES:
         write_git_diff(conf, package)
     write_pip_list(conf)
     write_pip_requirements(conf)

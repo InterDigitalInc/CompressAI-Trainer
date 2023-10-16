@@ -33,13 +33,10 @@ import os
 from datetime import datetime, timezone
 from typing import Any
 
-import compressai
 from omegaconf import DictConfig
 
-import compressai_trainer
+from compressai_trainer.registry import GIT_PACKAGES
 from compressai_trainer.utils import git, system
-
-PACKAGES = [compressai, compressai_trainer]
 
 
 def get_env(conf: DictConfig) -> dict[str, Any]:
@@ -50,7 +47,7 @@ def get_env(conf: DictConfig) -> dict[str, Any]:
                 package.__path__[0],
                 conf.env.git.get(package.__name__, {}).get("main_branch", "HEAD"),
             )
-            for package in PACKAGES
+            for package in GIT_PACKAGES
         },
         "slurm": {
             "account": os.environ.get("SLURM_JOB_ACCOUNT"),

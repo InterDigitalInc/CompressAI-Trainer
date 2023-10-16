@@ -27,6 +27,10 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import compressai
+
+import compressai_trainer
+
 from .catalyst import CALLBACKS, RUNNERS, register_runner
 from .torch import (
     CRITERIONS,
@@ -44,10 +48,14 @@ from .torch import (
 )
 from .torchvision import TRANSFORMS
 
+GIT_PACKAGES = [compressai, compressai_trainer]
+
+
 __all__ = [
     "CALLBACKS",
     "CRITERIONS",
     "DATASETS",
+    "GIT_PACKAGES",
     "MODELS",
     "MODULES",
     "OPTIMIZERS",

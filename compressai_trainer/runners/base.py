@@ -33,18 +33,15 @@ import os
 from types import ModuleType
 from typing import cast
 
-import compressai
 import yaml
 from catalyst import dl, metrics
 from catalyst.typing import TorchCriterion, TorchOptimizer
 from compressai.models.base import CompressionModel
 from torch.nn.parallel import DataParallel, DistributedDataParallel
 
-import compressai_trainer
+from compressai_trainer.registry import GIT_PACKAGES
 from compressai_trainer.utils.catalyst.loggers import AllSuperlogger
 from compressai_trainer.utils.utils import num_parameters
-
-PACKAGES = [compressai, compressai_trainer]
 
 
 class BaseRunner(dl.Runner, AllSuperlogger):
@@ -74,7 +71,7 @@ class BaseRunner(dl.Runner, AllSuperlogger):
     def on_experiment_start(self, runner):
         super().on_experiment_start(runner)
         self._log_config()
-        for package in PACKAGES:
+        for package in GIT_PACKAGES:
             self._log_git_diff(package)
         self._log_pip()
         self._log_model_info()
