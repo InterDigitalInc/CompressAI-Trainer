@@ -59,6 +59,11 @@ class FastTestModel(SimpleVAECompressionModel):
         )
         self.latent_codec = EntropyBottleneckLatentCodec(channels=M)
 
+    # NOTE: Only needed for compatibility until *.decompress is generalized
+    # in compressai to ignore extra kwargs outputted by compress.
+    def decompress(self, strings, shape, **kwargs):
+        return super().decompress(strings, shape)
+
 
 @register_dataset("SyntheticDataset")
 class SyntheticDataset(Dataset):
