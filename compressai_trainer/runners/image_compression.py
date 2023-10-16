@@ -52,6 +52,8 @@ from .utils import (
     RdFigureLogger,
 )
 
+RD_PLOT_TITLE = "Performance evaluation on {dataset} - {metric}"
+
 RD_PLOT_METRICS = [
     "psnr",
     "ms-ssim",
@@ -63,8 +65,6 @@ RD_PLOT_DESCRIPTIONS = [
     "MS-SSIM (RGB)",
     "MS-SSIM (RGB)",
 ]
-
-RD_PLOT_TITLE = "Performance evaluation on {dataset} - {metric}"
 
 RD_PLOT_SETTINGS_COMMON: dict[str, Any] = dict(
     codecs=[
@@ -225,7 +225,7 @@ class ImageCompressionRunner(BaseRunner):
                     title=RD_PLOT_TITLE.format(
                         dataset=meta["name"],
                         metric=description,
-                    )
+                    ),
                 ),
             )
 

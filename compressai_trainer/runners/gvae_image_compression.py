@@ -246,7 +246,7 @@ class GVAEImageCompressionRunner(BaseRunner):
                     title=RD_PLOT_TITLE.format(
                         dataset=meta["name"],
                         metric=description,
-                    )
+                    ),
                 ),
             )
 
