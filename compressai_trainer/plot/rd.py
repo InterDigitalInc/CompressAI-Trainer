@@ -29,6 +29,7 @@
 
 from __future__ import annotations
 
+from contextlib import suppress
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -40,6 +41,15 @@ _PLOT_RD_SCATTER_SETTINGS_COMMON = dict(
     color="name",
     hover_data=["psnr", "ms-ssim", "epoch"],
 )
+
+with suppress(ImportError):
+    import plotly.express as px
+
+    _PLOT_RD_SCATTER_SETTINGS_COMMON.update(
+        dict(
+            color_discrete_sequence=px.colors.qualitative.Prism,
+        )
+    )
 
 _PLOT_RD_LAYOUT_SETTINGS_COMMON = dict(
     xaxis_title="Bit-rate [bpp]",
