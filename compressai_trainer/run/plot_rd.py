@@ -45,19 +45,19 @@ import pandas as pd
 
 from compressai_trainer.plot import plot_rd
 from compressai_trainer.utils.aim.query import get_runs_dataframe, run_hashes_by_query
-from compressai_trainer.utils.compressai.results import compressai_dataframe
+from compressai_trainer.utils.compressai.results import compressai_results_dataframe
 from compressai_trainer.utils.optimal import optimal_dataframe
 from compressai_trainer.utils.utils import format_dataframe
-
-DATASET = "image/kodak"
 
 TITLE = "Performance evaluation on Kodak - PSNR (RGB)"
 
 COMPRESSAI_CODECS = [
-    "bmshj2018-factorized",
-    "bmshj2018-hyperprior",
-    "mbt2018",
-    "cheng2020-anchor",
+    "image/kodak/compressai-bmshj2018-factorized_mse_cuda.json",
+    "image/kodak/compressai-bmshj2018-hyperprior_mse_cuda.json",
+    "image/kodak/compressai-mbt2018-mean_mse_cuda.json",
+    "image/kodak/compressai-mbt2018_mse_cuda.json",
+    "image/kodak/compressai-cheng2020-anchor_mse_cuda.json",
+    "image/kodak/vtm.json",
 ]
 
 HOVER_HPARAMS = [
@@ -80,7 +80,7 @@ HOVER_DATA += HOVER_HPARAMS + HOVER_METRICS
 
 
 def _reference_dataframes():
-    return [compressai_dataframe(name, dataset=DATASET) for name in COMPRESSAI_CODECS]
+    return [compressai_results_dataframe(filename) for filename in COMPRESSAI_CODECS]
 
 
 def create_dataframe(repo, args):

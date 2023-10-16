@@ -30,6 +30,7 @@
 from __future__ import annotations
 
 import json
+import os
 from typing import Any, Optional
 
 import compressai
@@ -38,46 +39,16 @@ import pandas as pd
 
 DEFAULT_RESULTS_ROOT = f"{compressai.__path__[0]}/../results"
 
-GENERIC_CODECS = ["av1", "hm", "jpeg", "jpeg2000", "vtm", "webp"]
 
-
-def compressai_dataframe(
-    codec_name: str,
-    dataset: str = "image/kodak",
-    opt_metric: str = "mse",
-    device: str = "cuda",
-    source: str = "compressai",
-    generic_codecs: list[str] = GENERIC_CODECS,
+def compressai_results_dataframe(
+    filename: str,
     base_path: Optional[str] = None,
-    filename_format: Optional[str] = None,
-    **filename_format_kwargs,
 ) -> pd.DataFrame:
-    """Returns a dataframe containing the results of a given codec."""
+    """Returns a dataframe containing the results from the given path."""
     if base_path is None:
-        base_path = f"{DEFAULT_RESULTS_ROOT}/{dataset}"
-
-    if filename_format is not None:
-        pass
-    elif codec_name in generic_codecs:
-        filename_format = "{codec_name}"
-    elif source == "paper":
-        filename_format = "{source}-{codec_name}"
-    elif source == "compressai":
-        filename_format = "{source}-{codec_name}_{opt_metric}_{device}"
-    else:
-        raise ValueError(f"Unknown source: {source}")
-
-    filename = filename_format.format(
-        source=source,
-        codec_name=codec_name,
-        opt_metric=opt_metric,
-        device=device,
-        **filename_format_kwargs,
-    )
-
-    with open(f"{base_path}/{filename}.json") as f:
+        base_path = DEFAULT_RESULTS_ROOT
+    with open(os.path.join(base_path, filename)) as f:
         d = json.load(f)
-
     df = _compressai_results_json_to_dataframe(d)
     return df
 

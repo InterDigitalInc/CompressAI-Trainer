@@ -42,7 +42,7 @@ from PIL import Image
 from compressai_trainer import plot
 from compressai_trainer.plot import plot_entropy_bottleneck_distributions, plot_rd
 from compressai_trainer.plot.featuremap import DEFAULT_COLORMAP
-from compressai_trainer.utils.compressai.results import compressai_dataframe
+from compressai_trainer.utils.compressai.results import compressai_results_dataframe
 from compressai_trainer.utils.utils import tensor_to_np_img
 
 
@@ -204,10 +204,7 @@ class RdFigureLogger:
         **kwargs,
     ):
         hover_data = kwargs.get("scatter_kwargs", {}).get("hover_data", [])
-        dfs = [
-            compressai_dataframe(name, dataset=dataset, opt_metric=opt_metric)
-            for name in codecs
-        ]
+        dfs = [compressai_results_dataframe(filename) for filename in codecs]
         dfs.append(df)
         df = pd.concat(dfs)
         df = _reorder_dataframe_columns(df, hover_data)

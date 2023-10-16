@@ -68,12 +68,12 @@ RD_PLOT_TITLE = "Performance evaluation on {dataset} - {metric}"
 
 RD_PLOT_SETTINGS_COMMON: dict[str, Any] = dict(
     codecs=[
-        "bmshj2018-factorized",
-        "bmshj2018-hyperprior",
-        "mbt2018-mean",
-        "mbt2018",
-        "cheng2020-anchor",
-        "vtm",
+        "image/kodak/compressai-bmshj2018-factorized_mse_cuda.json",
+        "image/kodak/compressai-bmshj2018-hyperprior_mse_cuda.json",
+        "image/kodak/compressai-mbt2018-mean_mse_cuda.json",
+        "image/kodak/compressai-mbt2018_mse_cuda.json",
+        "image/kodak/compressai-cheng2020-anchor_mse_cuda.json",
+        "image/kodak/vtm.json",
     ],
     scatter_kwargs=dict(
         hover_data=[
