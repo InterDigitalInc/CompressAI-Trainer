@@ -157,9 +157,11 @@ def _map_none(f: Callable[[T], T], x: Optional[T]) -> Optional[T]:
     return None if x is None else f(x)
 
 
-def _get_path(x, path: Sequence[str]):
+def _get_path(x, path: Sequence[str], early_exit: bool = True):
     for key in path:
-        x = x[key]
+        if early_exit and x is None:
+            return None
+        x = x.get(key)
     return x
 
 
