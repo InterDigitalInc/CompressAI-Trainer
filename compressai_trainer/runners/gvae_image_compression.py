@@ -320,6 +320,7 @@ def inference(
     # Compress using forward.
     out_net = model(x_padded, lmbda=lmbda)
     out_net["x_hat"] = F.pad(out_net["x_hat"], unpad)
+    out_net["x_hat"] = out_net["x_hat"].clamp_(0, 1)
 
     # Compress using compress/decompress.
     if not skip_compress:
