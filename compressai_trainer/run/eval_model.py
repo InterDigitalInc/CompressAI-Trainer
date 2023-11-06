@@ -97,11 +97,11 @@ from __future__ import annotations
 import json
 import os
 from pathlib import Path
+from types import SimpleNamespace
 
 import catalyst
 import catalyst.utils
 import numpy as np
-import pandas as pd
 import plotly.graph_objects as go
 from omegaconf import DictConfig, OmegaConf, open_dict
 from PIL import Image
@@ -122,7 +122,7 @@ from compressai_trainer.runners.image_compression import (
 )
 from compressai_trainer.typing import TRunner
 from compressai_trainer.utils.args import iter_configs
-from compressai_trainer.utils.metrics import compute_metrics, db
+from compressai_trainer.utils.metrics import compute_metrics
 from compressai_trainer.utils.utils import ld_to_dl, tensor_to_np_img
 
 thisdir = Path(__file__).parent
@@ -207,23 +207,6 @@ def _write_image(x, filename):
     Image.fromarray(tensor_to_np_img(x[0])).save(filename.with_suffix(".png"))
 
 
-def _current_dataframe(conf, results):
-    r = lambda x: float(f"{x:.4g}")
-    d = {
-        "name": conf.model.name + "*",
-        "epoch": None,
-        "criterion.lmbda": conf.criterion.lmbda,
-        "loss": r(results["results_averaged"]["loss"]),
-        "bpp": r(results["results_averaged"]["bpp"]),
-        "psnr": r(results["results_averaged"]["psnr"]),
-        "ms-ssim": r(results["results_averaged"]["ms-ssim"]),
-        # NOTE: The dB of the mean of MS-SSIM samples
-        # is not the same as the mean of MS-SSIM dB samples.
-        "ms-ssim-db": r(db(1 - results["results_averaged"]["ms-ssim"])),
-    }
-    return pd.DataFrame.from_dict([d])
-
-
 def _current_rd_traces(conf, results, metric):
     lmbda = conf.criterion.lmbda
     num_points = len(results["results_by_file"]["bpp"])
@@ -238,13 +221,19 @@ def _current_rd_traces(conf, results, metric):
     return [samples_scatter]
 
 
-def _plot_rd(conf, results, metrics):
+def _plot_rd(runner, conf, results, metrics):
+    runner_ = SimpleNamespace(
+        hparams=conf,
+        epoch_step=None,
+        loader_metrics=results["results_averaged"],
+    )
+
     for metric, description in zip(RD_PLOT_METRICS, RD_PLOT_DESCRIPTIONS):
         if metric not in metrics:
             continue
 
         fig = RdFigureLogger(runner=None).log(
-            df=_current_dataframe(conf, results),
+            df=runner.__class__._current_dataframe.fget(runner_),
             traces=_current_rd_traces(conf, results, metric),
             metric=metric,
             dataset=conf.dataset.infer.meta.identifier,
@@ -292,8 +281,6 @@ def write_results(conf, outputs, metrics):
         for row in table:
             print("\t".join(f"{x}" for x in row), file=f)
 
-    _plot_rd(conf, results, metrics)
-
     return results
 
 
@@ -327,6 +314,7 @@ def main():
 
         outputs = run_eval_model(runner, batches, filenames, output_dir, metrics)
         results = write_results(conf, outputs, metrics)
+        _plot_rd(runner, conf, results, metrics)
         results_avg.append(results["results_averaged"])
 
     results_avg = ld_to_dl(results_avg)
