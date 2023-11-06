@@ -35,22 +35,36 @@ Saves bitstreams and reconstructed images to ``paths.output_dir``.
 Computes metrics and saves per-file results and averaged results to
 JSON and TSV files.
 
-To evaluate a model trained using CompressAI Trainer:
+To evaluate models trained using CompressAI Trainer:
 
 .. code-block:: bash
 
     compressai-eval \
         --config-path="$HOME/data/runs/e4e6d4d5e5c59c69f3bd7be2/configs" \
-        --config-name="config" \
-        ++model.source="config" \
-        ++paths.output_dir="outputs" \
-        ++paths.model_checkpoint='${paths.checkpoints}/runner.last.pth'
+        --config-path="$HOME/data/runs/d4d5e5c5e4e6bd7be29c69f3/configs" \
+        ...
 
-To evaluate a model from the CompressAI zoo:
+To evaluate models from the CompressAI zoo:
 
 .. code-block:: bash
 
-    compressai-eval --config-name="example_eval_zoo"
+    compressai-eval \
+        --config-name="example_eval_zoo" ++model.name="bmshj2018-factorized" ++model.quality=1 \
+        --config-name="example_eval_zoo" ++model.name="bmshj2018-factorized" ++model.quality=2 \
+        ...
+
+By default, the following options are used, if not specified:
+
+.. code-block:: bash
+
+    --config-path="conf"
+    --config-name="config"
+
+    ++model.source="config"
+    ++paths.output_dir="outputs"
+
+    # if model.source == "config":
+    ++paths.model_checkpoint='${paths.checkpoints}/runner.last.pth'
 
 The model is evaluated on ``dataset.infer``, which may be configured as follows:
 
@@ -87,14 +101,13 @@ from pathlib import Path
 import catalyst
 import catalyst.utils
 import compressai.zoo.image
-import hydra
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import torch
 from compressai.registry import MODELS
 from compressai.zoo import load_state_dict
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import DictConfig, OmegaConf, open_dict
 from PIL import Image
 
 from compressai_trainer.config import (
@@ -113,11 +126,16 @@ from compressai_trainer.runners.image_compression import (
     RdFigureLogger,
 )
 from compressai_trainer.typing import TModel, TRunner
+from compressai_trainer.utils.args import iter_configs
 from compressai_trainer.utils.metrics import compute_metrics, db
-from compressai_trainer.utils.utils import tensor_to_np_img
+from compressai_trainer.utils.utils import ld_to_dl, tensor_to_np_img
 
 thisdir = Path(__file__).parent
 config_path = str(thisdir.joinpath("../../conf").resolve())
+
+DEFAULT_MODEL_SOURCE = "config"
+DEFAULT_PATHS_MODEL_CHECKPOINT = "${paths.checkpoints}/runner.last.pth"
+DEFAULT_PATHS_OUTPUT_DIR = "outputs"
 
 
 def setup(conf: DictConfig) -> TRunner:
@@ -325,10 +343,10 @@ def _plot_rd(conf, results, metrics):
         fig.write_html(f"rd-curves-{metric}.html")
 
 
-def write_results(conf, outputs, metrics):
+def _results_dict(conf, outputs, metrics):
     result_avg_keys = ["bpp", "loss", *metrics, "encoding_time", "decoding_time"]
     result_keys = ["filename", *result_avg_keys]
-    results = {
+    return {
         "name": conf.model.name,
         "description": "",
         "dataset": conf.dataset.infer.meta.name,
@@ -339,6 +357,10 @@ def write_results(conf, outputs, metrics):
             **{k: [out[k] for out in outputs] for k in result_keys},
         },
     }
+
+
+def write_results(conf, outputs, metrics):
+    results = _results_dict(conf, outputs, metrics)
 
     with open("results.json", "w") as f:
         json.dump(results, f, indent=2)
@@ -354,18 +376,43 @@ def write_results(conf, outputs, metrics):
 
     _plot_rd(conf, results, metrics)
 
+    return results
 
-@hydra.main(version_base=None, config_path=config_path)
-def main(conf: DictConfig):
-    runner = setup(conf)
 
-    batches = runner.loaders["infer"]
-    filenames = get_filenames(conf, len(batches))
-    output_dir = conf.paths.output_dir
-    metrics = ["psnr", "ms-ssim"]
+def prepare_conf(conf):
+    if "source" not in conf.get("model", {}):
+        with open_dict(conf):
+            conf.model.source = DEFAULT_MODEL_SOURCE
 
-    outputs = run_eval_model(runner, batches, filenames, output_dir, metrics)
-    write_results(conf, outputs, metrics)
+    if (conf.model.source == "config") and (
+        conf.get("paths", {}).get("model_checkpoint", None) is None
+    ):
+        with open_dict(conf):
+            conf.paths.model_checkpoint = DEFAULT_PATHS_MODEL_CHECKPOINT
+
+    if "output_dir" not in conf.get("paths", {}):
+        with open_dict(conf):
+            conf.paths.output_dir = DEFAULT_PATHS_OUTPUT_DIR
+
+
+def main():
+    results_avg = []
+
+    for conf in iter_configs(start=thisdir):
+        prepare_conf(conf)
+        runner = setup(conf)
+
+        batches = runner.loaders["infer"]
+        filenames = get_filenames(conf, len(batches))
+        output_dir = Path(conf.paths.output_dir)
+        metrics = ["psnr", "ms-ssim"]
+
+        outputs = run_eval_model(runner, batches, filenames, output_dir, metrics)
+        results = write_results(conf, outputs, metrics)
+        results_avg.append(results["results_averaged"])
+
+    results_avg = ld_to_dl(results_avg)
+    print(json.dumps(results_avg, indent=2))
 
 
 if __name__ == "__main__":
