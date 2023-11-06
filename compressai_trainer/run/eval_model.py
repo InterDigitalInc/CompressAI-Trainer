@@ -49,8 +49,8 @@ To evaluate models from the CompressAI zoo:
 .. code-block:: bash
 
     compressai-eval \
-        --config-name="example_eval_zoo" ++model.name="bmshj2018-factorized" ++model.quality=1 \
-        --config-name="example_eval_zoo" ++model.name="bmshj2018-factorized" ++model.quality=2 \
+        --config-name="eval_zoo" ++model.name="bmshj2018-factorized" ++model.quality=1 \
+        --config-name="eval_zoo" ++model.name="bmshj2018-factorized" ++model.quality=2 \
         ...
 
 By default, the following options are used, if not specified:
