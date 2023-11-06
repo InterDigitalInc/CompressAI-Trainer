@@ -153,10 +153,11 @@ def setup(conf: DictConfig) -> TRunner:
     return runner
 
 
-def get_filenames(conf, num_files):
-    if conf.dataset.infer.type == "ImageFolder":
-        root = Path(conf.dataset.infer.config.root) / conf.dataset.infer.config.split
-        return sorted(str(f.relative_to(root)) for f in root.iterdir())
+def get_filenames(runner, num_files):
+    dataset = runner.loaders["infer"].dataset
+
+    if type(dataset).__name__ == "ImageFolder":
+        return [x.stem for x in dataset.samples]
 
     return [f"unknown_{i:06d}" for i in range(1, num_files + 1)]
 
@@ -312,7 +313,7 @@ def main():
         runner = setup(conf)
 
         batches = runner.loaders["infer"]
-        filenames = get_filenames(conf, len(batches))
+        filenames = get_filenames(runner, len(batches))
         output_dir = Path(conf.paths.output_dir)
         metrics = ["psnr", "ms-ssim"]
 
