@@ -153,7 +153,7 @@ def setup(conf: DictConfig) -> TRunner:
     return runner
 
 
-def get_filenames(runner, num_files):
+def _get_filenames(runner, num_files):
     dataset = runner.loaders["infer"].dataset
 
     if type(dataset).__name__ == "ImageFolder":
@@ -289,7 +289,7 @@ def _write_tsv(rows, file):
         print("\t".join(f"{x}" for x in row), file=file)
 
 
-def prepare_conf(conf):
+def _prepare_conf(conf):
     if "source" not in conf.get("model", {}):
         with open_dict(conf):
             conf.model.source = DEFAULT_MODEL_SOURCE
@@ -309,11 +309,11 @@ def main():
     results_avg = []
 
     for conf in iter_configs(start=thisdir):
-        prepare_conf(conf)
+        _prepare_conf(conf)
         runner = setup(conf)
 
         batches = runner.loaders["infer"]
-        filenames = get_filenames(runner, len(batches))
+        filenames = _get_filenames(runner, len(batches))
         output_dir = Path(conf.paths.output_dir)
         metrics = ["psnr", "ms-ssim"]
 
