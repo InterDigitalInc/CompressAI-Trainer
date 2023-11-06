@@ -278,10 +278,14 @@ def write_results(conf, outputs, metrics):
     ]
 
     with open("results.tsv", "w") as f:
-        for row in table:
-            print("\t".join(f"{x}" for x in row), file=f)
+        _write_tsv(table, file=f)
 
     return results
+
+
+def _write_tsv(rows, file):
+    for row in rows:
+        print("\t".join(f"{x}" for x in row), file=file)
 
 
 def prepare_conf(conf):
