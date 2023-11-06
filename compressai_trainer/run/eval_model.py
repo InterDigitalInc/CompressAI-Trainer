@@ -263,7 +263,10 @@ def _results_dict(conf, outputs, metrics):
     return {
         "name": conf.model.name,
         "description": "",
-        "dataset": conf.dataset.infer.meta.name,
+        "meta": {
+            "dataset": conf.dataset.infer.meta.name,
+            "device": conf.misc.device,
+        },
         "results_averaged": {
             **{k: np.mean([out[k] for out in outputs]) for k in result_avg_keys},
         },
@@ -273,10 +276,8 @@ def _results_dict(conf, outputs, metrics):
     }
 
 
-def write_results(conf, outputs, metrics):
-    results = _results_dict(conf, outputs, metrics)
-
-    with open("results.json", "w") as f:
+def _write_results(conf, results):
+    with open(f"{conf.paths.output_dir}/results.json", "w") as f:
         json.dump(results, f, indent=2)
 
     table = [
@@ -284,15 +285,40 @@ def write_results(conf, outputs, metrics):
         *zip(*results["results_by_file"].values()),
     ]
 
-    with open("results.tsv", "w") as f:
+    with open(f"{conf.paths.output_dir}/results.tsv", "w") as f:
         _write_tsv(table, file=f)
 
-    return results
+
+def _write_results_final(results_list):
+    results = {
+        "name": _get_common_value(results_list, ("name",)),
+        "description": _get_common_value(results_list, ("description",)),
+        "meta": {
+            key: _get_common_value(results_list, ("meta", key))
+            for key in results_list[0]["meta"]
+        },
+        "results": ld_to_dl([results["results_averaged"] for results in results_list]),
+    }
+
+    with open(f"{DEFAULT_PATHS_OUTPUT_DIR_ROOT}/results.json", "w") as f:
+        json.dump(results, f, indent=2)
 
 
 def _write_tsv(rows, file):
     for row in rows:
         print("\t".join(f"{x}" for x in row), file=file)
+
+
+def _get_common_value(ds, path):
+    value = _get_value(ds[0], path)
+    assert all(_get_value(d, path) == value for d in ds)
+    return value
+
+
+def _get_value(d, path):
+    for key in path:
+        d = d[key]
+    return d
 
 
 def _prepare_conf(conf):
@@ -335,7 +361,7 @@ def _get_output_dir(conf):
 
 
 def main():
-    results_avg = []
+    results_list = []
 
     for conf in iter_configs(start=thisdir):
         _prepare_conf(conf)
@@ -347,12 +373,12 @@ def main():
         metrics = ["psnr", "ms-ssim"]
 
         outputs = run_eval_model(runner, batches, filenames, output_dir, metrics)
-        results = write_results(conf, outputs, metrics)
+        results = _results_dict(conf, outputs, metrics)
+        results_list.append(results)
+        _write_results(conf, results)
         _plot_rd(runner, conf, results, metrics)
-        results_avg.append(results["results_averaged"])
 
-    results_avg = ld_to_dl(results_avg)
-    print(json.dumps(results_avg, indent=2))
+    _write_results_final(results_list)
 
 
 if __name__ == "__main__":
