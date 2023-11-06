@@ -128,7 +128,7 @@ from compressai_trainer.runners.image_compression import (
 )
 from compressai_trainer.typing import TRunner
 from compressai_trainer.utils.args import iter_configs
-from compressai_trainer.utils.metrics import compute_metrics
+from compressai_trainer.utils.metrics import _METRICS, compute_metrics
 from compressai_trainer.utils.utils import ld_to_dl, tensor_to_np_img
 
 thisdir = Path(__file__).parent
@@ -186,7 +186,11 @@ def run_eval_model(runner, batches, filenames, output_dir, metrics):
         output = {
             "filename": filename,
             "bpp": out_infer["bpp"],
-            "loss": out_criterion["loss"].item(),
+            **{
+                k: v.item()
+                for k, v in out_criterion.items()
+                if k in runner.hparams["runner"]["meters"]["infer"]
+            },
             **out_metrics,
             "encoding_time": out_infer["encoding_time"],
             "decoding_time": out_infer["decoding_time"],
@@ -257,9 +261,11 @@ def _plot_rd(runner, conf, results, metrics):
         fig.write_html(f"rd-curves-{metric}.html")
 
 
-def _results_dict(conf, outputs, metrics):
-    result_avg_keys = ["bpp", "loss", *metrics, "encoding_time", "decoding_time"]
-    result_keys = ["filename", *result_avg_keys]
+def _results_dict(conf, outputs):
+    result_keys = list(outputs[0].keys())
+    result_non_avg_keys = ["filename"]
+    result_avg_keys = [k for k in result_keys if k not in result_non_avg_keys]
+
     return {
         "name": conf.model.name,
         "description": "",
@@ -396,10 +402,10 @@ def main():
         batches = runner.loaders["infer"]
         filenames = _get_filenames(runner, len(batches))
         output_dir = Path(conf.paths.output_dir)
-        metrics = ["psnr", "ms-ssim"]
+        metrics = [x for x in conf.runner.meters.infer if x in _METRICS]
 
         outputs = run_eval_model(runner, batches, filenames, output_dir, metrics)
-        results = _results_dict(conf, outputs, metrics)
+        results = _results_dict(conf, outputs)
         results_list.append(results)
         _write_results(conf, results)
         _plot_rd(runner, conf, results, metrics)
