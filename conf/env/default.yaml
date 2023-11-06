@@ -16,8 +16,8 @@ git:
     main_version:
 slurm:
   account:
-  job_version:
-  job_array_task_version:
+  job_id:
+  job_array_task_id:
   job_name:
 system:
   hostname:
