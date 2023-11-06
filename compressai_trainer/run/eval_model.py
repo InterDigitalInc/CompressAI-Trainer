@@ -61,10 +61,16 @@ By default, the following options are used, if not specified:
     --config-name="config"
 
     ++model.source="config"
-    ++paths.output_dir="outputs"
 
     # if model.source == "config":
+    ++paths.output_dir="outputs/${model.source}-${env.aim.run_hash}-${model.name}"
     ++paths.model_checkpoint='${paths.checkpoints}/runner.last.pth'
+
+    # if model.source == "from_state_dict":
+    ++paths.output_dir="outputs/${model.name}-${Path(paths.model_checkpoint).stem}"
+
+    # if model.source == "zoo":
+    ++paths.output_dir="outputs/${model.source}-${model.name}-${model.metric}-${model.quality}"
 
 The model is evaluated on ``dataset.infer``, which may be configured as follows:
 
@@ -130,7 +136,7 @@ config_path = str(thisdir.joinpath("../../conf").resolve())
 
 DEFAULT_MODEL_SOURCE = "config"
 DEFAULT_PATHS_MODEL_CHECKPOINT = "${paths.checkpoints}/runner.last.pth"
-DEFAULT_PATHS_OUTPUT_DIR = "outputs"
+DEFAULT_PATHS_OUTPUT_DIR_ROOT = "outputs"
 
 
 def setup(conf: DictConfig) -> TRunner:
@@ -302,7 +308,30 @@ def _prepare_conf(conf):
 
     if "output_dir" not in conf.get("paths", {}):
         with open_dict(conf):
-            conf.paths.output_dir = DEFAULT_PATHS_OUTPUT_DIR
+            conf.paths.output_dir = _get_output_dir(conf)
+
+
+def _get_output_dir(conf):
+    source = conf.model.source
+    if conf.paths.get("output_dir") is not None:
+        return conf.paths.output_dir
+    if source == "config":
+        return (
+            f"{DEFAULT_PATHS_OUTPUT_DIR_ROOT}/"
+            "${model.source}-${env.aim.run_hash}-${model.name}"
+        )
+    if source == "from_state_dict":
+        return (
+            f"{DEFAULT_PATHS_OUTPUT_DIR_ROOT}/"
+            "${model.name}-"
+            f"{Path(conf.paths.model_checkpoint).stem}"
+        )
+    if source == "zoo":
+        return (
+            f"{DEFAULT_PATHS_OUTPUT_DIR_ROOT}/"
+            "${model.source}-${model.name}-${model.metric}-${model.quality}"
+        )
+    raise ValueError(f"Unknown model.source: {source}")
 
 
 def main():

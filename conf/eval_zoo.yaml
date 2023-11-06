@@ -7,9 +7,6 @@ defaults:
   - dataset@dataset.infer: kodak/infer
   - _self_
 
-paths:
-  output_dir: "outputs"
-
 model:
   source: "zoo"
   name: "bmshj2018-factorized"
