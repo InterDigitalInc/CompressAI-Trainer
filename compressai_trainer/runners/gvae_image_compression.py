@@ -31,9 +31,8 @@ from __future__ import annotations
 
 import random
 import time
-from collections import defaultdict
 from itertools import chain
-from typing import Any, Dict, List, Optional, TypeVar, cast
+from typing import Any, List, Optional, TypeVar, cast
 
 import pandas as pd
 import torch
@@ -44,7 +43,7 @@ from compressai.typing import TCriterion
 
 from compressai_trainer.registry import register_runner
 from compressai_trainer.utils.metrics import compute_metrics, db
-from compressai_trainer.utils.utils import compute_padding, flatten_values
+from compressai_trainer.utils.utils import compute_padding, flatten_values, ld_to_dl
 
 from .base import BaseRunner
 from .image_compression import (
@@ -261,7 +260,7 @@ class GVAEImageCompressionRunner(BaseRunner):
         # Average metrics over lambdas.
         averages = {
             metric_name: sum(values) / len(values)
-            for metric_name, values in _transpose_list_dict(batch_metricses).items()
+            for metric_name, values in ld_to_dl(batch_metricses).items()
         }
 
         return {**singles, **averages}
@@ -359,11 +358,3 @@ def inference(
         "encoding_time": enc_time,
         "decoding_time": dec_time,
     }
-
-
-def _transpose_list_dict(ds: List[Dict[K, V]]) -> Dict[K, List[V]]:
-    result = defaultdict(list)
-    for d in ds:
-        for k, v in d.items():
-            result[k].append(v)
-    return result

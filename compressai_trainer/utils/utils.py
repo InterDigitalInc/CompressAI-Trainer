@@ -31,12 +31,16 @@ from __future__ import annotations
 
 import math
 import string
-from typing import Any
+from collections import defaultdict
+from typing import Any, TypeVar
 
 import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
+
+K = TypeVar("K")
+V = TypeVar("V")
 
 
 class ConfigStringFormatter(string.Formatter):
@@ -167,3 +171,22 @@ def flatten_values(x, value_type=object):
         yield x
     else:
         raise ValueError(f"Unexpected type {type(x)}")
+
+
+def dl_to_ld(dl: dict[K, list[V]]) -> list[dict[K, V]]:
+    """Converts a dict of lists into a list of dicts."""
+    ld = []
+    for k, vs in dl.items():
+        ld += [{} for _ in range(len(vs) - len(ld))]
+        for i, v in enumerate(vs):
+            ld[i][k] = v
+    return ld
+
+
+def ld_to_dl(ld: list[dict[K, V]]) -> dict[K, list[V]]:
+    """Converts a list of dicts into a dict of lists."""
+    dl = defaultdict(list)
+    for d in ld:
+        for k, v in d.items():
+            dl[k].append(v)
+    return dl
