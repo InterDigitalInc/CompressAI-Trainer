@@ -41,9 +41,12 @@ from omegaconf import DictConfig, OmegaConf
 from torch import Tensor
 
 import compressai_trainer
-from compressai_trainer.config import outputs
-from compressai_trainer.config.config import create_model
+from compressai_trainer.registry import MODELS
+from compressai_trainer.typing import TModel
 from compressai_trainer.utils import git
+
+from . import outputs
+from .config import create_model
 
 if TYPE_CHECKING:
     import torch.nn as nn
@@ -83,6 +86,85 @@ def load_checkpoint(
     state_dict = state_dict_from_checkpoint(ckpt)
     model.load_state_dict(state_dict)
 
+    return model
+
+
+def load_model(conf: DictConfig) -> TModel:
+    """Load a model from one of various sources.
+
+    The source is determined by setting the config setting
+    ``model.source`` to one of the following:
+
+    - "config":
+        Uses CompressAI Trainer standard config.
+        (e.g. ``hp``, ``paths.model_checkpoint``, etc.)
+
+    - "from_state_dict":
+        Uses model's ``from_state_dict()`` factory method.
+        Requires ``model.name`` and ``paths.model_checkpoint`` to be set.
+        For example:
+
+        .. code-block:: yaml
+
+            model:
+              name: "bmshj2018-factorized"
+            paths:
+              model_checkpoint: "/home/user/.cache/torch/hub/checkpoints/bmshj2018-factorized-prior-3-5c6f152b.pth.tar"
+
+    - "zoo":
+        Uses CompressAI's zoo of models.
+        Requires ``model.name``, ``model.metric``, ``model.quality``,
+        and ``model.pretrained`` to be set.
+        For example:
+
+        .. code-block:: yaml
+
+            model:
+              name: "bmshj2018-factorized"
+              metric: "mse"
+              quality: 3
+              pretrained: True
+    """
+    source = conf.model.get("source", None)
+
+    if source is None:
+        raise ValueError(
+            "Please override model.source with one of "
+            '"config", "from_state_dict", or "zoo".\n'
+            "\nExample: "
+            '++model.source="config"'
+        )
+
+    if source is None or source == "config":
+        if not conf.paths.model_checkpoint:
+            raise ValueError(
+                "Please override paths.model_checkpoint.\nExample: "
+                "++paths.model_checkpoint='${paths.checkpoints}/runner.last.pth'"
+            )
+        return create_model(conf)
+
+    if source == "from_state_dict":
+        return _load_checkpoint_from_state_dict(
+            conf.model.name,
+            conf.paths.model_checkpoint,
+        ).to(conf.misc.device)
+
+    if source == "zoo":
+        return compressai.zoo.image._load_model(
+            conf.model.name,
+            conf.model.metric,
+            conf.model.quality,
+            conf.model.pretrained,
+        ).to(conf.misc.device)
+
+    raise ValueError(f"Unknown model.source: {source}")
+
+
+def _load_checkpoint_from_state_dict(arch: str, checkpoint_path: str):
+    ckpt = torch.load(checkpoint_path)
+    state_dict = state_dict_from_checkpoint(ckpt)
+    state_dict = compressai.zoo.load_state_dict(state_dict)  # for pre-trained models
+    model = MODELS[arch].from_state_dict(state_dict)
     return model
 
 

@@ -41,6 +41,7 @@ from .load import (
     get_checkpoint_path,
     load_checkpoint,
     load_config,
+    load_model,
     state_dict_from_checkpoint,
 )
 from .outputs import write_config, write_git_diff, write_outputs
@@ -63,5 +64,6 @@ __all__ = [
     "get_checkpoint_path",
     "load_checkpoint",
     "load_config",
+    "load_model",
     "state_dict_from_checkpoint",
 ]

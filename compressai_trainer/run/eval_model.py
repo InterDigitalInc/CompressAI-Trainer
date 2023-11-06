@@ -100,13 +100,9 @@ from pathlib import Path
 
 import catalyst
 import catalyst.utils
-import compressai.zoo.image
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
-import torch
-from compressai.registry import MODELS
-from compressai.zoo import load_state_dict
 from omegaconf import DictConfig, OmegaConf, open_dict
 from PIL import Image
 
@@ -114,9 +110,8 @@ from compressai_trainer.config import (
     configure_conf,
     create_criterion,
     create_dataloaders,
-    create_model,
     create_runner,
-    state_dict_from_checkpoint,
+    load_model,
 )
 from compressai_trainer.runners.image_compression import (
     RD_PLOT_DESCRIPTIONS,
@@ -125,7 +120,7 @@ from compressai_trainer.runners.image_compression import (
     RD_PLOT_TITLE,
     RdFigureLogger,
 )
-from compressai_trainer.typing import TModel, TRunner
+from compressai_trainer.typing import TRunner
 from compressai_trainer.utils.args import iter_configs
 from compressai_trainer.utils.metrics import compute_metrics, db
 from compressai_trainer.utils.utils import ld_to_dl, tensor_to_np_img
@@ -156,83 +151,6 @@ def setup(conf: DictConfig) -> TRunner:
     runner._hparams = OmegaConf.to_container(conf, resolve=True)
 
     return runner
-
-
-def load_model(conf: DictConfig) -> TModel:
-    """Load a model from one of various sources.
-
-    The source is determined by setting the config setting
-    ``model.source`` to one of the following:
-
-    - "config":
-        Uses CompressAI Trainer standard config.
-        (e.g. ``hp``, ``paths.model_checkpoint``, etc.)
-
-    - "from_state_dict":
-        Uses model's ``from_state_dict()`` factory method.
-        Requires ``model.name`` and ``paths.model_checkpoint`` to be set.
-        For example:
-
-        .. code-block:: yaml
-
-            model:
-              name: "bmshj2018-factorized"
-            paths:
-              model_checkpoint: "/home/user/.cache/torch/hub/checkpoints/bmshj2018-factorized-prior-3-5c6f152b.pth.tar"
-
-    - "zoo":
-        Uses CompressAI's zoo of models.
-        Requires ``model.name``, ``model.metric``, ``model.quality``,
-        and ``model.pretrained`` to be set.
-        For example:
-
-        .. code-block:: yaml
-
-            model:
-              name: "bmshj2018-factorized"
-              metric: "mse"
-              quality: 3
-              pretrained: True
-    """
-    source = conf.model.get("source", None)
-
-    if source is None:
-        raise ValueError(
-            "Please override model.source with one of "
-            '"config", "from_state_dict", or "zoo".\n'
-            "\nExample: "
-            '++model.source="config"'
-        )
-
-    if source is None or source == "config":
-        if not conf.paths.model_checkpoint:
-            raise ValueError(
-                "Please override paths.model_checkpoint.\nExample: "
-                "++paths.model_checkpoint='${paths.checkpoints}/runner.last.pth'"
-            )
-        return create_model(conf)
-
-    if source == "from_state_dict":
-        return load_checkpoint_from_state_dict(
-            conf.model.name,
-            conf.paths.model_checkpoint,
-        ).to(conf.misc.device)
-
-    if source == "zoo":
-        return compressai.zoo.image._load_model(
-            conf.model.name,
-            conf.model.metric,
-            conf.model.quality,
-            conf.model.pretrained,
-        ).to(conf.misc.device)
-
-
-def load_checkpoint_from_state_dict(arch: str, checkpoint_path: str):
-    ckpt = torch.load(checkpoint_path)
-    state_dict = state_dict_from_checkpoint(ckpt)
-    state_dict = load_state_dict(state_dict)  # for pre-trained models
-    model = MODELS[arch].from_state_dict(state_dict)
-    return model
 
 
 def get_filenames(conf, num_files):
