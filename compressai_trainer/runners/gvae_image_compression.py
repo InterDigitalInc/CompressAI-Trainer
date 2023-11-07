@@ -239,11 +239,17 @@ class GVAEImageCompressionRunner(BaseRunner):
             for metric, description in zip(RD_PLOT_METRICS, RD_PLOT_DESCRIPTIONS)
         ]
 
-    def _log_rd_curves_figure(self, metric, description, **kwargs):
+    def _log_rd_curves_figure(
+        self, metric, description, df=None, traces=None, **kwargs
+    ):
+        if df is None:
+            df = self._current_dataframe
+        if traces is None:
+            traces = self._current_traces(metric)
         meta = self.hparams["dataset"]["infer"]["meta"]
         return self._rd_figure_logger.log(
-            df=self._current_dataframe,
-            traces=self._current_traces(metric),
+            df=df,
+            traces=traces,
             metric=metric,
             dataset=meta["identifier"],
             **RD_PLOT_SETTINGS_COMMON,
