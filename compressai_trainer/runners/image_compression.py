@@ -208,7 +208,7 @@ class ImageCompressionRunner(BaseRunner):
             # is not the same as the mean of MS-SSIM dB samples.
             "ms-ssim-db": r(db(1 - self.loader_metrics["ms-ssim"])),
         }
-        return pd.DataFrame.from_dict([d])
+        return pd.DataFrame.from_records([d])
 
     def _current_traces(self, metric):
         return self._rd_figure_logger.current_rd_traces(
