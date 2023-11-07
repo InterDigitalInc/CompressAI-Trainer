@@ -258,7 +258,7 @@ def _plot_rd(runner, conf, results, metrics):
             log_figure=False,
         )
 
-        fig.write_html(f"rd-curves-{metric}.html")
+        fig.write_html(f"{conf.paths.output_dir}/rd-curves-{metric}.html")
 
 
 def _results_dict(conf, outputs):
