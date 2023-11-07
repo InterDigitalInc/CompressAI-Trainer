@@ -226,7 +226,7 @@ def _plot_rd(runner, results):
 
     runner.epoch_step = None
     runner.loader_metrics = results["results_averaged"]
-    runner._loader_metrics = results["results_by_file"]
+    runner._loader_metrics = results["results_by_sample"]
     runner.log_figure = types.MethodType(log_figure, runner)
     runner._log_rd_curves()
 
@@ -253,7 +253,7 @@ def _results_dict(conf, outputs):
         "results_averaged": {
             **{k: np.mean([out[k] for out in outputs]) for k in result_avg_keys},
         },
-        "results_by_file": {
+        "results_by_sample": {
             **{k: [out[k] for out in outputs] for k in result_keys},
         },
     }
@@ -264,8 +264,8 @@ def _write_results(conf, results):
         json.dump(results, f, indent=2)
 
     table = [
-        list(results["results_by_file"].keys()),
-        *zip(*results["results_by_file"].values()),
+        list(results["results_by_sample"].keys()),
+        *zip(*results["results_by_sample"].values()),
     ]
 
     with open(f"{conf.paths.output_dir}/results.tsv", "w") as f:
