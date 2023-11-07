@@ -7,6 +7,11 @@ defaults:
   - dataset@dataset.infer: kodak/infer
   - _self_
 
+# See the link for details about the lmbdas used for the pretrained models:
+# https://interdigitalinc.github.io/CompressAI/zoo.html#training
+criterion:
+  lmbda: .nan
+
 model:
   source: "zoo"
   name: "bmshj2018-factorized"
