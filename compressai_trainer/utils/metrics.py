@@ -49,6 +49,11 @@ def msssim(a: torch.Tensor, b: torch.Tensor) -> float:
     return ms_ssim(a, b, data_range=1.0).item()
 
 
+def msssim_db(a: torch.Tensor, b: torch.Tensor) -> float:
+    values = ms_ssim(a, b, data_range=1.0, size_average=False)
+    return -10 * (1 - values).log10().mean().item()
+
+
 def db(x):
     """Convert to dB scale."""
     return -10 * math.log10(x)
@@ -59,4 +64,7 @@ _METRICS = {
     "msssim": msssim,
     "ms-ssim": msssim,
     "ms_ssim": msssim,
+    "msssim-db": msssim_db,
+    "ms-ssim-db": msssim_db,
+    "ms_ssim-db": msssim_db,
 }

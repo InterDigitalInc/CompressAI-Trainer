@@ -159,9 +159,8 @@ class GVAEImageCompressionRunner(BaseRunner):
         out_net = out_infer["out_net"]
 
         out_criterion = self.criterion(out_net, x)
-        out_metrics = compute_metrics(x, out_net["x_hat"], ["psnr", "ms-ssim"])
+        out_metrics = compute_metrics(x, out_net["x_hat"], RD_PLOT_METRICS)
         out_metrics["bpp"] = out_infer["bpp"]
-        out_metrics["ms-ssim-db"] = db(1 - out_metrics["ms-ssim"])
 
         loss = {
             "net": out_criterion["loss"],
@@ -216,10 +215,14 @@ class GVAEImageCompressionRunner(BaseRunner):
             "ms-ssim": [
                 r(self.loader_metrics[f"ms-ssim_{i}"]) for i in self._lmbda_idxs
             ],
-            # NOTE: The dB of the mean of MS-SSIM samples
-            # is not the same as the mean of MS-SSIM dB samples.
+            # dB of the mean of MS-SSIM samples:
+            # "ms-ssim-db": [
+            #     r(db(1 - self.loader_metrics[f"ms-ssim_{i}"]))
+            #     for i in self._lmbda_idxs
+            # ],
+            # Mean of MS-SSIM dB samples:
             "ms-ssim-db": [
-                r(db(1 - self.loader_metrics[f"ms-ssim_{i}"])) for i in self._lmbda_idxs
+                r(self.loader_metrics[f"ms-ssim-db_{i}"]) for i in self._lmbda_idxs
             ],
         }
         return pd.DataFrame.from_dict(d)

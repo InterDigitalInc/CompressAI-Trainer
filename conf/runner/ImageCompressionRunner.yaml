@@ -24,3 +24,4 @@ meters:
     - bpp
     - psnr
     - ms-ssim
+    - ms-ssim-db

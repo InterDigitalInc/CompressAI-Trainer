@@ -159,9 +159,8 @@ class ImageCompressionRunner(BaseRunner):
         out_dec = out_infer["out_dec"]
 
         out_criterion = self.criterion(out_net, x)
-        out_metrics = compute_metrics(x, out_dec["x_hat"], ["psnr", "ms-ssim"])
+        out_metrics = compute_metrics(x, out_dec["x_hat"], RD_PLOT_METRICS)
         out_metrics["bpp"] = out_infer["bpp"]
-        out_metrics["ms-ssim-db"] = db(1 - out_metrics["ms-ssim"])
 
         loss = {
             "net": out_criterion["loss"],
@@ -204,9 +203,10 @@ class ImageCompressionRunner(BaseRunner):
             "bpp": r(self.loader_metrics["bpp"]),
             "psnr": r(self.loader_metrics["psnr"]),
             "ms-ssim": r(self.loader_metrics["ms-ssim"]),
-            # NOTE: The dB of the mean of MS-SSIM samples
-            # is not the same as the mean of MS-SSIM dB samples.
-            "ms-ssim-db": r(db(1 - self.loader_metrics["ms-ssim"])),
+            # dB of the mean of MS-SSIM samples:
+            # "ms-ssim-db": r(db(1 - self.loader_metrics["ms-ssim"])),
+            # Mean of MS-SSIM dB samples:
+            "ms-ssim-db": r(self.loader_metrics["ms-ssim-db"]),
         }
         return pd.DataFrame.from_records([d])
 
