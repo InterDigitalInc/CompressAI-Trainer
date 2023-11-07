@@ -265,7 +265,14 @@ def _results_dict(conf, outputs, metrics):
         "description": "",
         "meta": {
             "dataset": conf.dataset.infer.meta.name,
-            "device": conf.misc.device,
+            "env.aim.run_hash": conf.env.aim.run_hash,
+            "misc.device": conf.misc.device,
+            "model.source": conf.model.get("source"),
+            "model.name": conf.model.get("name"),
+            "model.metric": conf.model.get("metric"),
+            "model.quality": conf.model.get("quality"),
+            "criterion.lmbda": conf.criterion.get("lmbda"),
+            "paths.model_checkpoint": conf.paths.get("model_checkpoint"),
         },
         "results_averaged": {
             **{k: np.mean([out[k] for out in outputs]) for k in result_avg_keys},
@@ -290,14 +297,28 @@ def _write_results(conf, results):
 
 
 def _write_results_final(results_list):
+    meta_common = {
+        key: _get_common_value(results_list, ("meta", key))
+        for key in results_list[0]["meta"]
+        if _is_common_value(results_list, ("meta", key))
+    }
+
+    meta_noncommon = {
+        key: [_get_value(results, ("meta", key)) for results in results_list]
+        for key in results_list[0]["meta"]
+        if not _is_common_value(results_list, ("meta", key))
+    }
+
+    results_averaged = ld_to_dl(
+        [results["results_averaged"] for results in results_list]
+    )
+
     results = {
         "name": _get_common_value(results_list, ("name",)),
         "description": _get_common_value(results_list, ("description",)),
-        "meta": {
-            key: _get_common_value(results_list, ("meta", key))
-            for key in results_list[0]["meta"]
-        },
-        "results": ld_to_dl([results["results_averaged"] for results in results_list]),
+        "meta": meta_common,
+        "meta_": meta_noncommon,
+        "results": results_averaged,
     }
 
     with open(f"{DEFAULT_PATHS_OUTPUT_DIR_ROOT}/results.json", "w") as f:
@@ -307,6 +328,11 @@ def _write_results_final(results_list):
 def _write_tsv(rows, file):
     for row in rows:
         print("\t".join(f"{x}" for x in row), file=file)
+
+
+def _is_common_value(ds, path):
+    value = _get_value(ds[0], path)
+    return all(_get_value(d, path) == value for d in ds)
 
 
 def _get_common_value(ds, path):
