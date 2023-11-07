@@ -113,6 +113,7 @@ from pathlib import Path
 import catalyst
 import catalyst.utils
 import numpy as np
+import pandas as pd
 from omegaconf import DictConfig, OmegaConf, open_dict
 from PIL import Image
 
@@ -224,11 +225,22 @@ def _plot_rd(runner, results):
         context_str = ";".join(f"{slugify(k)}={slugify(v)}" for k, v in context.items())
         fig.write_html(f"{output_dir}/{tag};{context_str}.html")
 
-    runner.epoch_step = None
-    runner.loader_metrics = results["results_averaged"]
-    runner._loader_metrics = results["results_by_sample"]
     runner.log_figure = types.MethodType(log_figure, runner)
     runner._log_rd_curves()
+
+
+def _plot_rd_all(runner, dfs):
+    def log_figure(self, tag, fig, runner=runner, context=None, **kwargs):
+        def slugify(s):
+            return f"{s}".replace("/", "-")
+
+        output_dir = DEFAULT_PATHS_OUTPUT_DIR_ROOT
+        context_str = ";".join(f"{slugify(k)}={slugify(v)}" for k, v in context.items())
+        fig.write_html(f"{output_dir}/{tag};{context_str}.html")
+
+    # WARNING: This uses the latest runner's hparams, so the context_str may be unusual.
+    runner.log_figure = types.MethodType(log_figure, runner)
+    runner._log_rd_curves(df=pd.concat(dfs), traces=[])
 
 
 def _results_dict(conf, outputs):
@@ -364,6 +376,7 @@ def _get_output_dir(conf):
 
 def main():
     results_list = []
+    dfs = []
 
     for conf in iter_configs(start=thisdir):
         _prepare_conf(conf)
@@ -378,9 +391,16 @@ def main():
         results = _results_dict(conf, outputs)
         results_list.append(results)
         _write_results(conf, results)
+
+        runner.epoch_step = None
+        runner.loader_metrics = results["results_averaged"]
+        runner._loader_metrics = results["results_by_sample"]
+        dfs.append(runner._current_dataframe)
+
         _plot_rd(runner, results)
 
     _write_results_final(results_list)
+    _plot_rd_all(runner, dfs)
 
 
 if __name__ == "__main__":
