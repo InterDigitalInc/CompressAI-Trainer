@@ -107,13 +107,12 @@ from __future__ import annotations
 
 import json
 import os
+import types
 from pathlib import Path
-from types import SimpleNamespace
 
 import catalyst
 import catalyst.utils
 import numpy as np
-import plotly.graph_objects as go
 from omegaconf import DictConfig, OmegaConf, open_dict
 from PIL import Image
 
@@ -123,13 +122,6 @@ from compressai_trainer.config import (
     create_dataloaders,
     create_runner,
     load_model,
-)
-from compressai_trainer.runners.image_compression import (
-    RD_PLOT_DESCRIPTIONS,
-    RD_PLOT_METRICS,
-    RD_PLOT_SETTINGS_COMMON,
-    RD_PLOT_TITLE,
-    RdFigureLogger,
 )
 from compressai_trainer.typing import TRunner
 from compressai_trainer.utils.args import iter_configs
@@ -223,47 +215,20 @@ def _write_image(x, filename):
     Image.fromarray(tensor_to_np_img(x[0])).save(filename.with_suffix(".png"))
 
 
-def _current_rd_traces(conf, results, metric):
-    lmbda = conf.criterion.lmbda
-    num_points = len(results["results_by_file"]["bpp"])
-    samples_scatter = go.Scatter(
-        x=results["results_by_file"]["bpp"],
-        y=results["results_by_file"][metric],
-        mode="markers",
-        name=f"{conf.model.name} {lmbda:.4f}",
-        text=[f"lmbda={lmbda:.4f}\nsample_idx={i}" for i in range(num_points)],
-        visible="legendonly",
-    )
-    return [samples_scatter]
+def _plot_rd(runner, results):
+    def log_figure(self, tag, fig, runner=runner, context=None, **kwargs):
+        def slugify(s):
+            return f"{s}".replace("/", "-")
 
+        output_dir = runner.hparams["paths"]["output_dir"]
+        context_str = ";".join(f"{slugify(k)}={slugify(v)}" for k, v in context.items())
+        fig.write_html(f"{output_dir}/{tag};{context_str}.html")
 
-def _plot_rd(runner, conf, results, metrics):
-    runner_ = SimpleNamespace(
-        hparams=conf,
-        epoch_step=None,
-        loader_metrics=results["results_averaged"],
-    )
-
-    for metric, description in zip(RD_PLOT_METRICS, RD_PLOT_DESCRIPTIONS):
-        if metric not in metrics:
-            continue
-
-        fig = RdFigureLogger(runner=None).log(
-            df=runner.__class__._current_dataframe.fget(runner_),
-            traces=_current_rd_traces(conf, results, metric),
-            metric=metric,
-            dataset=conf.dataset.infer.meta.identifier,
-            **RD_PLOT_SETTINGS_COMMON,
-            layout_kwargs=dict(
-                title=RD_PLOT_TITLE.format(
-                    dataset=conf.dataset.infer.meta.name,
-                    metric=description,
-                )
-            ),
-            log_figure=False,
-        )
-
-        fig.write_html(f"{conf.paths.output_dir}/rd-curves-{metric}.html")
+    runner.epoch_step = None
+    runner.loader_metrics = results["results_averaged"]
+    runner._loader_metrics = results["results_by_file"]
+    runner.log_figure = types.MethodType(log_figure, runner)
+    runner._log_rd_curves()
 
 
 def _results_dict(conf, outputs):
@@ -413,7 +378,7 @@ def main():
         results = _results_dict(conf, outputs)
         results_list.append(results)
         _write_results(conf, results)
-        _plot_rd(runner, conf, results, metrics)
+        _plot_rd(runner, results)
 
     _write_results_final(results_list)
 
