@@ -210,24 +210,30 @@ class ImageCompressionRunner(BaseRunner):
         }
         return pd.DataFrame.from_dict([d])
 
-    def _log_rd_curves(self):
+    def _log_rd_curves(self, **kwargs):
+        return [
+            self._log_rd_curves_figure(metric, description, **kwargs)
+            for metric, description in zip(RD_PLOT_METRICS, RD_PLOT_DESCRIPTIONS)
+        ]
+
+    def _log_rd_curves_figure(self, metric, description, **kwargs):
         meta = self.hparams["dataset"]["infer"]["meta"]
-        for metric, description in zip(RD_PLOT_METRICS, RD_PLOT_DESCRIPTIONS):
-            self._rd_figure_logger.log(
-                df=self._current_dataframe,
-                traces=self._rd_figure_logger.current_rd_traces(
-                    x="bpp", y=metric, lmbda=self.hparams["criterion"]["lmbda"]
+        return self._rd_figure_logger.log(
+            df=self._current_dataframe,
+            traces=self._rd_figure_logger.current_rd_traces(
+                x="bpp", y=metric, lmbda=self.hparams["criterion"]["lmbda"]
+            ),
+            metric=metric,
+            dataset=meta["identifier"],
+            **RD_PLOT_SETTINGS_COMMON,
+            layout_kwargs=dict(
+                title=RD_PLOT_TITLE.format(
+                    dataset=meta["name"],
+                    metric=description,
                 ),
-                metric=metric,
-                dataset=meta["identifier"],
-                **RD_PLOT_SETTINGS_COMMON,
-                layout_kwargs=dict(
-                    title=RD_PLOT_TITLE.format(
-                        dataset=meta["name"],
-                        metric=description,
-                    ),
-                ),
-            )
+            ),
+            **kwargs,
+        )
 
     def _handle_custom_metrics(self, out_net, out_metrics):
         self._loader_metrics["chan_bpp"].update(out_net)
