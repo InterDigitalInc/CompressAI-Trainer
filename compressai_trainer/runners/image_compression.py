@@ -210,6 +210,11 @@ class ImageCompressionRunner(BaseRunner):
         }
         return pd.DataFrame.from_dict([d])
 
+    def _current_traces(self, metric):
+        return self._rd_figure_logger.current_rd_traces(
+            x="bpp", y=metric, lmbda=self.hparams["criterion"]["lmbda"]
+        )
+
     def _log_rd_curves(self, **kwargs):
         return [
             self._log_rd_curves_figure(metric, description, **kwargs)
@@ -220,9 +225,7 @@ class ImageCompressionRunner(BaseRunner):
         meta = self.hparams["dataset"]["infer"]["meta"]
         return self._rd_figure_logger.log(
             df=self._current_dataframe,
-            traces=self._rd_figure_logger.current_rd_traces(
-                x="bpp", y=metric, lmbda=self.hparams["criterion"]["lmbda"]
-            ),
+            traces=self._current_traces(metric),
             metric=metric,
             dataset=meta["identifier"],
             **RD_PLOT_SETTINGS_COMMON,
