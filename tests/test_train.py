@@ -41,6 +41,7 @@ def test_train_imagecompressionrunner_check():
     argv = [
         "++model.name=fast-test-model",
         "++hp.M=4",
+        "++criterion.lmbda=0.01",
         "++misc.device=cpu",
         "++engine.check=True",
     ]
