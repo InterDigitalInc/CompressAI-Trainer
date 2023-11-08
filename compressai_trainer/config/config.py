@@ -92,6 +92,12 @@ def create_model(conf: DictConfig) -> TModel:
     if conf.paths.model_checkpoint:
         from compressai_trainer.config.load import state_dict_from_checkpoint
 
+        if conf.paths.checkpoint is not None:
+            raise ValueError(
+                "No more than one of `paths.checkpoint` "
+                "and `paths.model_checkpoint` should be set."
+            )
+
         checkpoint = load_checkpoint(conf.paths.model_checkpoint)
         state_dict = state_dict_from_checkpoint(checkpoint)
         missing_keys, unexpected_keys = model.load_state_dict(state_dict, strict=False)
