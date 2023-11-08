@@ -33,7 +33,6 @@ import numpy as np
 import torch
 import torch.nn as nn
 import yaml
-from compressai.entropy_models import EntropyBottleneck
 from compressai.latent_codecs import EntropyBottleneckLatentCodec
 from compressai.models.base import SimpleVAECompressionModel
 from compressai.registry import register_dataset, register_model

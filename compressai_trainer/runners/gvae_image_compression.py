@@ -42,7 +42,7 @@ from compressai.models.base import CompressionModel
 from compressai.typing import TCriterion
 
 from compressai_trainer.registry import register_runner
-from compressai_trainer.utils.metrics import compute_metrics, db
+from compressai_trainer.utils.metrics import compute_metrics
 from compressai_trainer.utils.utils import compute_padding, flatten_values, ld_to_dl
 
 from .base import BaseRunner

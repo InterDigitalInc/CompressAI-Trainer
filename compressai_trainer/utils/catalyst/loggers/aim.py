@@ -30,9 +30,6 @@
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 import aim
-import numpy as np
-from aim.storage.object import CustomObject
-from aim.storage.types import BLOB
 from catalyst.core.logger import ILogger
 from catalyst.settings import SETTINGS
 
