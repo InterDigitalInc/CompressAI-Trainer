@@ -58,6 +58,20 @@ To evaluate models from the CompressAI zoo:
         --config-name="eval_zoo" ++model.name="bmshj2018-factorized" ++model.quality=7 ++criterion.lmbda=0.0932 \
         --config-name="eval_zoo" ++model.name="bmshj2018-factorized" ++model.quality=8 ++criterion.lmbda=0.1800
 
+The above can be written more compactly by prepending a "default" override
+``++model.name="bmshj2018-factorized"`` that applies to all configs:
+
+    compressai-eval \
+        ++model.name="bmshj2018-factorized" \
+        --config-name="eval_zoo" ++model.quality=1 ++criterion.lmbda=0.0018 \
+        --config-name="eval_zoo" ++model.quality=2 ++criterion.lmbda=0.0035 \
+        --config-name="eval_zoo" ++model.quality=3 ++criterion.lmbda=0.0067 \
+        --config-name="eval_zoo" ++model.quality=4 ++criterion.lmbda=0.0130 \
+        --config-name="eval_zoo" ++model.quality=5 ++criterion.lmbda=0.0250 \
+        --config-name="eval_zoo" ++model.quality=6 ++criterion.lmbda=0.0483 \
+        --config-name="eval_zoo" ++model.quality=7 ++criterion.lmbda=0.0932 \
+        --config-name="eval_zoo" ++model.quality=8 ++criterion.lmbda=0.1800
+
 By default, the following options are used, if not specified:
 
 .. code-block:: bash

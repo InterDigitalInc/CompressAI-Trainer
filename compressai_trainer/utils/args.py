@@ -45,15 +45,42 @@ __all__ = [
 
 
 def split_argv_groups(argv, special_options):
+    """Split argv into groups of arguments separated by special options.
+
+    The first group contains all arguments before the first special option.
+
+    Example:
+
+    .. code-block:: python
+
+        >>> special_options = ["--config-path", "--config-name"]
+        >>> argv = [
+        ...     "default1", "default2",
+        ...     "--config-path=A", "a1",
+        ...     "--config-path=B", "b1", "b2",
+        ...     "--config-path=C", "--config-name=C2", "c1", "c2",
+        ...     "--config-name=D", "d1", "d2",
+        ... ]
+        >>> split_argv_groups(argv, special_options)
+        [
+            ["default1", "default2"],
+            ["--config-path=A", "a1"],
+            ["--config-path=B", "b1", "b2"],
+            ["--config-path=C", "--config-name=C2", "c1", "c2"],
+            ["--config-name=D", "d1", "d2"],
+        ]
+
+    """
     argv_groups = [[]]
-    visited_options = set()
+    visited_options = set(special_options)
     for arg in argv:
         for option in special_options:
-            if arg.startswith(option):
-                if option in visited_options:
-                    visited_options = set()
-                    argv_groups.append([])
-                visited_options.add(option)
+            if option != arg.split("=", 1)[0]:
+                continue
+            if option in visited_options:
+                visited_options = set()
+                argv_groups.append([])
+            visited_options.add(option)
         argv_groups[-1].append(arg)
     return argv_groups
 
@@ -100,8 +127,11 @@ def parse_args(argv=None):
     if argv is None:
         argv = sys.argv[1:]
 
-    argv_groups = split_argv_groups(argv, SPECIAL_OPTIONS)
-    args_groups = [parse_argv_group(argv_group) for argv_group in argv_groups]
+    default_overrides, *argv_groups = split_argv_groups(argv, SPECIAL_OPTIONS)
+    args_groups = [
+        parse_argv_group([*default_overrides, *argv_group])
+        for argv_group in argv_groups
+    ]
 
     # Merge all args into a single namespace containing lists.
     args = argparse.Namespace()
