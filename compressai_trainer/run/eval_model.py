@@ -395,6 +395,7 @@ def main():
 
     argv = [
         # Prepend default overrides.
+        "++misc.cudnn.deterministic=True",
         "++paths.checkpoint=null",
         "++paths.model_checkpoint=null",
         *sys.argv[1:],
