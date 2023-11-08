@@ -121,6 +121,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 import types
 from pathlib import Path
 
@@ -392,7 +393,14 @@ def main():
     results_list = []
     dfs = []
 
-    for conf in iter_configs(start=thisdir):
+    argv = [
+        # Prepend default overrides.
+        "++paths.checkpoint=null",
+        "++paths.model_checkpoint=null",
+        *sys.argv[1:],
+    ]
+
+    for conf in iter_configs(argv=argv, start=thisdir):
         _prepare_conf(conf)
         runner = setup(conf)
 
