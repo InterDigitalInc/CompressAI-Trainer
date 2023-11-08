@@ -84,7 +84,7 @@ def create_dataloaders(conf: DictConfig) -> dict[str, TDataLoader]:
 
 
 def create_model(conf: DictConfig) -> TModel:
-    import compressai.models as _
+    import compressai.models as _  # noqa: F401
 
     model = MODELS[conf.model.name](**conf.hp)
     model = model.to(conf.misc.device)
