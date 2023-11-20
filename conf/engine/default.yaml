@@ -20,7 +20,7 @@ callbacks:
     resume_runner:  "${paths.checkpoint}"
     topk: 1     # number of top-k checkpoints to keep
   - type: "EarlyStoppingCallback"
-    patience: 15
+    patience: 21
     loader_key: "valid"
     metric_key: "loss"
     minimize: True
