@@ -30,11 +30,12 @@
 from __future__ import annotations
 
 from math import ceil, sqrt
-from typing import Optional, Tuple
+from typing import TYPE_CHECKING, Optional, Tuple
 
-import matplotlib
-import matplotlib.pyplot as plt
 import numpy as np
+
+if TYPE_CHECKING:
+    import matplotlib.pyplot as plt
 
 DEFAULT_COLORMAP = "plasma"
 
@@ -71,6 +72,8 @@ def featuremap_matplotlib(
         tile_method: "reshape" (default, fast) or "loop" (slow)
         fig_kw: keyword arguments to pass to matplotlib
     """
+    import matplotlib.pyplot as plt
+
     if tile_method == "loop":
         assert padding is None
         assert fill_value is None
@@ -181,6 +184,8 @@ def featuremap_image(
     arr = _tile_featuremap_3d(arr, nrows, ncols, padding, fill_value)
 
     if cmap is not None:
+        import matplotlib
+
         arr = ((arr - clim[0]) / (clim[1] - clim[0])).clip(0, 1)
         arr = (matplotlib.colormaps[cmap](arr)[..., :3] * 255).astype(np.uint8)
 
