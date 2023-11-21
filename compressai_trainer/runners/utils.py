@@ -68,7 +68,7 @@ class ChannelwiseBppMeter:
         self.unit = unit
         self.ref_key = ref_key
         self.ref_dims = ref_dims
-        self._chan_bpp = defaultdict(list)
+        self._chan_rate = defaultdict(list)
 
     def update(self, out_net):
         ref_shape = out_net[self.ref_key].shape
@@ -77,18 +77,18 @@ class ChannelwiseBppMeter:
             if self.ref_dims is None
             else [ref_shape[d] for d in self.ref_dims]
         )
-        chan_bpp = {
+        chan_rate = {
             k: lh.detach().log2().sum(dim=tuple(range(2, len(lh.shape)))) / -div
             for k, lh in out_net["likelihoods"].items()
         }
-        for name, ch_bpp in chan_bpp.items():
-            self._chan_bpp[name].extend(ch_bpp)
+        for name, ch_rate in chan_rate.items():
+            self._chan_rate[name].extend(ch_rate)
 
     def log(self, context=None):
-        for name, ch_bpp_samples in self._chan_bpp.items():
-            ch_bpp = torch.stack(ch_bpp_samples).mean(dim=0).to(torch.float16).cpu()
-            c, *_ = ch_bpp.shape
-            ch_bpp_sorted, _ = torch.sort(ch_bpp, descending=True)
+        for name, ch_rate_samples in self._chan_rate.items():
+            ch_rate = torch.stack(ch_rate_samples).mean(dim=0).to(torch.float16).cpu()
+            c, *_ = ch_rate.shape
+            ch_rate_sorted, _ = torch.sort(ch_rate, descending=True)
             kw = dict(
                 unused=None,
                 scope="epoch",
@@ -96,10 +96,10 @@ class ChannelwiseBppMeter:
                 bin_range=(0, c),
             )
             self.runner.log_distribution(
-                f"chan_{self.unit}_sorted", hist=ch_bpp_sorted, **kw
+                f"chan_{self.unit}_sorted", hist=ch_rate_sorted, **kw
             )
             self.runner.log_distribution(
-                f"chan_{self.unit}_unsorted", hist=ch_bpp, **kw
+                f"chan_{self.unit}_unsorted", hist=ch_rate, **kw
             )
 
 
