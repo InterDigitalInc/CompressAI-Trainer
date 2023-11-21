@@ -100,7 +100,7 @@ def _get_entropy_bottleneck_distributions_dataframe(
 
     def trim(y):
         y = y.cpu().numpy()
-        xss = [y[i, :l] for i, l in enumerate(sizes.cpu().tolist())]
+        xss = [y[i, :length] for i, length in enumerate(sizes.cpu().tolist())]
         return [x for xs in xss for x in xs]
 
     d = {

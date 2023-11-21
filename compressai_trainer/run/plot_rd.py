@@ -155,8 +155,11 @@ def plot_dataframe(df: pd.DataFrame, args):
         fig.show()
 
 
+def wrap(s):
+    return "\n".join("\n".join(textwrap.wrap(x)) for x in s.splitlines())
+
+
 def build_args(argv):
-    wrap = lambda s: "\n".join("\n".join(textwrap.wrap(x)) for x in s.splitlines())
     help = {
         "description": wrap(
             "Plot.\n"
