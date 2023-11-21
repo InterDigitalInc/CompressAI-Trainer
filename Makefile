@@ -1,5 +1,7 @@
 .DEFAULT_GOAL := help
 
+src_dirs := compressai_trainer tests
+
 
 .PHONY: help
 help: ## Show this message
@@ -17,6 +19,29 @@ install: ## Install via poetry
 	@echo "poetry run pip install --editable /path/to/compressai"
 	@echo "Then, to activate the virtual environment, please run:"
 	@echo "poetry shell"
+
+
+.PHONY: static-analysis
+static-analysis: check-black check-isort check-ruff ## Run all static checks
+
+
+.PHONY: check-black
+check-black: ## Run black
+	@echo "--> Running black"
+	black --check --diff $(src_dirs)
+
+
+.PHONY: check-isort
+check-isort: ## Run isort
+	@echo "--> Running isort"
+	isort --check-only $(src_dirs)
+
+
+.PHONY: check-ruff
+check-ruff: ## Run ruff
+	@echo "--> Running ruff"
+	ruff check $(src_dirs)
+	ruff format --check --diff $(src_dirs)
 
 
 .PHONY: tests
