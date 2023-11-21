@@ -61,6 +61,8 @@ To evaluate models from the CompressAI zoo:
 The above can be written more compactly by prepending a "default" override
 ``++model.name="bmshj2018-factorized"`` that applies to all configs:
 
+.. code-block:: bash
+
     compressai-eval \
         ++model.name="bmshj2018-factorized" \
         --config-name="eval_zoo" ++model.quality=1 ++criterion.lmbda=0.0018 \
