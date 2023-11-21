@@ -13,8 +13,10 @@ jobs:
           - os: "ubuntu-latest"
     steps:
       - uses: actions/checkout@v3
+
       - name: Install poetry
         run: pipx install poetry
+
       - name: Setup Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
@@ -31,6 +33,10 @@ jobs:
           git clone "https://github.com/InterDigitalInc/CompressAI.git" compressai
           cd -
           poetry run pip install -e ../compressai
+
+      # NOTE: This could be in a separate job, but doing it here requires less computation.
+      - name: Run static analysis
+        run: poetry run make static-analysis
 
       - name: Run unit tests
         run: poetry run make tests
