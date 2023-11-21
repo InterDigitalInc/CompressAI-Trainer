@@ -29,6 +29,7 @@
 
 from __future__ import annotations
 
+import math
 from collections import defaultdict
 from typing import Any, Optional, cast
 
@@ -62,15 +63,23 @@ class GradientClipper:
 class ChannelwiseBppMeter:
     """Log channel-wise rates (bpp)."""
 
-    def __init__(self, runner):
+    def __init__(self, runner, unit="bpp", ref_key="x_hat", ref_dims=None):
         self.runner = runner
+        self.unit = unit
+        self.ref_key = ref_key
+        self.ref_dims = ref_dims
         self._chan_bpp = defaultdict(list)
 
     def update(self, out_net):
-        _, _, h, w = out_net["x_hat"].shape
+        ref_shape = out_net[self.ref_key].shape
+        div = math.prod(
+            ref_shape[2:]
+            if self.ref_dims is None
+            else [ref_shape[d] for d in self.ref_dims]
+        )
         chan_bpp = {
-            k: l.detach().log2().sum(axis=(-2, -1)) / -(h * w)
-            for k, l in out_net["likelihoods"].items()
+            k: lh.detach().log2().sum(dim=tuple(range(2, len(lh.shape)))) / -div
+            for k, lh in out_net["likelihoods"].items()
         }
         for name, ch_bpp in chan_bpp.items():
             self._chan_bpp[name].extend(ch_bpp)
@@ -86,8 +95,12 @@ class ChannelwiseBppMeter:
                 context={"name": name, **(context or {})},
                 bin_range=(0, c),
             )
-            self.runner.log_distribution("chan_bpp_sorted", hist=ch_bpp_sorted, **kw)
-            self.runner.log_distribution("chan_bpp_unsorted", hist=ch_bpp, **kw)
+            self.runner.log_distribution(
+                f"chan_{self.unit}_sorted", hist=ch_bpp_sorted, **kw
+            )
+            self.runner.log_distribution(
+                f"chan_{self.unit}_unsorted", hist=ch_bpp, **kw
+            )
 
 
 class DebugOutputsLogger:
