@@ -27,15 +27,42 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-from .distribution import plot_entropy_bottleneck_distributions
-from .featuremap import featuremap_image, featuremap_matplotlib
-from .pdf_signatures import plot_pdf_signatures
-from .rd import plot_rd
+from __future__ import annotations
 
-__all__ = [
-    "featuremap_image",
-    "featuremap_matplotlib",
-    "plot_entropy_bottleneck_distributions",
-    "plot_pdf_signatures",
-    "plot_rd",
-]
+import base64
+from io import BytesIO
+from typing import TYPE_CHECKING
+
+import numpy as np
+from PIL import Image
+
+if TYPE_CHECKING:
+    import matplotlib.pyplot as plt
+
+
+def plt_hide_axes(ax: plt.Axes):
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.xaxis.set_ticklabels([])
+    ax.yaxis.set_ticklabels([])
+    ax.tick_params(axis="y", direction="in", pad=0)
+    ax.tick_params(axis="x", direction="in", pad=0)
+    ax.axis("off")
+
+
+def np_image_to_base64(img: np.ndarray, format: str = "webp") -> str:
+    prefix = f"data:image/{format};base64,"
+    pil_img = Image.fromarray(img)
+    with BytesIO() as stream:
+        pil_img.save(stream, format=format)
+        return prefix + base64.b64encode(stream.getvalue()).decode("utf-8")
+
+
+def latex_matplotlib_rcparams():
+    return {
+        "text.usetex": True,
+        "text.latex.preamble": r"\usepackage{bm}",
+        # Enforce default LaTeX font.
+        "font.family": "serif",
+        "font.serif": ["Computer Modern"],
+    }

@@ -237,6 +237,47 @@ class RdFigureLogger:
         return [samples_scatter]
 
 
+class PdfSignaturesFigureLogger:
+    """Log PDF signatures figure."""
+
+    def __init__(self, runner):
+        self.runner = runner
+
+    def log(
+        self,
+        dataset: str = "image/kodak",
+        loader: str = "infer",
+        log_figure: bool = True,
+        context: Optional[dict[str, Any]] = None,
+        log_kwargs: Optional[dict[str, Any]] = None,
+        batch_slice: slice = slice(None),
+        **kwargs,
+    ):
+        def collect(key):
+            return [
+                value.detach().cpu().numpy()
+                for value in self.runner._loader_metrics[key][batch_slice]
+            ]
+
+        x = collect("x")
+        p = collect("p")
+        p_hat = collect("p_hat")
+
+        fig = plot.plot_pdf_signatures(x, p, p_hat, backend="plotly", **kwargs)
+        fig.update_layout(autosize=False, width=700, height=150 * len(x))
+
+        if log_figure:
+            log_kwargs = log_kwargs or {}
+            context = {
+                "dataset": dataset,
+                "loader": loader,
+                **(context or {}),
+            }
+            self.runner.log_figure("pdf-signatures", fig, context=context, **log_kwargs)
+
+        return fig
+
+
 def _reorder_dataframe_columns(df: pd.DataFrame, head: list[str]) -> pd.DataFrame:
     head_set = set(head)
     columns = head + [x for x in df.columns if x not in head_set]
