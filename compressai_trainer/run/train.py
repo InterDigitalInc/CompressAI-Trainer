@@ -58,6 +58,7 @@ from compressai_trainer.typing import TRunner
 
 thisdir = Path(__file__).parent
 config_path = str(thisdir.joinpath("../../conf").resolve())
+config_name = "config"
 
 
 def setup(conf: DictConfig) -> tuple[TRunner, dict[str, Any]]:
@@ -93,7 +94,7 @@ def _main(conf: DictConfig):
     runner.train(**engine_kwargs)
 
 
-@hydra.main(version_base=None, config_path=config_path)
+@hydra.main(version_base=None, config_path=config_path, config_name=config_name)
 def main(conf: DictConfig):
     _main(conf)
 

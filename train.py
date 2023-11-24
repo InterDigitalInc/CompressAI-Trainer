@@ -32,10 +32,10 @@ import warnings
 import hydra
 from omegaconf import DictConfig
 
-from compressai_trainer.run.train import _main
+from compressai_trainer.run.train import _main, config_name, config_path
 
 
-@hydra.main(version_base=None, config_path="conf")
+@hydra.main(version_base=None, config_path=config_path, config_name=config_name)
 def main(conf: DictConfig):
     _main(conf)
 
