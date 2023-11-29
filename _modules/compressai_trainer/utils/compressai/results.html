@@ -284,61 +284,36 @@ document.write(`
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
 <span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">compressai</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
-<span class="n">GENERIC_CODECS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;av1&quot;</span><span class="p">,</span> <span class="s2">&quot;hm&quot;</span><span class="p">,</span> <span class="s2">&quot;jpeg&quot;</span><span class="p">,</span> <span class="s2">&quot;jpeg2000&quot;</span><span class="p">,</span> <span class="s2">&quot;vtm&quot;</span><span class="p">,</span> <span class="s2">&quot;webp&quot;</span><span class="p">]</span>
+<span class="n">DEFAULT_RESULTS_ROOT</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">compressai</span><span class="o">.</span><span class="n">__path__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">/../results&quot;</span>
 
 
-<div class="viewcode-block" id="compressai_dataframe"><a class="viewcode-back" href="../../../../compressai_trainer/utils.html#compressai_trainer.utils.compressai.results.compressai_dataframe">[docs]</a><span class="k">def</span> <span class="nf">compressai_dataframe</span><span class="p">(</span>
-    <span class="n">codec_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;image/kodak&quot;</span><span class="p">,</span>
-    <span class="n">opt_metric</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mse&quot;</span><span class="p">,</span>
-    <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span><span class="p">,</span>
-    <span class="n">generic_codecs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">GENERIC_CODECS</span><span class="p">,</span>
+<div class="viewcode-block" id="compressai_results_dataframe"><a class="viewcode-back" href="../../../../compressai_trainer/utils.html#compressai_trainer.utils.compressai.results.compressai_results_dataframe">[docs]</a><span class="k">def</span> <span class="nf">compressai_results_dataframe</span><span class="p">(</span>
+    <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">base_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a dataframe containing the results of a given codec.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">codec_name</span> <span class="ow">in</span> <span class="n">generic_codecs</span><span class="p">:</span>
-        <span class="n">d</span> <span class="o">=</span> <span class="n">generic_codec_result</span><span class="p">(</span><span class="n">codec_name</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">d</span> <span class="o">=</span> <span class="n">deep_codec_result</span><span class="p">(</span>
-            <span class="n">codec_name</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">,</span> <span class="n">opt_metric</span><span class="o">=</span><span class="n">opt_metric</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span>
-        <span class="p">)</span>
-
-    <span class="n">d</span><span class="p">[</span><span class="s2">&quot;results&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_process_results</span><span class="p">(</span><span class="n">_rename_results</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;results&quot;</span><span class="p">]))</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;results&quot;</span><span class="p">])</span>
-    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
-    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;model.name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
-    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">]</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a dataframe containing the results from the given path.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">base_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">base_path</span> <span class="o">=</span> <span class="n">DEFAULT_RESULTS_ROOT</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">_compressai_results_json_to_dataframe</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">df</span></div>
 
 
-<div class="viewcode-block" id="deep_codec_result"><a class="viewcode-back" href="../../../../compressai_trainer/utils.html#compressai_trainer.utils.compressai.results.deep_codec_result">[docs]</a><span class="k">def</span> <span class="nf">deep_codec_result</span><span class="p">(</span>
-    <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;image/kodak&quot;</span><span class="p">,</span>
-    <span class="n">opt_metric</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;mse&quot;</span><span class="p">,</span>
-    <span class="n">device</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cuda&quot;</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-    <span class="n">path</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">compressai</span><span class="o">.</span><span class="n">__path__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">/../results/</span><span class="si">{</span><span class="n">dataset</span><span class="si">}</span><span class="s2">/&quot;</span>
-        <span class="sa">f</span><span class="s2">&quot;compressai-</span><span class="si">{</span><span class="n">model_name</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">opt_metric</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">device</span><span class="si">}</span><span class="s2">.json&quot;</span>
-    <span class="p">)</span>
-
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="generic_codec_result"><a class="viewcode-back" href="../../../../compressai_trainer/utils.html#compressai_trainer.utils.compressai.results.generic_codec_result">[docs]</a><span class="k">def</span> <span class="nf">generic_codec_result</span><span class="p">(</span>
-    <span class="n">codec_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-    <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;image/kodak&quot;</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-    <span class="n">path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">compressai</span><span class="o">.</span><span class="n">__path__</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">/../results/</span><span class="si">{</span><span class="n">dataset</span><span class="si">}</span><span class="s2">/&quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">codec_name</span><span class="si">}</span><span class="s2">.json&quot;</span>
-
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span></div>
+<span class="k">def</span> <span class="nf">_compressai_results_json_to_dataframe</span><span class="p">(</span><span class="n">d</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+    <span class="n">d</span><span class="p">[</span><span class="s2">&quot;results&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_process_results</span><span class="p">(</span><span class="n">_rename_results</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;results&quot;</span><span class="p">]))</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;results&quot;</span><span class="p">])</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;model.name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;meta&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;model.name&quot;</span><span class="p">)</span>
+    <span class="n">df</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">d</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;description&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">df</span>
 
 
 <span class="k">def</span> <span class="nf">_rename_results</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
@@ -357,9 +332,12 @@ document.write(`
 
 
 <span class="k">def</span> <span class="nf">_process_results</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
-    <span class="c1"># NOTE: The dB of the mean of MS-SSIM samples</span>
-    <span class="c1"># is not the same as the mean of MS-SSIM dB samples.</span>
-    <span class="n">results</span><span class="p">[</span><span class="s2">&quot;ms-ssim-db&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;ms-ssim&quot;</span><span class="p">])))</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+    <span class="k">if</span> <span class="s2">&quot;ms-ssim&quot;</span> <span class="ow">in</span> <span class="n">results</span> <span class="ow">and</span> <span class="s2">&quot;ms-ssim-db&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+        <span class="c1"># NOTE: The dB of the mean of MS-SSIM samples</span>
+        <span class="c1"># is not the same as the mean of MS-SSIM dB samples.</span>
+        <span class="n">results</span><span class="p">[</span><span class="s2">&quot;ms-ssim-db&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="o">-</span><span class="mi">10</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;ms-ssim&quot;</span><span class="p">]))</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">results</span>
 </pre></div>
 

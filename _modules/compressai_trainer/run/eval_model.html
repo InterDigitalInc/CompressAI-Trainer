@@ -289,22 +289,63 @@ document.write(`
 <span class="sd">Computes metrics and saves per-file results and averaged results to</span>
 <span class="sd">JSON and TSV files.</span>
 
-<span class="sd">To evaluate a model trained using CompressAI Trainer:</span>
+<span class="sd">To evaluate models trained using CompressAI Trainer:</span>
 
 <span class="sd">.. code-block:: bash</span>
 
 <span class="sd">    compressai-eval \</span>
 <span class="sd">        --config-path=&quot;$HOME/data/runs/e4e6d4d5e5c59c69f3bd7be2/configs&quot; \</span>
-<span class="sd">        --config-name=&quot;config&quot; \</span>
-<span class="sd">        ++model.source=&quot;config&quot; \</span>
-<span class="sd">        ++paths.output_dir=&quot;outputs&quot; \</span>
-<span class="sd">        ++paths.model_checkpoint=&#39;${paths.checkpoints}/runner.last.pth&#39;</span>
+<span class="sd">        --config-path=&quot;$HOME/data/runs/d4d5e5c5e4e6bd7be29c69f3/configs&quot; \</span>
+<span class="sd">        ...</span>
 
-<span class="sd">To evaluate a model from the CompressAI zoo:</span>
+<span class="sd">To evaluate models from the CompressAI zoo:</span>
 
 <span class="sd">.. code-block:: bash</span>
 
-<span class="sd">    compressai-eval --config-name=&quot;example_eval_zoo&quot;</span>
+<span class="sd">    compressai-eval \</span>
+<span class="sd">        --config-name=&quot;eval_zoo&quot; ++model.name=&quot;bmshj2018-factorized&quot; ++model.quality=1 ++criterion.lmbda=0.0018 \</span>
+<span class="sd">        --config-name=&quot;eval_zoo&quot; ++model.name=&quot;bmshj2018-factorized&quot; ++model.quality=2 ++criterion.lmbda=0.0035 \</span>
+<span class="sd">        --config-name=&quot;eval_zoo&quot; ++model.name=&quot;bmshj2018-factorized&quot; ++model.quality=3 ++criterion.lmbda=0.0067 \</span>
+<span class="sd">        --config-name=&quot;eval_zoo&quot; ++model.name=&quot;bmshj2018-factorized&quot; ++model.quality=4 ++criterion.lmbda=0.0130 \</span>
+<span class="sd">        --config-name=&quot;eval_zoo&quot; ++model.name=&quot;bmshj2018-factorized&quot; ++model.quality=5 ++criterion.lmbda=0.0250 \</span>
+<span class="sd">        --config-name=&quot;eval_zoo&quot; ++model.name=&quot;bmshj2018-factorized&quot; ++model.quality=6 ++criterion.lmbda=0.0483 \</span>
+<span class="sd">        --config-name=&quot;eval_zoo&quot; ++model.name=&quot;bmshj2018-factorized&quot; ++model.quality=7 ++criterion.lmbda=0.0932 \</span>
+<span class="sd">        --config-name=&quot;eval_zoo&quot; ++model.name=&quot;bmshj2018-factorized&quot; ++model.quality=8 ++criterion.lmbda=0.1800</span>
+
+<span class="sd">The above can be written more compactly by prepending a &quot;default&quot; override</span>
+<span class="sd">``++model.name=&quot;bmshj2018-factorized&quot;`` that applies to all configs:</span>
+
+<span class="sd">.. code-block:: bash</span>
+
+<span class="sd">    compressai-eval \</span>
+<span class="sd">        ++model.name=&quot;bmshj2018-factorized&quot; \</span>
+<span class="sd">        --config-name=&quot;eval_zoo&quot; ++model.quality=1 ++criterion.lmbda=0.0018 \</span>
+<span class="sd">        --config-name=&quot;eval_zoo&quot; ++model.quality=2 ++criterion.lmbda=0.0035 \</span>
+<span class="sd">        --config-name=&quot;eval_zoo&quot; ++model.quality=3 ++criterion.lmbda=0.0067 \</span>
+<span class="sd">        --config-name=&quot;eval_zoo&quot; ++model.quality=4 ++criterion.lmbda=0.0130 \</span>
+<span class="sd">        --config-name=&quot;eval_zoo&quot; ++model.quality=5 ++criterion.lmbda=0.0250 \</span>
+<span class="sd">        --config-name=&quot;eval_zoo&quot; ++model.quality=6 ++criterion.lmbda=0.0483 \</span>
+<span class="sd">        --config-name=&quot;eval_zoo&quot; ++model.quality=7 ++criterion.lmbda=0.0932 \</span>
+<span class="sd">        --config-name=&quot;eval_zoo&quot; ++model.quality=8 ++criterion.lmbda=0.1800</span>
+
+<span class="sd">By default, the following options are used, if not specified:</span>
+
+<span class="sd">.. code-block:: bash</span>
+
+<span class="sd">    --config-path=&quot;conf&quot;</span>
+<span class="sd">    --config-name=&quot;config&quot;</span>
+
+<span class="sd">    ++model.source=&quot;config&quot;</span>
+
+<span class="sd">    # if model.source == &quot;config&quot;:</span>
+<span class="sd">    ++paths.output_dir=&quot;outputs/${model.source}-${env.aim.run_hash}-${model.name}&quot;</span>
+<span class="sd">    ++paths.model_checkpoint=&#39;${paths.checkpoints}/runner.last.pth&#39;</span>
+
+<span class="sd">    # if model.source == &quot;from_state_dict&quot;:</span>
+<span class="sd">    ++paths.output_dir=&quot;outputs/${model.name}-${Path(paths.model_checkpoint).stem}&quot;</span>
+
+<span class="sd">    # if model.source == &quot;zoo&quot;:</span>
+<span class="sd">    ++paths.output_dir=&quot;outputs/${model.source}-${model.name}-${model.metric}-${model.quality}&quot;</span>
 
 <span class="sd">The model is evaluated on ``dataset.infer``, which may be configured as follows:</span>
 
@@ -336,42 +377,35 @@ document.write(`
 
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">types</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
 <span class="kn">import</span> <span class="nn">catalyst</span>
 <span class="kn">import</span> <span class="nn">catalyst.utils</span>
-<span class="kn">import</span> <span class="nn">compressai.zoo.image</span>
-<span class="kn">import</span> <span class="nn">hydra</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">plotly.graph_objects</span> <span class="k">as</span> <span class="nn">go</span>
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">compressai.registry</span> <span class="kn">import</span> <span class="n">MODELS</span>
-<span class="kn">from</span> <span class="nn">compressai.zoo</span> <span class="kn">import</span> <span class="n">load_state_dict</span>
-<span class="kn">from</span> <span class="nn">omegaconf</span> <span class="kn">import</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">OmegaConf</span>
+<span class="kn">from</span> <span class="nn">omegaconf</span> <span class="kn">import</span> <span class="n">DictConfig</span><span class="p">,</span> <span class="n">OmegaConf</span><span class="p">,</span> <span class="n">open_dict</span>
 <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
 
 <span class="kn">from</span> <span class="nn">compressai_trainer.config</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">configure_conf</span><span class="p">,</span>
     <span class="n">create_criterion</span><span class="p">,</span>
     <span class="n">create_dataloaders</span><span class="p">,</span>
-    <span class="n">create_model</span><span class="p">,</span>
     <span class="n">create_runner</span><span class="p">,</span>
-    <span class="n">state_dict_from_checkpoint</span><span class="p">,</span>
+    <span class="n">load_model</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">compressai_trainer.runners.image_compression</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">RD_PLOT_DESCRIPTIONS</span><span class="p">,</span>
-    <span class="n">RD_PLOT_METRICS</span><span class="p">,</span>
-    <span class="n">RD_PLOT_SETTINGS_COMMON</span><span class="p">,</span>
-    <span class="n">RD_PLOT_TITLE</span><span class="p">,</span>
-    <span class="n">RdFigureLogger</span><span class="p">,</span>
-<span class="p">)</span>
-<span class="kn">from</span> <span class="nn">compressai_trainer.typing</span> <span class="kn">import</span> <span class="n">TModel</span><span class="p">,</span> <span class="n">TRunner</span>
-<span class="kn">from</span> <span class="nn">compressai_trainer.utils.metrics</span> <span class="kn">import</span> <span class="n">compute_metrics</span><span class="p">,</span> <span class="n">db</span>
-<span class="kn">from</span> <span class="nn">compressai_trainer.utils.utils</span> <span class="kn">import</span> <span class="n">tensor_to_np_img</span>
+<span class="kn">from</span> <span class="nn">compressai_trainer.typing</span> <span class="kn">import</span> <span class="n">TRunner</span>
+<span class="kn">from</span> <span class="nn">compressai_trainer.utils.args</span> <span class="kn">import</span> <span class="n">iter_configs</span>
+<span class="kn">from</span> <span class="nn">compressai_trainer.utils.metrics</span> <span class="kn">import</span> <span class="n">_METRICS</span><span class="p">,</span> <span class="n">compute_metrics</span>
+<span class="kn">from</span> <span class="nn">compressai_trainer.utils.utils</span> <span class="kn">import</span> <span class="n">ld_to_dl</span><span class="p">,</span> <span class="n">tensor_to_np_img</span>
 
 <span class="n">thisdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
-<span class="n">config_path</span> <span class="o">=</span> <span class="n">thisdir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;../../conf&quot;</span><span class="p">)</span>
+<span class="n">config_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">thisdir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;../../conf&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">())</span>
+
+<span class="n">DEFAULT_MODEL_SOURCE</span> <span class="o">=</span> <span class="s2">&quot;config&quot;</span>
+<span class="n">DEFAULT_PATHS_MODEL_CHECKPOINT</span> <span class="o">=</span> <span class="s2">&quot;$</span><span class="si">{paths.checkpoints}</span><span class="s2">/runner.last.pth&quot;</span>
+<span class="n">DEFAULT_PATHS_OUTPUT_DIR_ROOT</span> <span class="o">=</span> <span class="s2">&quot;outputs&quot;</span>
 
 
 <div class="viewcode-block" id="setup"><a class="viewcode-back" href="../../../compressai_trainer/run.html#compressai_trainer.run.eval_model.setup">[docs]</a><span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="n">conf</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TRunner</span><span class="p">:</span>
@@ -394,89 +428,13 @@ document.write(`
     <span class="k">return</span> <span class="n">runner</span></div>
 
 
-<div class="viewcode-block" id="load_model"><a class="viewcode-back" href="../../../compressai_trainer/run.html#compressai_trainer.run.eval_model.load_model">[docs]</a><span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="n">conf</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TModel</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load a model from one of various sources.</span>
+<span class="k">def</span> <span class="nf">_get_filenames</span><span class="p">(</span><span class="n">runner</span><span class="p">,</span> <span class="n">num_files</span><span class="p">):</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">loaders</span><span class="p">[</span><span class="s2">&quot;infer&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dataset</span>
 
-<span class="sd">    The source is determined by setting the config setting</span>
-<span class="sd">    ``model.source`` to one of the following:</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;ImageFolder&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">stem</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">samples</span><span class="p">]</span>
 
-<span class="sd">    - &quot;config&quot;:</span>
-<span class="sd">        Uses CompressAI Trainer standard config.</span>
-<span class="sd">        (e.g. ``hp``, ``paths.model_checkpoint``, etc.)</span>
-
-<span class="sd">    - &quot;from_state_dict&quot;:</span>
-<span class="sd">        Uses model&#39;s ``from_state_dict()`` factory method.</span>
-<span class="sd">        Requires ``model.name`` and ``paths.model_checkpoint`` to be set.</span>
-<span class="sd">        For example:</span>
-
-<span class="sd">        .. code-block:: yaml</span>
-
-<span class="sd">            model:</span>
-<span class="sd">              name: &quot;bmshj2018-factorized&quot;</span>
-<span class="sd">            paths:</span>
-<span class="sd">              model_checkpoint: &quot;/home/user/.cache/torch/hub/checkpoints/bmshj2018-factorized-prior-3-5c6f152b.pth.tar&quot;</span>
-
-<span class="sd">    - &quot;zoo&quot;:</span>
-<span class="sd">        Uses CompressAI&#39;s zoo of models.</span>
-<span class="sd">        Requires ``model.name``, ``model.metric``, ``model.quality``,</span>
-<span class="sd">        and ``model.pretrained`` to be set.</span>
-<span class="sd">        For example:</span>
-
-<span class="sd">        .. code-block:: yaml</span>
-
-<span class="sd">            model:</span>
-<span class="sd">              name: &quot;bmshj2018-factorized&quot;</span>
-<span class="sd">              metric: &quot;mse&quot;</span>
-<span class="sd">              quality: 3</span>
-<span class="sd">              pretrained: True</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">source</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;Please override model.source with one of &quot;</span>
-            <span class="s1">&#39;&quot;config&quot;, &quot;from_state_dict&quot;, or &quot;zoo&quot;.</span><span class="se">\n</span><span class="s1">&#39;</span>
-            <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Example: &quot;</span>
-            <span class="s1">&#39;++model.source=&quot;config&quot;&#39;</span>
-        <span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">source</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">source</span> <span class="o">==</span> <span class="s2">&quot;config&quot;</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">conf</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">model_checkpoint</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Please override paths.model_checkpoint.</span><span class="se">\n</span><span class="s2">Example: &quot;</span>
-                <span class="s2">&quot;++paths.model_checkpoint=&#39;$</span><span class="si">{paths.checkpoints}</span><span class="s2">/runner.last.pth&#39;&quot;</span>
-            <span class="p">)</span>
-        <span class="k">return</span> <span class="n">create_model</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">source</span> <span class="o">==</span> <span class="s2">&quot;from_state_dict&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">load_checkpoint_from_state_dict</span><span class="p">(</span>
-            <span class="n">conf</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-            <span class="n">conf</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">model_checkpoint</span><span class="p">,</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">conf</span><span class="o">.</span><span class="n">misc</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">source</span> <span class="o">==</span> <span class="s2">&quot;zoo&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">compressai</span><span class="o">.</span><span class="n">zoo</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">_load_model</span><span class="p">(</span>
-            <span class="n">conf</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-            <span class="n">conf</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">metric</span><span class="p">,</span>
-            <span class="n">conf</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">quality</span><span class="p">,</span>
-            <span class="n">conf</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">pretrained</span><span class="p">,</span>
-        <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">conf</span><span class="o">.</span><span class="n">misc</span><span class="o">.</span><span class="n">device</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="load_checkpoint_from_state_dict"><a class="viewcode-back" href="../../../compressai_trainer/run.html#compressai_trainer.run.eval_model.load_checkpoint_from_state_dict">[docs]</a><span class="k">def</span> <span class="nf">load_checkpoint_from_state_dict</span><span class="p">(</span><span class="n">arch</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="n">ckpt</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">checkpoint_path</span><span class="p">)</span>
-    <span class="n">state_dict</span> <span class="o">=</span> <span class="n">state_dict_from_checkpoint</span><span class="p">(</span><span class="n">ckpt</span><span class="p">)</span>
-    <span class="n">state_dict</span> <span class="o">=</span> <span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span>  <span class="c1"># for pre-trained models</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">MODELS</span><span class="p">[</span><span class="n">arch</span><span class="p">]</span><span class="o">.</span><span class="n">from_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">model</span></div>
-
-
-<div class="viewcode-block" id="get_filenames"><a class="viewcode-back" href="../../../compressai_trainer/run.html#compressai_trainer.run.eval_model.get_filenames">[docs]</a><span class="k">def</span> <span class="nf">get_filenames</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">num_files</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">conf</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">infer</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;ImageFolder&quot;</span><span class="p">:</span>
-        <span class="n">root</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">conf</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">infer</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">root</span><span class="p">)</span> <span class="o">/</span> <span class="n">conf</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">infer</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">split</span>
-        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">root</span><span class="p">))</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">root</span><span class="o">.</span><span class="n">iterdir</span><span class="p">())</span>
-
-    <span class="k">return</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;unknown_</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">06d</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_files</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span></div>
+    <span class="k">return</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;unknown_</span><span class="si">{</span><span class="n">i</span><span class="si">:</span><span class="s2">06d</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">num_files</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
 
 
 <div class="viewcode-block" id="run_eval_model"><a class="viewcode-back" href="../../../compressai_trainer/run.html#compressai_trainer.run.eval_model.run_eval_model">[docs]</a><span class="k">def</span> <span class="nf">run_eval_model</span><span class="p">(</span><span class="n">runner</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">filenames</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="n">metrics</span><span class="p">):</span>
@@ -497,7 +455,11 @@ document.write(`
         <span class="n">output</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;filename&quot;</span><span class="p">:</span> <span class="n">filename</span><span class="p">,</span>
             <span class="s2">&quot;bpp&quot;</span><span class="p">:</span> <span class="n">out_infer</span><span class="p">[</span><span class="s2">&quot;bpp&quot;</span><span class="p">],</span>
-            <span class="s2">&quot;loss&quot;</span><span class="p">:</span> <span class="n">out_criterion</span><span class="p">[</span><span class="s2">&quot;loss&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">item</span><span class="p">(),</span>
+            <span class="o">**</span><span class="p">{</span>
+                <span class="n">k</span><span class="p">:</span> <span class="n">v</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">out_criterion</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">runner</span><span class="o">.</span><span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;runner&quot;</span><span class="p">][</span><span class="s2">&quot;meters&quot;</span><span class="p">][</span><span class="s2">&quot;infer&quot;</span><span class="p">]</span>
+            <span class="p">},</span>
             <span class="o">**</span><span class="n">out_metrics</span><span class="p">,</span>
             <span class="s2">&quot;encoding_time&quot;</span><span class="p">:</span> <span class="n">out_infer</span><span class="p">[</span><span class="s2">&quot;encoding_time&quot;</span><span class="p">],</span>
             <span class="s2">&quot;decoding_time&quot;</span><span class="p">:</span> <span class="n">out_infer</span><span class="p">[</span><span class="s2">&quot;decoding_time&quot;</span><span class="p">],</span>
@@ -525,101 +487,199 @@ document.write(`
     <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">tensor_to_np_img</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">filename</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.png&quot;</span><span class="p">))</span>
 
 
-<span class="k">def</span> <span class="nf">_current_dataframe</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.4g</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="n">d</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">conf</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;epoch&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="s2">&quot;criterion.lmbda&quot;</span><span class="p">:</span> <span class="n">conf</span><span class="o">.</span><span class="n">criterion</span><span class="o">.</span><span class="n">lmbda</span><span class="p">,</span>
-        <span class="s2">&quot;loss&quot;</span><span class="p">:</span> <span class="n">r</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;results_averaged&quot;</span><span class="p">][</span><span class="s2">&quot;loss&quot;</span><span class="p">]),</span>
-        <span class="s2">&quot;bpp&quot;</span><span class="p">:</span> <span class="n">r</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;results_averaged&quot;</span><span class="p">][</span><span class="s2">&quot;bpp&quot;</span><span class="p">]),</span>
-        <span class="s2">&quot;psnr&quot;</span><span class="p">:</span> <span class="n">r</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;results_averaged&quot;</span><span class="p">][</span><span class="s2">&quot;psnr&quot;</span><span class="p">]),</span>
-        <span class="s2">&quot;ms-ssim&quot;</span><span class="p">:</span> <span class="n">r</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;results_averaged&quot;</span><span class="p">][</span><span class="s2">&quot;ms-ssim&quot;</span><span class="p">]),</span>
-        <span class="c1"># NOTE: The dB of the mean of MS-SSIM samples</span>
-        <span class="c1"># is not the same as the mean of MS-SSIM dB samples.</span>
-        <span class="s2">&quot;ms-ssim-db&quot;</span><span class="p">:</span> <span class="n">r</span><span class="p">(</span><span class="n">db</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">results</span><span class="p">[</span><span class="s2">&quot;results_averaged&quot;</span><span class="p">][</span><span class="s2">&quot;ms-ssim&quot;</span><span class="p">])),</span>
-    <span class="p">}</span>
-    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">([</span><span class="n">d</span><span class="p">])</span>
+<span class="k">def</span> <span class="nf">_plot_rd</span><span class="p">(</span><span class="n">runner</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">log_figure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">fig</span><span class="p">,</span> <span class="n">runner</span><span class="o">=</span><span class="n">runner</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">slugify</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span>
+
+        <span class="n">output_dir</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;paths&quot;</span><span class="p">][</span><span class="s2">&quot;output_dir&quot;</span><span class="p">]</span>
+        <span class="n">context_str</span> <span class="o">=</span> <span class="s2">&quot;;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">slugify</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">slugify</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">context</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">write_html</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">output_dir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">;</span><span class="si">{</span><span class="n">context_str</span><span class="si">}</span><span class="s2">.html&quot;</span><span class="p">)</span>
+
+    <span class="n">runner</span><span class="o">.</span><span class="n">log_figure</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">(</span><span class="n">log_figure</span><span class="p">,</span> <span class="n">runner</span><span class="p">)</span>
+    <span class="n">runner</span><span class="o">.</span><span class="n">_log_rd_curves</span><span class="p">()</span>
 
 
-<span class="k">def</span> <span class="nf">_current_rd_traces</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">metric</span><span class="p">):</span>
-    <span class="n">lmbda</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">criterion</span><span class="o">.</span><span class="n">lmbda</span>
-    <span class="n">num_points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;results_by_file&quot;</span><span class="p">][</span><span class="s2">&quot;bpp&quot;</span><span class="p">])</span>
-    <span class="n">samples_scatter</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Scatter</span><span class="p">(</span>
-        <span class="n">x</span><span class="o">=</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;results_by_file&quot;</span><span class="p">][</span><span class="s2">&quot;bpp&quot;</span><span class="p">],</span>
-        <span class="n">y</span><span class="o">=</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;results_by_file&quot;</span><span class="p">][</span><span class="n">metric</span><span class="p">],</span>
-        <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;markers&quot;</span><span class="p">,</span>
-        <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">conf</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">lmbda</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="n">text</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;lmbda=</span><span class="si">{</span><span class="n">lmbda</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="se">\n</span><span class="s2">sample_idx=</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_points</span><span class="p">)],</span>
-        <span class="n">visible</span><span class="o">=</span><span class="s2">&quot;legendonly&quot;</span><span class="p">,</span>
-    <span class="p">)</span>
-    <span class="k">return</span> <span class="p">[</span><span class="n">samples_scatter</span><span class="p">]</span>
+<span class="k">def</span> <span class="nf">_plot_rd_all</span><span class="p">(</span><span class="n">runner</span><span class="p">,</span> <span class="n">dfs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">log_figure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">fig</span><span class="p">,</span> <span class="n">runner</span><span class="o">=</span><span class="n">runner</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">slugify</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">s</span><span class="si">}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span>
+
+        <span class="n">output_dir</span> <span class="o">=</span> <span class="n">DEFAULT_PATHS_OUTPUT_DIR_ROOT</span>
+        <span class="n">context_str</span> <span class="o">=</span> <span class="s2">&quot;;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">slugify</span><span class="p">(</span><span class="n">k</span><span class="p">)</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="n">slugify</span><span class="p">(</span><span class="n">v</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">context</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="n">fig</span><span class="o">.</span><span class="n">write_html</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">output_dir</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">;</span><span class="si">{</span><span class="n">context_str</span><span class="si">}</span><span class="s2">.html&quot;</span><span class="p">)</span>
+
+    <span class="c1"># WARNING: This uses the latest runner&#39;s hparams, so the context_str may be unusual.</span>
+    <span class="n">runner</span><span class="o">.</span><span class="n">log_figure</span> <span class="o">=</span> <span class="n">types</span><span class="o">.</span><span class="n">MethodType</span><span class="p">(</span><span class="n">log_figure</span><span class="p">,</span> <span class="n">runner</span><span class="p">)</span>
+    <span class="n">runner</span><span class="o">.</span><span class="n">_log_rd_curves</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">dfs</span><span class="p">),</span> <span class="n">traces</span><span class="o">=</span><span class="p">[])</span>
 
 
-<span class="k">def</span> <span class="nf">_plot_rd</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">metrics</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">metric</span><span class="p">,</span> <span class="n">description</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">RD_PLOT_METRICS</span><span class="p">,</span> <span class="n">RD_PLOT_DESCRIPTIONS</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">metric</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">metrics</span><span class="p">:</span>
-            <span class="k">continue</span>
+<span class="k">def</span> <span class="nf">_results_dict</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">outputs</span><span class="p">):</span>
+    <span class="n">result_keys</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="n">result_non_avg_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;filename&quot;</span><span class="p">]</span>
+    <span class="n">result_avg_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">result_keys</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">result_non_avg_keys</span><span class="p">]</span>
 
-        <span class="n">fig</span> <span class="o">=</span> <span class="n">RdFigureLogger</span><span class="p">(</span><span class="n">runner</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
-            <span class="n">df</span><span class="o">=</span><span class="n">_current_dataframe</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">results</span><span class="p">),</span>
-            <span class="n">traces</span><span class="o">=</span><span class="n">_current_rd_traces</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">metric</span><span class="p">),</span>
-            <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
-            <span class="n">dataset</span><span class="o">=</span><span class="n">conf</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">infer</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span>
-            <span class="o">**</span><span class="n">RD_PLOT_SETTINGS_COMMON</span><span class="p">,</span>
-            <span class="n">layout_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-                <span class="n">title</span><span class="o">=</span><span class="n">RD_PLOT_TITLE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                    <span class="n">dataset</span><span class="o">=</span><span class="n">conf</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">infer</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                    <span class="n">metric</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="p">),</span>
-            <span class="n">log_figure</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="n">fig</span><span class="o">.</span><span class="n">write_html</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;rd-curves-</span><span class="si">{</span><span class="n">metric</span><span class="si">}</span><span class="s2">.html&quot;</span><span class="p">)</span>
-
-
-<div class="viewcode-block" id="write_results"><a class="viewcode-back" href="../../../compressai_trainer/run.html#compressai_trainer.run.eval_model.write_results">[docs]</a><span class="k">def</span> <span class="nf">write_results</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">metrics</span><span class="p">):</span>
-    <span class="n">result_avg_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;bpp&quot;</span><span class="p">,</span> <span class="s2">&quot;loss&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">metrics</span><span class="p">,</span> <span class="s2">&quot;encoding_time&quot;</span><span class="p">,</span> <span class="s2">&quot;decoding_time&quot;</span><span class="p">]</span>
-    <span class="n">result_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;filename&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">result_avg_keys</span><span class="p">]</span>
-    <span class="n">results</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="p">{</span>
         <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">conf</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
         <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;dataset&quot;</span><span class="p">:</span> <span class="n">conf</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">infer</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;dataset&quot;</span><span class="p">:</span> <span class="n">conf</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">infer</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="s2">&quot;env.aim.run_hash&quot;</span><span class="p">:</span> <span class="n">conf</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">aim</span><span class="o">.</span><span class="n">run_hash</span><span class="p">,</span>
+            <span class="s2">&quot;misc.device&quot;</span><span class="p">:</span> <span class="n">conf</span><span class="o">.</span><span class="n">misc</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
+            <span class="s2">&quot;model.source&quot;</span><span class="p">:</span> <span class="n">conf</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;model.name&quot;</span><span class="p">:</span> <span class="n">conf</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;model.metric&quot;</span><span class="p">:</span> <span class="n">conf</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;metric&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;model.quality&quot;</span><span class="p">:</span> <span class="n">conf</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;quality&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;criterion.lmbda&quot;</span><span class="p">:</span> <span class="n">conf</span><span class="o">.</span><span class="n">criterion</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;lmbda&quot;</span><span class="p">),</span>
+            <span class="s2">&quot;paths.model_checkpoint&quot;</span><span class="p">:</span> <span class="n">conf</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;model_checkpoint&quot;</span><span class="p">),</span>
+        <span class="p">},</span>
         <span class="s2">&quot;results_averaged&quot;</span><span class="p">:</span> <span class="p">{</span>
             <span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">out</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">])</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">result_avg_keys</span><span class="p">},</span>
         <span class="p">},</span>
-        <span class="s2">&quot;results_by_file&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;results_by_sample&quot;</span><span class="p">:</span> <span class="p">{</span>
             <span class="o">**</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">[</span><span class="n">out</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="n">out</span> <span class="ow">in</span> <span class="n">outputs</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">result_keys</span><span class="p">},</span>
         <span class="p">},</span>
     <span class="p">}</span>
 
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;results.json&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+
+<span class="k">def</span> <span class="nf">_write_results</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">conf</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">output_dir</span><span class="si">}</span><span class="s2">/results.json&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
     <span class="n">table</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="nb">list</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;results_by_file&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
-        <span class="o">*</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;results_by_file&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
+        <span class="nb">list</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;results_by_sample&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
+        <span class="o">*</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;results_by_sample&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
     <span class="p">]</span>
 
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;results.tsv&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">table</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">row</span><span class="p">),</span> <span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
-
-    <span class="n">_plot_rd</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">metrics</span><span class="p">)</span></div>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">conf</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">output_dir</span><span class="si">}</span><span class="s2">/results.tsv&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">_write_tsv</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../compressai_trainer/run.html#compressai_trainer.run.eval_model.main">[docs]</a><span class="nd">@hydra</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">version_base</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config_path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">config_path</span><span class="p">))</span>
-<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">conf</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">):</span>
-    <span class="n">runner</span> <span class="o">=</span> <span class="n">setup</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_write_results_final</span><span class="p">(</span><span class="n">results_list</span><span class="p">):</span>
+    <span class="n">meta_common</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">key</span><span class="p">:</span> <span class="n">_get_common_value</span><span class="p">(</span><span class="n">results_list</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;meta&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">results_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;meta&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">_is_common_value</span><span class="p">(</span><span class="n">results_list</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;meta&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+    <span class="p">}</span>
 
-    <span class="n">batches</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">loaders</span><span class="p">[</span><span class="s2">&quot;infer&quot;</span><span class="p">]</span>
-    <span class="n">filenames</span> <span class="o">=</span> <span class="n">get_filenames</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">batches</span><span class="p">))</span>
-    <span class="n">output_dir</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">output_dir</span>
-    <span class="n">metrics</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;psnr&quot;</span><span class="p">,</span> <span class="s2">&quot;ms-ssim&quot;</span><span class="p">]</span>
+    <span class="n">meta_noncommon</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">key</span><span class="p">:</span> <span class="p">[</span><span class="n">_get_value</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;meta&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span> <span class="k">for</span> <span class="n">results</span> <span class="ow">in</span> <span class="n">results_list</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">results_list</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;meta&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_common_value</span><span class="p">(</span><span class="n">results_list</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;meta&quot;</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+    <span class="p">}</span>
 
-    <span class="n">outputs</span> <span class="o">=</span> <span class="n">run_eval_model</span><span class="p">(</span><span class="n">runner</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">filenames</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="n">metrics</span><span class="p">)</span>
-    <span class="n">write_results</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">metrics</span><span class="p">)</span></div>
+    <span class="n">results_averaged</span> <span class="o">=</span> <span class="n">ld_to_dl</span><span class="p">(</span>
+        <span class="p">[</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;results_averaged&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">results</span> <span class="ow">in</span> <span class="n">results_list</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">_get_common_value</span><span class="p">(</span><span class="n">results_list</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,)),</span>
+        <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">_get_common_value</span><span class="p">(</span><span class="n">results_list</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;description&quot;</span><span class="p">,)),</span>
+        <span class="s2">&quot;meta&quot;</span><span class="p">:</span> <span class="n">meta_common</span><span class="p">,</span>
+        <span class="s2">&quot;meta_&quot;</span><span class="p">:</span> <span class="n">meta_noncommon</span><span class="p">,</span>
+        <span class="s2">&quot;results&quot;</span><span class="p">:</span> <span class="n">results_averaged</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DEFAULT_PATHS_OUTPUT_DIR_ROOT</span><span class="si">}</span><span class="s2">/results.json&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_write_tsv</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">file</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">row</span><span class="p">),</span> <span class="n">file</span><span class="o">=</span><span class="n">file</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_is_common_value</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">_get_value</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="n">_get_value</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span> <span class="o">==</span> <span class="n">value</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_get_common_value</span><span class="p">(</span><span class="n">ds</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+    <span class="n">value</span> <span class="o">=</span> <span class="n">_get_value</span><span class="p">(</span><span class="n">ds</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">path</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">all</span><span class="p">(</span><span class="n">_get_value</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span> <span class="o">==</span> <span class="n">value</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">ds</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">value</span>
+
+
+<span class="k">def</span> <span class="nf">_get_value</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">d</span>
+
+
+<span class="k">def</span> <span class="nf">_prepare_conf</span><span class="p">(</span><span class="n">conf</span><span class="p">):</span>
+    <span class="k">if</span> <span class="s2">&quot;source&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;model&quot;</span><span class="p">,</span> <span class="p">{}):</span>
+        <span class="k">with</span> <span class="n">open_dict</span><span class="p">(</span><span class="n">conf</span><span class="p">):</span>
+            <span class="n">conf</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">DEFAULT_MODEL_SOURCE</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">conf</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">source</span> <span class="o">==</span> <span class="s2">&quot;config&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+        <span class="n">conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;paths&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;model_checkpoint&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span>
+    <span class="p">):</span>
+        <span class="k">with</span> <span class="n">open_dict</span><span class="p">(</span><span class="n">conf</span><span class="p">):</span>
+            <span class="n">conf</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">model_checkpoint</span> <span class="o">=</span> <span class="n">DEFAULT_PATHS_MODEL_CHECKPOINT</span>
+
+    <span class="k">if</span> <span class="s2">&quot;output_dir&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">conf</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;paths&quot;</span><span class="p">,</span> <span class="p">{}):</span>
+        <span class="k">with</span> <span class="n">open_dict</span><span class="p">(</span><span class="n">conf</span><span class="p">):</span>
+            <span class="n">conf</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">output_dir</span> <span class="o">=</span> <span class="n">_get_output_dir</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_get_output_dir</span><span class="p">(</span><span class="n">conf</span><span class="p">):</span>
+    <span class="n">source</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">source</span>
+    <span class="k">if</span> <span class="n">conf</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;output_dir&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">conf</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">output_dir</span>
+    <span class="k">if</span> <span class="n">source</span> <span class="o">==</span> <span class="s2">&quot;config&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DEFAULT_PATHS_OUTPUT_DIR_ROOT</span><span class="si">}</span><span class="s2">/&quot;</span>
+            <span class="s2">&quot;$</span><span class="si">{model.source}</span><span class="s2">-$</span><span class="si">{env.aim.run_hash}</span><span class="s2">-$</span><span class="si">{model.name}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">source</span> <span class="o">==</span> <span class="s2">&quot;from_state_dict&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DEFAULT_PATHS_OUTPUT_DIR_ROOT</span><span class="si">}</span><span class="s2">/&quot;</span>
+            <span class="s2">&quot;$</span><span class="si">{model.name}</span><span class="s2">-&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">Path</span><span class="p">(</span><span class="n">conf</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">model_checkpoint</span><span class="p">)</span><span class="o">.</span><span class="n">stem</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">source</span> <span class="o">==</span> <span class="s2">&quot;zoo&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">DEFAULT_PATHS_OUTPUT_DIR_ROOT</span><span class="si">}</span><span class="s2">/&quot;</span>
+            <span class="s2">&quot;$</span><span class="si">{model.source}</span><span class="s2">-$</span><span class="si">{model.name}</span><span class="s2">-$</span><span class="si">{model.metric}</span><span class="s2">-$</span><span class="si">{model.quality}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown model.source: </span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../compressai_trainer/run.html#compressai_trainer.run.eval_model.main">[docs]</a><span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="n">results_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">dfs</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">argv</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="c1"># Prepend default overrides.</span>
+        <span class="s2">&quot;++misc.cudnn.deterministic=True&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;++paths.checkpoint=null&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;++paths.model_checkpoint=null&quot;</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+    <span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">conf</span> <span class="ow">in</span> <span class="n">iter_configs</span><span class="p">(</span><span class="n">argv</span><span class="o">=</span><span class="n">argv</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">thisdir</span><span class="p">):</span>
+        <span class="n">_prepare_conf</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
+        <span class="n">runner</span> <span class="o">=</span> <span class="n">setup</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
+
+        <span class="n">batches</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">loaders</span><span class="p">[</span><span class="s2">&quot;infer&quot;</span><span class="p">]</span>
+        <span class="n">filenames</span> <span class="o">=</span> <span class="n">_get_filenames</span><span class="p">(</span><span class="n">runner</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">batches</span><span class="p">))</span>
+        <span class="n">output_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">conf</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">output_dir</span><span class="p">)</span>
+        <span class="n">metrics</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">conf</span><span class="o">.</span><span class="n">runner</span><span class="o">.</span><span class="n">meters</span><span class="o">.</span><span class="n">infer</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">_METRICS</span><span class="p">]</span>
+
+        <span class="n">outputs</span> <span class="o">=</span> <span class="n">run_eval_model</span><span class="p">(</span><span class="n">runner</span><span class="p">,</span> <span class="n">batches</span><span class="p">,</span> <span class="n">filenames</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="n">metrics</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">_results_dict</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span>
+        <span class="n">results_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+        <span class="n">_write_results</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
+
+        <span class="n">runner</span><span class="o">.</span><span class="n">epoch_step</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">runner</span><span class="o">.</span><span class="n">loader_metrics</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s2">&quot;results_averaged&quot;</span><span class="p">]</span>
+        <span class="n">runner</span><span class="o">.</span><span class="n">_loader_metrics</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s2">&quot;results_by_sample&quot;</span><span class="p">]</span>
+        <span class="n">dfs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">runner</span><span class="o">.</span><span class="n">_current_dataframe</span><span class="p">)</span>
+
+        <span class="n">_plot_rd</span><span class="p">(</span><span class="n">runner</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
+
+    <span class="n">_write_results_final</span><span class="p">(</span><span class="n">results_list</span><span class="p">)</span>
+    <span class="n">_plot_rd_all</span><span class="p">(</span><span class="n">runner</span><span class="p">,</span> <span class="n">dfs</span><span class="p">)</span></div>
 
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>

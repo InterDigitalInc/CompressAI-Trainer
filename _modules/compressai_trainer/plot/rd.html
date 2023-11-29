@@ -283,6 +283,7 @@ document.write(`
 
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">annotations</span>
 
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">suppress</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
@@ -294,6 +295,15 @@ document.write(`
     <span class="n">color</span><span class="o">=</span><span class="s2">&quot;name&quot;</span><span class="p">,</span>
     <span class="n">hover_data</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;psnr&quot;</span><span class="p">,</span> <span class="s2">&quot;ms-ssim&quot;</span><span class="p">,</span> <span class="s2">&quot;epoch&quot;</span><span class="p">],</span>
 <span class="p">)</span>
+
+<span class="k">with</span> <span class="n">suppress</span><span class="p">(</span><span class="ne">ImportError</span><span class="p">):</span>
+    <span class="kn">import</span> <span class="nn">plotly.express</span> <span class="k">as</span> <span class="nn">px</span>
+
+    <span class="n">_PLOT_RD_SCATTER_SETTINGS_COMMON</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+        <span class="nb">dict</span><span class="p">(</span>
+            <span class="n">color_discrete_sequence</span><span class="o">=</span><span class="n">px</span><span class="o">.</span><span class="n">colors</span><span class="o">.</span><span class="n">qualitative</span><span class="o">.</span><span class="n">Prism</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
 
 <span class="n">_PLOT_RD_LAYOUT_SETTINGS_COMMON</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
     <span class="n">xaxis_title</span><span class="o">=</span><span class="s2">&quot;Bit-rate [bpp]&quot;</span><span class="p">,</span>
@@ -352,6 +362,14 @@ document.write(`
     <span class="n">fig</span> <span class="o">=</span> <span class="n">make_subplots</span><span class="p">()</span>
     <span class="n">fig</span> <span class="o">=</span> <span class="n">px</span><span class="o">.</span><span class="n">line</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="o">**</span><span class="n">scatter_kwargs</span><span class="p">,</span> <span class="n">markers</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="o">**</span><span class="n">layout_kwargs</span><span class="p">)</span>
+
+    <span class="c1"># Highlight important traces.</span>
+    <span class="k">for</span> <span class="n">trace</span> <span class="ow">in</span> <span class="n">fig</span><span class="o">.</span><span class="n">data</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">trace</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="n">trace</span><span class="o">.</span><span class="n">marker</span><span class="o">.</span><span class="n">symbol</span> <span class="o">=</span> <span class="s2">&quot;star&quot;</span>
+        <span class="n">trace</span><span class="o">.</span><span class="n">marker</span><span class="o">.</span><span class="n">size</span> <span class="o">=</span> <span class="mi">10</span>
+
     <span class="k">return</span> <span class="n">fig</span></div>
 </pre></div>
 

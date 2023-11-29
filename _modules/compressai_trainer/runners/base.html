@@ -287,18 +287,15 @@ document.write(`
 <span class="kn">from</span> <span class="nn">types</span> <span class="kn">import</span> <span class="n">ModuleType</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">cast</span>
 
-<span class="kn">import</span> <span class="nn">compressai</span>
 <span class="kn">import</span> <span class="nn">yaml</span>
 <span class="kn">from</span> <span class="nn">catalyst</span> <span class="kn">import</span> <span class="n">dl</span><span class="p">,</span> <span class="n">metrics</span>
 <span class="kn">from</span> <span class="nn">catalyst.typing</span> <span class="kn">import</span> <span class="n">TorchCriterion</span><span class="p">,</span> <span class="n">TorchOptimizer</span>
 <span class="kn">from</span> <span class="nn">compressai.models.base</span> <span class="kn">import</span> <span class="n">CompressionModel</span>
 <span class="kn">from</span> <span class="nn">torch.nn.parallel</span> <span class="kn">import</span> <span class="n">DataParallel</span><span class="p">,</span> <span class="n">DistributedDataParallel</span>
 
-<span class="kn">import</span> <span class="nn">compressai_trainer</span>
+<span class="kn">from</span> <span class="nn">compressai_trainer.registry</span> <span class="kn">import</span> <span class="n">GIT_PACKAGES</span>
 <span class="kn">from</span> <span class="nn">compressai_trainer.utils.catalyst.loggers</span> <span class="kn">import</span> <span class="n">AllSuperlogger</span>
 <span class="kn">from</span> <span class="nn">compressai_trainer.utils.utils</span> <span class="kn">import</span> <span class="n">num_parameters</span>
-
-<span class="n">PACKAGES</span> <span class="o">=</span> <span class="p">[</span><span class="n">compressai</span><span class="p">,</span> <span class="n">compressai_trainer</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="BaseRunner"><a class="viewcode-back" href="../../../compressai_trainer/runners.html#compressai_trainer.runners.BaseRunner">[docs]</a><span class="k">class</span> <span class="nc">BaseRunner</span><span class="p">(</span><span class="n">dl</span><span class="o">.</span><span class="n">Runner</span><span class="p">,</span> <span class="n">AllSuperlogger</span><span class="p">):</span>
@@ -328,7 +325,7 @@ document.write(`
 <div class="viewcode-block" id="BaseRunner.on_experiment_start"><a class="viewcode-back" href="../../../compressai_trainer/runners.html#compressai_trainer.runners.BaseRunner.on_experiment_start">[docs]</a>    <span class="k">def</span> <span class="nf">on_experiment_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">runner</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">on_experiment_start</span><span class="p">(</span><span class="n">runner</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_log_config</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">package</span> <span class="ow">in</span> <span class="n">PACKAGES</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">package</span> <span class="ow">in</span> <span class="n">GIT_PACKAGES</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_log_git_diff</span><span class="p">(</span><span class="n">package</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_log_pip</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_log_model_info</span><span class="p">()</span></div>

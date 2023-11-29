@@ -299,19 +299,19 @@ document.write(`
 
 <span class="kn">from</span> <span class="nn">compressai_trainer.plot</span> <span class="kn">import</span> <span class="n">plot_rd</span>
 <span class="kn">from</span> <span class="nn">compressai_trainer.utils.aim.query</span> <span class="kn">import</span> <span class="n">get_runs_dataframe</span><span class="p">,</span> <span class="n">run_hashes_by_query</span>
-<span class="kn">from</span> <span class="nn">compressai_trainer.utils.compressai.results</span> <span class="kn">import</span> <span class="n">compressai_dataframe</span>
+<span class="kn">from</span> <span class="nn">compressai_trainer.utils.compressai.results</span> <span class="kn">import</span> <span class="n">compressai_results_dataframe</span>
 <span class="kn">from</span> <span class="nn">compressai_trainer.utils.optimal</span> <span class="kn">import</span> <span class="n">optimal_dataframe</span>
 <span class="kn">from</span> <span class="nn">compressai_trainer.utils.utils</span> <span class="kn">import</span> <span class="n">format_dataframe</span>
-
-<span class="n">DATASET</span> <span class="o">=</span> <span class="s2">&quot;image/kodak&quot;</span>
 
 <span class="n">TITLE</span> <span class="o">=</span> <span class="s2">&quot;Performance evaluation on Kodak - PSNR (RGB)&quot;</span>
 
 <span class="n">COMPRESSAI_CODECS</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s2">&quot;bmshj2018-factorized&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;bmshj2018-hyperprior&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;mbt2018&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;cheng2020-anchor&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;image/kodak/compressai-bmshj2018-factorized_mse_cuda.json&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;image/kodak/compressai-bmshj2018-hyperprior_mse_cuda.json&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;image/kodak/compressai-mbt2018-mean_mse_cuda.json&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;image/kodak/compressai-mbt2018_mse_cuda.json&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;image/kodak/compressai-cheng2020-anchor_mse_cuda.json&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;image/kodak/vtm.json&quot;</span><span class="p">,</span>
 <span class="p">]</span>
 
 <span class="n">HOVER_HPARAMS</span> <span class="o">=</span> <span class="p">[</span>
@@ -334,7 +334,7 @@ document.write(`
 
 
 <span class="k">def</span> <span class="nf">_reference_dataframes</span><span class="p">():</span>
-    <span class="k">return</span> <span class="p">[</span><span class="n">compressai_dataframe</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">dataset</span><span class="o">=</span><span class="n">DATASET</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">COMPRESSAI_CODECS</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">compressai_results_dataframe</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">COMPRESSAI_CODECS</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="create_dataframe"><a class="viewcode-back" href="../../../compressai_trainer/run.html#compressai_trainer.run.plot_rd.create_dataframe">[docs]</a><span class="k">def</span> <span class="nf">create_dataframe</span><span class="p">(</span><span class="n">repo</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
@@ -409,8 +409,11 @@ document.write(`
         <span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span></div>
 
 
+<div class="viewcode-block" id="wrap"><a class="viewcode-back" href="../../../compressai_trainer/run.html#compressai_trainer.run.plot_rd.wrap">[docs]</a><span class="k">def</span> <span class="nf">wrap</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">textwrap</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">splitlines</span><span class="p">())</span></div>
+
+
 <div class="viewcode-block" id="build_args"><a class="viewcode-back" href="../../../compressai_trainer/run.html#compressai_trainer.run.plot_rd.build_args">[docs]</a><span class="k">def</span> <span class="nf">build_args</span><span class="p">(</span><span class="n">argv</span><span class="p">):</span>
-    <span class="n">wrap</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">textwrap</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">splitlines</span><span class="p">())</span>
     <span class="n">help</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;description&quot;</span><span class="p">:</span> <span class="n">wrap</span><span class="p">(</span>
             <span class="s2">&quot;Plot.</span><span class="se">\n</span><span class="s2">&quot;</span>

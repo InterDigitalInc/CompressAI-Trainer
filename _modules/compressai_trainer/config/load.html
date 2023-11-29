@@ -295,9 +295,12 @@ document.write(`
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">Tensor</span>
 
 <span class="kn">import</span> <span class="nn">compressai_trainer</span>
-<span class="kn">from</span> <span class="nn">compressai_trainer.config</span> <span class="kn">import</span> <span class="n">outputs</span>
-<span class="kn">from</span> <span class="nn">compressai_trainer.config.config</span> <span class="kn">import</span> <span class="n">create_model</span>
+<span class="kn">from</span> <span class="nn">compressai_trainer.registry</span> <span class="kn">import</span> <span class="n">MODELS</span>
+<span class="kn">from</span> <span class="nn">compressai_trainer.typing</span> <span class="kn">import</span> <span class="n">TModel</span>
 <span class="kn">from</span> <span class="nn">compressai_trainer.utils</span> <span class="kn">import</span> <span class="n">git</span>
+
+<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">outputs</span>
+<span class="kn">from</span> <span class="nn">.config</span> <span class="kn">import</span> <span class="n">create_model</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">torch.nn</span> <span class="k">as</span> <span class="nn">nn</span>
@@ -338,6 +341,85 @@ document.write(`
     <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">model</span></div>
+
+
+<div class="viewcode-block" id="load_model"><a class="viewcode-back" href="../../../compressai_trainer/config.html#compressai_trainer.config.load.load_model">[docs]</a><span class="k">def</span> <span class="nf">load_model</span><span class="p">(</span><span class="n">conf</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">TModel</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Load a model from one of various sources.</span>
+
+<span class="sd">    The source is determined by setting the config setting</span>
+<span class="sd">    ``model.source`` to one of the following:</span>
+
+<span class="sd">    - &quot;config&quot;:</span>
+<span class="sd">        Uses CompressAI Trainer standard config.</span>
+<span class="sd">        (e.g. ``hp``, ``paths.model_checkpoint``, etc.)</span>
+
+<span class="sd">    - &quot;from_state_dict&quot;:</span>
+<span class="sd">        Uses model&#39;s ``from_state_dict()`` factory method.</span>
+<span class="sd">        Requires ``model.name`` and ``paths.model_checkpoint`` to be set.</span>
+<span class="sd">        For example:</span>
+
+<span class="sd">        .. code-block:: yaml</span>
+
+<span class="sd">            model:</span>
+<span class="sd">              name: &quot;bmshj2018-factorized&quot;</span>
+<span class="sd">            paths:</span>
+<span class="sd">              model_checkpoint: &quot;/home/user/.cache/torch/hub/checkpoints/bmshj2018-factorized-prior-3-5c6f152b.pth.tar&quot;</span>
+
+<span class="sd">    - &quot;zoo&quot;:</span>
+<span class="sd">        Uses CompressAI&#39;s zoo of models.</span>
+<span class="sd">        Requires ``model.name``, ``model.metric``, ``model.quality``,</span>
+<span class="sd">        and ``model.pretrained`` to be set.</span>
+<span class="sd">        For example:</span>
+
+<span class="sd">        .. code-block:: yaml</span>
+
+<span class="sd">            model:</span>
+<span class="sd">              name: &quot;bmshj2018-factorized&quot;</span>
+<span class="sd">              metric: &quot;mse&quot;</span>
+<span class="sd">              quality: 3</span>
+<span class="sd">              pretrained: True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">source</span> <span class="o">=</span> <span class="n">conf</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;source&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">source</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;Please override model.source with one of &quot;</span>
+            <span class="s1">&#39;&quot;config&quot;, &quot;from_state_dict&quot;, or &quot;zoo&quot;.</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Example: &quot;</span>
+            <span class="s1">&#39;++model.source=&quot;config&quot;&#39;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">source</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">source</span> <span class="o">==</span> <span class="s2">&quot;config&quot;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">conf</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">model_checkpoint</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Please override paths.model_checkpoint.</span><span class="se">\n</span><span class="s2">Example: &quot;</span>
+                <span class="s2">&quot;++paths.model_checkpoint=&#39;$</span><span class="si">{paths.checkpoints}</span><span class="s2">/runner.last.pth&#39;&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">create_model</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">source</span> <span class="o">==</span> <span class="s2">&quot;from_state_dict&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_load_checkpoint_from_state_dict</span><span class="p">(</span>
+            <span class="n">conf</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">conf</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">model_checkpoint</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">conf</span><span class="o">.</span><span class="n">misc</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">source</span> <span class="o">==</span> <span class="s2">&quot;zoo&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">compressai</span><span class="o">.</span><span class="n">zoo</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">_load_model</span><span class="p">(</span>
+            <span class="n">conf</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">conf</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">metric</span><span class="p">,</span>
+            <span class="n">conf</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">quality</span><span class="p">,</span>
+            <span class="n">conf</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">pretrained</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">conf</span><span class="o">.</span><span class="n">misc</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
+
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown model.source: </span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_load_checkpoint_from_state_dict</span><span class="p">(</span><span class="n">arch</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">checkpoint_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="n">ckpt</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">checkpoint_path</span><span class="p">)</span>
+    <span class="n">state_dict</span> <span class="o">=</span> <span class="n">state_dict_from_checkpoint</span><span class="p">(</span><span class="n">ckpt</span><span class="p">)</span>
+    <span class="n">state_dict</span> <span class="o">=</span> <span class="n">compressai</span><span class="o">.</span><span class="n">zoo</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span>  <span class="c1"># for pre-trained models</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">MODELS</span><span class="p">[</span><span class="n">arch</span><span class="p">]</span><span class="o">.</span><span class="n">from_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model</span>
 
 
 <div class="viewcode-block" id="get_checkpoint_path"><a class="viewcode-back" href="../../../compressai_trainer/config.html#compressai_trainer.config.load.get_checkpoint_path">[docs]</a><span class="k">def</span> <span class="nf">get_checkpoint_path</span><span class="p">(</span><span class="n">conf</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">epoch</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;best&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>

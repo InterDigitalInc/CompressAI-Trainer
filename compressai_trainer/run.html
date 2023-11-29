@@ -350,7 +350,7 @@ document.write(`
 
 <dl class="py function">
 <dt class="sig sig-object py" id="compressai_trainer.run.train.setup">
-<span class="sig-prename descclassname"><span class="pre">compressai_trainer.run.train.</span></span><span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">omegaconf.dictconfig.DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.11)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://catalyst-team.github.io/catalyst/api/runners.html#catalyst.runners.runner.Runner" title="(in Catalyst v22.04)"><span class="pre">catalyst.runners.runner.Runner</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.11)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.11)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/compressai_trainer/run/train.html#setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.run.train.setup" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">compressai_trainer.run.train.</span></span><span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">omegaconf.dictconfig.DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.12)"><span class="pre">tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://catalyst-team.github.io/catalyst/api/runners.html#catalyst.runners.runner.Runner" title="(in Catalyst v22.04)"><span class="pre">catalyst.runners.runner.Runner</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.12)"><span class="pre">dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.12)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/compressai_trainer/run/train.html#setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.run.train.setup" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 </section>
@@ -361,17 +361,54 @@ document.write(`
 Saves bitstreams and reconstructed images to <code class="docutils literal notranslate"><span class="pre">paths.output_dir</span></code>.
 Computes metrics and saves per-file results and averaged results to
 JSON and TSV files.</p>
-<p>To evaluate a model trained using CompressAI Trainer:</p>
+<p>To evaluate models trained using CompressAI Trainer:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>compressai-eval<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--config-path<span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/data/runs/e4e6d4d5e5c59c69f3bd7be2/configs&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;config&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>++model.source<span class="o">=</span><span class="s2">&quot;config&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>++paths.output_dir<span class="o">=</span><span class="s2">&quot;outputs&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>++paths.model_checkpoint<span class="o">=</span><span class="s1">&#39;${paths.checkpoints}/runner.last.pth&#39;</span>
+<span class="w">    </span>--config-path<span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/data/runs/d4d5e5c5e4e6bd7be29c69f3/configs&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>...
 </pre></div>
 </div>
-<p>To evaluate a model from the CompressAI zoo:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>compressai-eval<span class="w"> </span>--config-name<span class="o">=</span><span class="s2">&quot;example_eval_zoo&quot;</span>
+<p>To evaluate models from the CompressAI zoo:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>compressai-eval<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.name<span class="o">=</span><span class="s2">&quot;bmshj2018-factorized&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">1</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.0018<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.name<span class="o">=</span><span class="s2">&quot;bmshj2018-factorized&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">2</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.0035<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.name<span class="o">=</span><span class="s2">&quot;bmshj2018-factorized&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">3</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.0067<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.name<span class="o">=</span><span class="s2">&quot;bmshj2018-factorized&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">4</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.0130<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.name<span class="o">=</span><span class="s2">&quot;bmshj2018-factorized&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">5</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.0250<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.name<span class="o">=</span><span class="s2">&quot;bmshj2018-factorized&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">6</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.0483<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.name<span class="o">=</span><span class="s2">&quot;bmshj2018-factorized&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">7</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.0932<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.name<span class="o">=</span><span class="s2">&quot;bmshj2018-factorized&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">8</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.1800
+</pre></div>
+</div>
+<p>The above can be written more compactly by prepending a “default” override
+<code class="docutils literal notranslate"><span class="pre">++model.name=&quot;bmshj2018-factorized&quot;</span></code> that applies to all configs:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>compressai-eval<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>++model.name<span class="o">=</span><span class="s2">&quot;bmshj2018-factorized&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">1</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.0018<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">2</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.0035<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">3</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.0067<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">4</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.0130<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">5</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.0250<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">6</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.0483<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">7</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.0932<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">8</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.1800
+</pre></div>
+</div>
+<p>By default, the following options are used, if not specified:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>--config-path<span class="o">=</span><span class="s2">&quot;conf&quot;</span>
+--config-name<span class="o">=</span><span class="s2">&quot;config&quot;</span>
+
+++model.source<span class="o">=</span><span class="s2">&quot;config&quot;</span>
+
+<span class="c1"># if model.source == &quot;config&quot;:</span>
+++paths.output_dir<span class="o">=</span><span class="s2">&quot;outputs/</span><span class="si">${</span><span class="nv">model</span><span class="p">.source</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">env</span><span class="p">.aim.run_hash</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">model</span><span class="p">.name</span><span class="si">}</span><span class="s2">&quot;</span>
+++paths.model_checkpoint<span class="o">=</span><span class="s1">&#39;${paths.checkpoints}/runner.last.pth&#39;</span>
+
+<span class="c1"># if model.source == &quot;from_state_dict&quot;:</span>
+++paths.output_dir<span class="o">=</span><span class="s2">&quot;outputs/</span><span class="si">${</span><span class="nv">model</span><span class="p">.name</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">Path</span><span class="p">(paths.model_checkpoint).stem</span><span class="si">}</span><span class="s2">&quot;</span>
+
+<span class="c1"># if model.source == &quot;zoo&quot;:</span>
+++paths.output_dir<span class="o">=</span><span class="s2">&quot;outputs/</span><span class="si">${</span><span class="nv">model</span><span class="p">.source</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">model</span><span class="p">.name</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">model</span><span class="p">.metric</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">model</span><span class="p">.quality</span><span class="si">}</span><span class="s2">&quot;</span>
 </pre></div>
 </div>
 <p>The model is evaluated on <code class="docutils literal notranslate"><span class="pre">dataset.infer</span></code>, which may be configured as follows:</p>
@@ -397,62 +434,8 @@ JSON and TSV files.</p>
 <p>To evaluate a model on a custom directory of samples, use the above
 config and override <code class="docutils literal notranslate"><span class="pre">dataset.infer.config.root</span></code>.</p>
 <dl class="py function">
-<dt class="sig sig-object py" id="compressai_trainer.run.eval_model.get_filenames">
-<span class="sig-prename descclassname"><span class="pre">compressai_trainer.run.eval_model.</span></span><span class="sig-name descname"><span class="pre">get_filenames</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_files</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compressai_trainer/run/eval_model.html#get_filenames"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.run.eval_model.get_filenames" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="compressai_trainer.run.eval_model.load_checkpoint_from_state_dict">
-<span class="sig-prename descclassname"><span class="pre">compressai_trainer.run.eval_model.</span></span><span class="sig-name descname"><span class="pre">load_checkpoint_from_state_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arch</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpoint_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compressai_trainer/run/eval_model.html#load_checkpoint_from_state_dict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.run.eval_model.load_checkpoint_from_state_dict" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="compressai_trainer.run.eval_model.load_model">
-<span class="sig-prename descclassname"><span class="pre">compressai_trainer.run.eval_model.</span></span><span class="sig-name descname"><span class="pre">load_model</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">omegaconf.dictconfig.DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://pytorch.org/docs/stable/generated/torch.nn.Module.html#torch.nn.Module" title="(in PyTorch v2.0)"><span class="pre">torch.nn.modules.module.Module</span></a></span></span><a class="reference internal" href="../_modules/compressai_trainer/run/eval_model.html#load_model"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.run.eval_model.load_model" title="Permalink to this definition">#</a></dt>
-<dd><p>Load a model from one of various sources.</p>
-<p>The source is determined by setting the config setting
-<code class="docutils literal notranslate"><span class="pre">model.source</span></code> to one of the following:</p>
-<ul>
-<li><dl class="simple">
-<dt>“config”:</dt><dd><p>Uses CompressAI Trainer standard config.
-(e.g. <code class="docutils literal notranslate"><span class="pre">hp</span></code>, <code class="docutils literal notranslate"><span class="pre">paths.model_checkpoint</span></code>, etc.)</p>
-</dd>
-</dl>
-</li>
-<li><dl>
-<dt>“from_state_dict”:</dt><dd><p>Uses model’s <code class="docutils literal notranslate"><span class="pre">from_state_dict()</span></code> factory method.
-Requires <code class="docutils literal notranslate"><span class="pre">model.name</span></code> and <code class="docutils literal notranslate"><span class="pre">paths.model_checkpoint</span></code> to be set.
-For example:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">model</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;bmshj2018-factorized&quot;</span>
-<span class="nt">paths</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">model_checkpoint</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;/home/user/.cache/torch/hub/checkpoints/bmshj2018-factorized-prior-3-5c6f152b.pth.tar&quot;</span>
-</pre></div>
-</div>
-</dd>
-</dl>
-</li>
-<li><dl>
-<dt>“zoo”:</dt><dd><p>Uses CompressAI’s zoo of models.
-Requires <code class="docutils literal notranslate"><span class="pre">model.name</span></code>, <code class="docutils literal notranslate"><span class="pre">model.metric</span></code>, <code class="docutils literal notranslate"><span class="pre">model.quality</span></code>,
-and <code class="docutils literal notranslate"><span class="pre">model.pretrained</span></code> to be set.
-For example:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">model</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;bmshj2018-factorized&quot;</span>
-<span class="w">  </span><span class="nt">metric</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;mse&quot;</span>
-<span class="w">  </span><span class="nt">quality</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
-<span class="w">  </span><span class="nt">pretrained</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">True</span>
-</pre></div>
-</div>
-</dd>
-</dl>
-</li>
-</ul>
-</dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="compressai_trainer.run.eval_model.main">
-<span class="sig-prename descclassname"><span class="pre">compressai_trainer.run.eval_model.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">omegaconf.dictconfig.DictConfig</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compressai_trainer/run/eval_model.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.run.eval_model.main" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">compressai_trainer.run.eval_model.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compressai_trainer/run/eval_model.html#main"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.run.eval_model.main" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -463,11 +446,6 @@ For example:</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="compressai_trainer.run.eval_model.setup">
 <span class="sig-prename descclassname"><span class="pre">compressai_trainer.run.eval_model.</span></span><span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conf</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">omegaconf.dictconfig.DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://catalyst-team.github.io/catalyst/api/runners.html#catalyst.runners.runner.Runner" title="(in Catalyst v22.04)"><span class="pre">catalyst.runners.runner.Runner</span></a></span></span><a class="reference internal" href="../_modules/compressai_trainer/run/eval_model.html#setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.run.eval_model.setup" title="Permalink to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="compressai_trainer.run.eval_model.write_results">
-<span class="sig-prename descclassname"><span class="pre">compressai_trainer.run.eval_model.</span></span><span class="sig-name descname"><span class="pre">write_results</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">conf</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">outputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metrics</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compressai_trainer/run/eval_model.html#write_results"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.run.eval_model.write_results" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 </section>
@@ -492,7 +470,12 @@ For example:</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="compressai_trainer.run.plot_rd.plot_dataframe">
-<span class="sig-prename descclassname"><span class="pre">compressai_trainer.run.plot_rd.</span></span><span class="sig-name descname"><span class="pre">plot_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.0.3)"><span class="pre">pandas.core.frame.DataFrame</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compressai_trainer/run/plot_rd.html#plot_dataframe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.run.plot_rd.plot_dataframe" title="Permalink to this definition">#</a></dt>
+<span class="sig-prename descclassname"><span class="pre">compressai_trainer.run.plot_rd.</span></span><span class="sig-name descname"><span class="pre">plot_dataframe</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.html#pandas.DataFrame" title="(in pandas v2.1.3)"><span class="pre">pandas.core.frame.DataFrame</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compressai_trainer/run/plot_rd.html#plot_dataframe"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.run.plot_rd.plot_dataframe" title="Permalink to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="compressai_trainer.run.plot_rd.wrap">
+<span class="sig-prename descclassname"><span class="pre">compressai_trainer.run.plot_rd.</span></span><span class="sig-name descname"><span class="pre">wrap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compressai_trainer/run/plot_rd.html#wrap"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compressai_trainer.run.plot_rd.wrap" title="Permalink to this definition">#</a></dt>
 <dd></dd></dl>
 
 </section>

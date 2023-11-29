@@ -311,7 +311,8 @@ document.write(`
 <span class="kn">from</span> <span class="nn">compressai_trainer.typing</span> <span class="kn">import</span> <span class="n">TRunner</span>
 
 <span class="n">thisdir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
-<span class="n">config_path</span> <span class="o">=</span> <span class="n">thisdir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;../../conf&quot;</span><span class="p">)</span>
+<span class="n">config_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">thisdir</span><span class="o">.</span><span class="n">joinpath</span><span class="p">(</span><span class="s2">&quot;../../conf&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">())</span>
+<span class="n">config_name</span> <span class="o">=</span> <span class="s2">&quot;config&quot;</span>
 
 
 <div class="viewcode-block" id="setup"><a class="viewcode-back" href="../../../compressai_trainer/run.html#compressai_trainer.run.train.setup">[docs]</a><span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="n">conf</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">TRunner</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
@@ -347,7 +348,7 @@ document.write(`
     <span class="n">runner</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="o">**</span><span class="n">engine_kwargs</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../compressai_trainer/run.html#compressai_trainer.run.train.main">[docs]</a><span class="nd">@hydra</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">version_base</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config_path</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">config_path</span><span class="p">))</span>
+<div class="viewcode-block" id="main"><a class="viewcode-back" href="../../../compressai_trainer/run.html#compressai_trainer.run.train.main">[docs]</a><span class="nd">@hydra</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">version_base</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">config_path</span><span class="o">=</span><span class="n">config_path</span><span class="p">,</span> <span class="n">config_name</span><span class="o">=</span><span class="n">config_name</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">conf</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">):</span>
     <span class="n">_main</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span></div>
 

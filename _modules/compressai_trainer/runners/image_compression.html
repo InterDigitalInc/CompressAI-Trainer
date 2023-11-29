@@ -294,8 +294,8 @@ document.write(`
 <span class="kn">from</span> <span class="nn">compressai.typing</span> <span class="kn">import</span> <span class="n">TCriterion</span>
 
 <span class="kn">from</span> <span class="nn">compressai_trainer.registry</span> <span class="kn">import</span> <span class="n">register_runner</span>
-<span class="kn">from</span> <span class="nn">compressai_trainer.utils.metrics</span> <span class="kn">import</span> <span class="n">compute_metrics</span><span class="p">,</span> <span class="n">db</span>
-<span class="kn">from</span> <span class="nn">compressai_trainer.utils.utils</span> <span class="kn">import</span> <span class="n">compute_padding</span>
+<span class="kn">from</span> <span class="nn">compressai_trainer.utils.metrics</span> <span class="kn">import</span> <span class="n">compute_metrics</span>
+<span class="kn">from</span> <span class="nn">compressai_trainer.utils.utils</span> <span class="kn">import</span> <span class="n">compute_padding</span><span class="p">,</span> <span class="n">flatten_values</span>
 
 <span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">BaseRunner</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="p">(</span>
@@ -305,6 +305,8 @@ document.write(`
     <span class="n">GradientClipper</span><span class="p">,</span>
     <span class="n">RdFigureLogger</span><span class="p">,</span>
 <span class="p">)</span>
+
+<span class="n">RD_PLOT_TITLE</span> <span class="o">=</span> <span class="s2">&quot;Performance evaluation on </span><span class="si">{dataset}</span><span class="s2"> - </span><span class="si">{metric}</span><span class="s2">&quot;</span>
 
 <span class="n">RD_PLOT_METRICS</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s2">&quot;psnr&quot;</span><span class="p">,</span>
@@ -318,16 +320,14 @@ document.write(`
     <span class="s2">&quot;MS-SSIM (RGB)&quot;</span><span class="p">,</span>
 <span class="p">]</span>
 
-<span class="n">RD_PLOT_TITLE</span> <span class="o">=</span> <span class="s2">&quot;Performance evaluation on </span><span class="si">{dataset}</span><span class="s2"> - </span><span class="si">{metric}</span><span class="s2">&quot;</span>
-
 <span class="n">RD_PLOT_SETTINGS_COMMON</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
     <span class="n">codecs</span><span class="o">=</span><span class="p">[</span>
-        <span class="s2">&quot;bmshj2018-factorized&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;bmshj2018-hyperprior&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;mbt2018-mean&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;mbt2018&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;cheng2020-anchor&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;vtm&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;image/kodak/compressai-bmshj2018-factorized_mse_cuda.json&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;image/kodak/compressai-bmshj2018-hyperprior_mse_cuda.json&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;image/kodak/compressai-mbt2018-mean_mse_cuda.json&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;image/kodak/compressai-mbt2018_mse_cuda.json&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;image/kodak/compressai-cheng2020-anchor_mse_cuda.json&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;image/kodak/vtm.json&quot;</span><span class="p">,</span>
     <span class="p">],</span>
     <span class="n">scatter_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
         <span class="n">hover_data</span><span class="o">=</span><span class="p">[</span>
@@ -385,18 +385,16 @@ document.write(`
         <span class="n">x</span> <span class="o">=</span> <span class="n">batch</span>
         <span class="n">out_net</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="n">out_criterion</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">(</span><span class="n">out_net</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
-        <span class="n">loss</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">loss</span><span class="p">[</span><span class="s2">&quot;net&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out_criterion</span><span class="p">[</span><span class="s2">&quot;loss&quot;</span><span class="p">]</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;net&quot;</span><span class="p">:</span> <span class="n">out_criterion</span><span class="p">[</span><span class="s2">&quot;loss&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;aux&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_module</span><span class="o">.</span><span class="n">aux_loss</span><span class="p">(),</span>
+        <span class="p">}</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loader_key</span> <span class="o">==</span> <span class="s2">&quot;train&quot;</span><span class="p">:</span>
             <span class="n">loss</span><span class="p">[</span><span class="s2">&quot;net&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+            <span class="n">loss</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_grad_clip</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s2">&quot;net&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-
-        <span class="n">loss</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_module</span><span class="o">.</span><span class="n">aux_loss</span><span class="p">()</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loader_key</span> <span class="o">==</span> <span class="s2">&quot;train&quot;</span><span class="p">:</span>
-            <span class="n">loss</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s2">&quot;net&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
@@ -412,15 +410,16 @@ document.write(`
         <span class="n">x</span> <span class="o">=</span> <span class="n">batch</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
         <span class="n">out_infer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">predict_batch</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_inference_kwargs</span><span class="p">)</span>
         <span class="n">out_net</span> <span class="o">=</span> <span class="n">out_infer</span><span class="p">[</span><span class="s2">&quot;out_net&quot;</span><span class="p">]</span>
+        <span class="n">out_dec</span> <span class="o">=</span> <span class="n">out_infer</span><span class="p">[</span><span class="s2">&quot;out_dec&quot;</span><span class="p">]</span>
 
         <span class="n">out_criterion</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">criterion</span><span class="p">(</span><span class="n">out_net</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
-        <span class="n">out_metrics</span> <span class="o">=</span> <span class="n">compute_metrics</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out_net</span><span class="p">[</span><span class="s2">&quot;x_hat&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;psnr&quot;</span><span class="p">,</span> <span class="s2">&quot;ms-ssim&quot;</span><span class="p">])</span>
+        <span class="n">out_metrics</span> <span class="o">=</span> <span class="n">compute_metrics</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">out_dec</span><span class="p">[</span><span class="s2">&quot;x_hat&quot;</span><span class="p">],</span> <span class="n">RD_PLOT_METRICS</span><span class="p">)</span>
         <span class="n">out_metrics</span><span class="p">[</span><span class="s2">&quot;bpp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out_infer</span><span class="p">[</span><span class="s2">&quot;bpp&quot;</span><span class="p">]</span>
-        <span class="n">out_metrics</span><span class="p">[</span><span class="s2">&quot;ms-ssim-db&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">db</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">out_metrics</span><span class="p">[</span><span class="s2">&quot;ms-ssim&quot;</span><span class="p">])</span>
 
-        <span class="n">loss</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">loss</span><span class="p">[</span><span class="s2">&quot;net&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out_criterion</span><span class="p">[</span><span class="s2">&quot;loss&quot;</span><span class="p">]</span>
-        <span class="n">loss</span><span class="p">[</span><span class="s2">&quot;aux&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_module</span><span class="o">.</span><span class="n">aux_loss</span><span class="p">()</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;net&quot;</span><span class="p">:</span> <span class="n">out_criterion</span><span class="p">[</span><span class="s2">&quot;loss&quot;</span><span class="p">],</span>
+            <span class="s2">&quot;aux&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_module</span><span class="o">.</span><span class="n">aux_loss</span><span class="p">(),</span>
+        <span class="p">}</span>
 
         <span class="n">batch_metrics</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;loss&quot;</span><span class="p">:</span> <span class="n">loss</span><span class="p">[</span><span class="s2">&quot;net&quot;</span><span class="p">],</span>
@@ -449,7 +448,7 @@ document.write(`
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_current_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">r</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.4g</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">x</span><span class="si">:</span><span class="s2">.6g</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>  <span class="c1"># noqa: E731</span>
         <span class="n">d</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">][</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span>
             <span class="s2">&quot;epoch&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">epoch_step</span><span class="p">,</span>
@@ -458,30 +457,46 @@ document.write(`
             <span class="s2">&quot;bpp&quot;</span><span class="p">:</span> <span class="n">r</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loader_metrics</span><span class="p">[</span><span class="s2">&quot;bpp&quot;</span><span class="p">]),</span>
             <span class="s2">&quot;psnr&quot;</span><span class="p">:</span> <span class="n">r</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loader_metrics</span><span class="p">[</span><span class="s2">&quot;psnr&quot;</span><span class="p">]),</span>
             <span class="s2">&quot;ms-ssim&quot;</span><span class="p">:</span> <span class="n">r</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loader_metrics</span><span class="p">[</span><span class="s2">&quot;ms-ssim&quot;</span><span class="p">]),</span>
-            <span class="c1"># NOTE: The dB of the mean of MS-SSIM samples</span>
-            <span class="c1"># is not the same as the mean of MS-SSIM dB samples.</span>
-            <span class="s2">&quot;ms-ssim-db&quot;</span><span class="p">:</span> <span class="n">r</span><span class="p">(</span><span class="n">db</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">loader_metrics</span><span class="p">[</span><span class="s2">&quot;ms-ssim&quot;</span><span class="p">])),</span>
+            <span class="c1"># dB of the mean of MS-SSIM samples:</span>
+            <span class="c1"># &quot;ms-ssim-db&quot;: r(db(1 - self.loader_metrics[&quot;ms-ssim&quot;])),</span>
+            <span class="c1"># Mean of MS-SSIM dB samples:</span>
+            <span class="s2">&quot;ms-ssim-db&quot;</span><span class="p">:</span> <span class="n">r</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loader_metrics</span><span class="p">[</span><span class="s2">&quot;ms-ssim-db&quot;</span><span class="p">]),</span>
         <span class="p">}</span>
-        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_dict</span><span class="p">([</span><span class="n">d</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">.</span><span class="n">from_records</span><span class="p">([</span><span class="n">d</span><span class="p">])</span>
 
-    <span class="k">def</span> <span class="nf">_log_rd_curves</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_current_traces</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metric</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rd_figure_logger</span><span class="o">.</span><span class="n">current_rd_traces</span><span class="p">(</span>
+            <span class="n">x</span><span class="o">=</span><span class="s2">&quot;bpp&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span> <span class="n">lmbda</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;criterion&quot;</span><span class="p">][</span><span class="s2">&quot;lmbda&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_log_rd_curves</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_log_rd_curves_figure</span><span class="p">(</span><span class="n">metric</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">metric</span><span class="p">,</span> <span class="n">description</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">RD_PLOT_METRICS</span><span class="p">,</span> <span class="n">RD_PLOT_DESCRIPTIONS</span><span class="p">)</span>
+        <span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_log_rd_curves_figure</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">metric</span><span class="p">,</span> <span class="n">description</span><span class="p">,</span> <span class="n">df</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">traces</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_dataframe</span>
+        <span class="k">if</span> <span class="n">traces</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">traces</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_traces</span><span class="p">(</span><span class="n">metric</span><span class="p">)</span>
         <span class="n">meta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;dataset&quot;</span><span class="p">][</span><span class="s2">&quot;infer&quot;</span><span class="p">][</span><span class="s2">&quot;meta&quot;</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">metric</span><span class="p">,</span> <span class="n">description</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">RD_PLOT_METRICS</span><span class="p">,</span> <span class="n">RD_PLOT_DESCRIPTIONS</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_rd_figure_logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
-                <span class="n">df</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_dataframe</span><span class="p">,</span>
-                <span class="n">traces</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_rd_figure_logger</span><span class="o">.</span><span class="n">current_rd_traces</span><span class="p">(</span>
-                    <span class="n">x</span><span class="o">=</span><span class="s2">&quot;bpp&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span> <span class="n">lmbda</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">hparams</span><span class="p">[</span><span class="s2">&quot;criterion&quot;</span><span class="p">][</span><span class="s2">&quot;lmbda&quot;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rd_figure_logger</span><span class="o">.</span><span class="n">log</span><span class="p">(</span>
+            <span class="n">df</span><span class="o">=</span><span class="n">df</span><span class="p">,</span>
+            <span class="n">traces</span><span class="o">=</span><span class="n">traces</span><span class="p">,</span>
+            <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
+            <span class="n">dataset</span><span class="o">=</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;identifier&quot;</span><span class="p">],</span>
+            <span class="o">**</span><span class="n">RD_PLOT_SETTINGS_COMMON</span><span class="p">,</span>
+            <span class="n">layout_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
+                <span class="n">title</span><span class="o">=</span><span class="n">RD_PLOT_TITLE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">dataset</span><span class="o">=</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span>
+                    <span class="n">metric</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
                 <span class="p">),</span>
-                <span class="n">metric</span><span class="o">=</span><span class="n">metric</span><span class="p">,</span>
-                <span class="n">dataset</span><span class="o">=</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;identifier&quot;</span><span class="p">],</span>
-                <span class="o">**</span><span class="n">RD_PLOT_SETTINGS_COMMON</span><span class="p">,</span>
-                <span class="n">layout_kwargs</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span>
-                    <span class="n">title</span><span class="o">=</span><span class="n">RD_PLOT_TITLE</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                        <span class="n">dataset</span><span class="o">=</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span>
-                        <span class="n">metric</span><span class="o">=</span><span class="n">description</span><span class="p">,</span>
-                    <span class="p">)</span>
-                <span class="p">),</span>
-            <span class="p">)</span>
+            <span class="p">),</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_handle_custom_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out_net</span><span class="p">,</span> <span class="n">out_metrics</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_loader_metrics</span><span class="p">[</span><span class="s2">&quot;chan_bpp&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">out_net</span><span class="p">)</span>
@@ -517,6 +532,7 @@ document.write(`
     <span class="c1"># Compress using forward.</span>
     <span class="n">out_net</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x_padded</span><span class="p">)</span>
     <span class="n">out_net</span><span class="p">[</span><span class="s2">&quot;x_hat&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">out_net</span><span class="p">[</span><span class="s2">&quot;x_hat&quot;</span><span class="p">],</span> <span class="n">unpad</span><span class="p">)</span>
+    <span class="n">out_net</span><span class="p">[</span><span class="s2">&quot;x_hat&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">out_net</span><span class="p">[</span><span class="s2">&quot;x_hat&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">clamp_</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
     <span class="c1"># Compress using compress/decompress.</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_compress</span><span class="p">:</span>
@@ -530,7 +546,7 @@ document.write(`
     <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_decompress</span><span class="p">:</span>
         <span class="k">assert</span> <span class="ow">not</span> <span class="n">skip_compress</span>
         <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-        <span class="n">out_dec</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="n">out_enc</span><span class="p">[</span><span class="s2">&quot;strings&quot;</span><span class="p">],</span> <span class="n">out_enc</span><span class="p">[</span><span class="s2">&quot;shape&quot;</span><span class="p">])</span>
+        <span class="n">out_dec</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">decompress</span><span class="p">(</span><span class="o">**</span><span class="n">out_enc</span><span class="p">)</span>
         <span class="n">dec_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span>
         <span class="n">out_dec</span><span class="p">[</span><span class="s2">&quot;x_hat&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">out_dec</span><span class="p">[</span><span class="s2">&quot;x_hat&quot;</span><span class="p">],</span> <span class="n">unpad</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -540,7 +556,7 @@ document.write(`
 
     <span class="c1"># Compute bpp.</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">skip_compress</span><span class="p">:</span>
-        <span class="n">num_bits</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">len</span><span class="p">,</span> <span class="n">s</span><span class="p">))</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">out_enc</span><span class="p">[</span><span class="s2">&quot;strings&quot;</span><span class="p">])</span> <span class="o">*</span> <span class="mf">8.0</span>
+        <span class="n">num_bits</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">flatten_values</span><span class="p">(</span><span class="n">out_enc</span><span class="p">[</span><span class="s2">&quot;strings&quot;</span><span class="p">],</span> <span class="nb">bytes</span><span class="p">))</span> <span class="o">*</span> <span class="mf">8.0</span>
         <span class="n">num_pixels</span> <span class="o">=</span> <span class="n">n</span> <span class="o">*</span> <span class="n">h</span> <span class="o">*</span> <span class="n">w</span>
         <span class="n">bpp</span> <span class="o">=</span> <span class="n">num_bits</span> <span class="o">/</span> <span class="n">num_pixels</span>
     <span class="k">else</span><span class="p">:</span>

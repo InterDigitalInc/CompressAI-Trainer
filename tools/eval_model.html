@@ -310,17 +310,54 @@ document.write(`
 Saves bitstreams and reconstructed images to <code class="docutils literal notranslate"><span class="pre">paths.output_dir</span></code>.
 Computes metrics and saves per-file results and averaged results to
 JSON and TSV files.</p>
-<p>To evaluate a model trained using CompressAI Trainer:</p>
+<p>To evaluate models trained using CompressAI Trainer:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>compressai-eval<span class="w"> </span><span class="se">\</span>
 <span class="w">    </span>--config-path<span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/data/runs/e4e6d4d5e5c59c69f3bd7be2/configs&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;config&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>++model.source<span class="o">=</span><span class="s2">&quot;config&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>++paths.output_dir<span class="o">=</span><span class="s2">&quot;outputs&quot;</span><span class="w"> </span><span class="se">\</span>
-<span class="w">    </span>++paths.model_checkpoint<span class="o">=</span><span class="s1">&#39;${paths.checkpoints}/runner.last.pth&#39;</span>
+<span class="w">    </span>--config-path<span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/data/runs/d4d5e5c5e4e6bd7be29c69f3/configs&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>...
 </pre></div>
 </div>
-<p>To evaluate a model from the CompressAI zoo:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>compressai-eval<span class="w"> </span>--config-name<span class="o">=</span><span class="s2">&quot;example_eval_zoo&quot;</span>
+<p>To evaluate models from the CompressAI zoo:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>compressai-eval<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.name<span class="o">=</span><span class="s2">&quot;bmshj2018-factorized&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">1</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.0018<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.name<span class="o">=</span><span class="s2">&quot;bmshj2018-factorized&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">2</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.0035<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.name<span class="o">=</span><span class="s2">&quot;bmshj2018-factorized&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">3</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.0067<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.name<span class="o">=</span><span class="s2">&quot;bmshj2018-factorized&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">4</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.0130<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.name<span class="o">=</span><span class="s2">&quot;bmshj2018-factorized&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">5</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.0250<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.name<span class="o">=</span><span class="s2">&quot;bmshj2018-factorized&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">6</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.0483<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.name<span class="o">=</span><span class="s2">&quot;bmshj2018-factorized&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">7</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.0932<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.name<span class="o">=</span><span class="s2">&quot;bmshj2018-factorized&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">8</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.1800
+</pre></div>
+</div>
+<p>The above can be written more compactly by prepending a “default” override
+<code class="docutils literal notranslate"><span class="pre">++model.name=&quot;bmshj2018-factorized&quot;</span></code> that applies to all configs:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>compressai-eval<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>++model.name<span class="o">=</span><span class="s2">&quot;bmshj2018-factorized&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">1</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.0018<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">2</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.0035<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">3</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.0067<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">4</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.0130<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">5</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.0250<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">6</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.0483<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">7</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.0932<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--config-name<span class="o">=</span><span class="s2">&quot;eval_zoo&quot;</span><span class="w"> </span>++model.quality<span class="o">=</span><span class="m">8</span><span class="w"> </span>++criterion.lmbda<span class="o">=</span><span class="m">0</span>.1800
+</pre></div>
+</div>
+<p>By default, the following options are used, if not specified:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>--config-path<span class="o">=</span><span class="s2">&quot;conf&quot;</span>
+--config-name<span class="o">=</span><span class="s2">&quot;config&quot;</span>
+
+++model.source<span class="o">=</span><span class="s2">&quot;config&quot;</span>
+
+<span class="c1"># if model.source == &quot;config&quot;:</span>
+++paths.output_dir<span class="o">=</span><span class="s2">&quot;outputs/</span><span class="si">${</span><span class="nv">model</span><span class="p">.source</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">env</span><span class="p">.aim.run_hash</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">model</span><span class="p">.name</span><span class="si">}</span><span class="s2">&quot;</span>
+++paths.model_checkpoint<span class="o">=</span><span class="s1">&#39;${paths.checkpoints}/runner.last.pth&#39;</span>
+
+<span class="c1"># if model.source == &quot;from_state_dict&quot;:</span>
+++paths.output_dir<span class="o">=</span><span class="s2">&quot;outputs/</span><span class="si">${</span><span class="nv">model</span><span class="p">.name</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">Path</span><span class="p">(paths.model_checkpoint).stem</span><span class="si">}</span><span class="s2">&quot;</span>
+
+<span class="c1"># if model.source == &quot;zoo&quot;:</span>
+++paths.output_dir<span class="o">=</span><span class="s2">&quot;outputs/</span><span class="si">${</span><span class="nv">model</span><span class="p">.source</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">model</span><span class="p">.name</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">model</span><span class="p">.metric</span><span class="si">}</span><span class="s2">-</span><span class="si">${</span><span class="nv">model</span><span class="p">.quality</span><span class="si">}</span><span class="s2">&quot;</span>
 </pre></div>
 </div>
 <p>The model is evaluated on <code class="docutils literal notranslate"><span class="pre">dataset.infer</span></code>, which may be configured as follows:</p>
